@@ -13,8 +13,7 @@ The other files contain experiments demonstrating that the SVCA initialization s
 
 ⚠️ networkx==2.6.3 to be compatible with the pysbm package
     matplotlib== 3.4.3 to be compatible with networkx to display graph 
-    compatible with python 3.9
-
+    compatible with **Python 3.9**. 
     You can reproduce the same environment with the installation instructions. 
 
 ## 📦 Installation
