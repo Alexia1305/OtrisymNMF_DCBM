@@ -11,10 +11,11 @@ The other files contain experiments demonstrating that the SVCA initialization s
 
 ## 🔧 Requirements
 
-⚠️ networkx==2.6.3 to be compatible with the pysbm package
-    matplotlib== 3.4.3 to be compatible with networkx to display graph 
-    compatible with **Python 3.9**. 
-    You can reproduce the same environment with the installation instructions. 
+⚠️To be compatible with the **pysbm** package: 
+-  networkx==2.6.3 to be compatible with the pysbm package
+-  matplotlib== 3.4.3 to be compatible with networkx to display graph 
+- compatible with **Python 3.9**. 
+You can reproduce the same environment with the installation instructions. 
 
 ## 📦 Installation
 
@@ -66,7 +67,9 @@ python LFR_benchmark.py
 python Scotland_test.py
 ```
 
-# OtrisymNMFThis package provides implementations of the **Orthogonal Symmetric Nonnegative Matrix Tri-Factorization** (OtrisymNMF) algorithm  as proposed in the paper:
+# OtrisymNMF
+
+This package provides implementations of the **Orthogonal Symmetric Nonnegative Matrix Tri-Factorization** (OtrisymNMF) algorithm  as proposed in the paper:
 
 **Dache, Alexandra, Arnaud Vandaele, and Nicolas Gillis.**  
 *"Orthogonal Symmetric Nonnegative Matrix Tri-Factorization."*  
