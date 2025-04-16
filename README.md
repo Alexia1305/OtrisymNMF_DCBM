@@ -42,7 +42,7 @@ pip install -r requirements.txt
 
 ## 🚀 Run Tests
 
-### Karate Club (Figure 3)
+### Karate Club 
 
 To run the `Karate.ipynb` notebook:
 
