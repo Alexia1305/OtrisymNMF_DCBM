@@ -89,6 +89,8 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
         if obj_value_d > obj_max_d:
             best_degree_partition = degree_corrected_partition
             obj_max_d = obj_value_d
+    if verbosity:
+        print(f"Best logP : {obj_max_d}")
     if tri==True:
         return [best_degree_partition.get_block_of_node(node) for node in sorted(G.nodes)]
     else :
