@@ -56,7 +56,7 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, i
     """
     start_time = time.time()
     if issparse(X):
-        X=X.toarray()
+        X = X.toarray()
     n = X.shape[0]
     error_best = float('inf')
 
@@ -81,7 +81,8 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, i
             for i in range(n):
                 nw[v[i]] += w[i] ** 2
             nw = np.sqrt(nw)
-            w /= nw[v]
+            # w /= nw[v]
+            w = np.where(nw[v] != 0, w / nw[v], 0)
             S = np.random.rand(r, r)
             S = (S + S.T) / 2  # Symmetric
         else:
@@ -93,7 +94,8 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, i
             for i in range(n):
                 nw[v[i]] += w[i] ** 2
             nw = np.sqrt(nw)
-            w /= nw[v]
+            # w /= nw[v]
+            w = np.where(nw[v] != 0, w / nw[v], 0)
             S = update_S(X, r, w, v)
 
         # Iterative update

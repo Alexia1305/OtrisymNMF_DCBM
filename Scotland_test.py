@@ -54,7 +54,7 @@ def main(graph, clusters):
 
         # KL_EM
         EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=10,
-                             init_method="random", tri=False)
+                             init_method="random", tri=False, verbosity=0)
         NMI = normalized_mutual_info_score(clusters, EM_partition)
         results["KL_EM"]["NMI"].append(NMI)
 
@@ -67,7 +67,7 @@ def main(graph, clusters):
         # KL_EM initialized by SVCA
 
         EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference,
-                             numTrials=10, init_method="SVCA", tri=False)
+                             numTrials=5, init_method="SVCA", tri=False, verbosity=0)
         NMI = normalized_mutual_info_score(clusters, EM_partition)
         results["KL_EM_SVCA"]["NMI"].append(NMI)
 
