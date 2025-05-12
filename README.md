@@ -1,12 +1,16 @@
-# Degree-Corrected Block Model: A New Approach and Efficient Initialization for Inference
+# A Matrix Factorization Framework for Community Detection under the Degree-Corrected Block Model with Efficient Initialization for Inference
 
 We use **OtrisymNMF** as a **degree corrected block model (DCBM)** to detect communities in several benchmark networks, including the LFR benchmark. 
 We also demonstrate that our initialization, based on separable NMF, significantly improves the results of classical inference methods for the **DCBM of Karrer and Newman**.
 
 All the tools for OtrisymNMF are available in the Python package **OtrisymNMF**. For Karrer and Newman's DCBM and inference methods, we used the **pysbm** package.
-The Karate notebook compares the use of OtrisymNMF and Karrer and Newman's DCBM on the **Karate Club network**.
-The other files contain experiments demonstrating that the SVCA initialization significantly improves the results of inference methods.
+The provided notebooks compare the performance of **OtrisymNMF** and **Karrer and Newman's DCBM** on three real-world networks:
+- the **Karate Club network**,
+- the **Political Blog network**, and
+- the **Southern Women network**.
 
+Additional experiment files demonstrate that the **SVCA initialization** significantly improves the performance of inference methods on various benchmark graphs, including the **LFR benchmark**, and the **Scotland Interlock network**.
+  
 # Reproduce the results
 
 ## 🔧 Requirements
@@ -55,6 +59,19 @@ jupyter notebook
 
 3. Open the `Karate.ipynb` file from the interface and execute the cells.
 
+### Political blog
+
+run the `Polblogs.ipynb` notebook
+
+To test SVCA initialization, run:
+```bash
+python Polblogs_test_init.py
+```
+
+### Southern women
+
+run the `Southern_women.ipynb` notebook
+
 ### LFR Graphs Tests
 
 Run the script and select the desired value for $mu.
@@ -69,12 +86,7 @@ python Scotland_test.py
 
 # OtrisymNMF
 
-This package provides implementations of the **Orthogonal Symmetric Nonnegative Matrix Tri-Factorization** (OtrisymNMF) algorithm  as proposed in the paper:
-
-**Dache, Alexandra, Arnaud Vandaele, and Nicolas Gillis.**  
-*"Orthogonal Symmetric Nonnegative Matrix Tri-Factorization."*  
-IEEE International Workshop on Machine Learning for Signal Processing (MLSP), 2024.  
-Institute of Electrical and Electronics Engineers (IEEE), United States.
+This package provides implementations of the **Orthogonal Symmetric Nonnegative Matrix Tri-Factorization** (OtrisymNMF) algorithm.
 
 The algorithm aims to solve the following optimization problem:
 
