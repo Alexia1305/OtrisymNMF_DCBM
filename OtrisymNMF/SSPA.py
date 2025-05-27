@@ -154,7 +154,7 @@ def SVCA(X,r,p,options=None):
 
         # Calcul des vecteurs singuliers
     U, S, Vt = svds(X, k=r)  # U contient les premiers r vecteurs singuliers de X
-    # On peut utiliser des algorithmes plus rapides ici, comme mentionné dans le code MATLAB
+
 
     if options['lra'] == 1:
         X = np.dot(S, Vt)  # Remplace X par son approximation de faible rang

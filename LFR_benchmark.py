@@ -171,7 +171,7 @@ def main(list_mu):
 if __name__ == "__main__":
 
     #Options TEST
-    list_mu = [ 0.4]  # mu between 0 and 0.6
+    list_mu = [0.5]  # mu between 0 and 0.6
 
     random.seed(42)  # Fixer la seed
     main(list_mu)
