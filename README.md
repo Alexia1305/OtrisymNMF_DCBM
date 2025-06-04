@@ -1,7 +1,7 @@
-# A Matrix Factorization Framework for Community Detection under the Degree-Corrected Block Model with Efficient Initialization for Inference
+# A Matrix Factorization Framework for Community Detection under the Degree-Corrected Block Model
 
 We use **OtrisymNMF** as a **degree corrected block model (DCBM)** to detect communities in several benchmark networks, including the LFR benchmark. 
-We also demonstrate that our initialization, based on separable NMF, significantly improves the results of classical inference methods for the **DCBM of Karrer and Newman**.
+We also demonstrate that our initialization, based on smoothed separable NMF, significantly improves the results of classical inference methods for the **DCBM of Karrer and Newman**.
 
 All the tools for OtrisymNMF are available in the Python package **OtrisymNMF**. For Karrer and Newman's DCBM and inference methods, we used the **pysbm** package.
 The provided notebooks compare the performance of **OtrisymNMF** and **Karrer and Newman's DCBM** on three real-world networks:
@@ -86,7 +86,7 @@ python Scotland_test.py
 
 # OtrisymNMF
 
-This package provides implementations of the **Orthogonal Symmetric Nonnegative Matrix Tri-Factorization** (OtrisymNMF) algorithm.
+This package implements the **Orthogonal Symmetric Nonnegative Matrix Tri-Factorization** (OtrisymNMF) algorithm.
 
 The algorithm aims to solve the following optimization problem:
 
@@ -99,7 +99,7 @@ Where:
 - **W** is a matrix representing the assignment of elements to **r** communities.
 - **S** is a central matrix describing interactions between communities.
 
-The **OtrisymNMF** package also includes the **SVCA** algorithm to initialize the inference.
+The **OtrisymNMF** package also includes the **SVCA** algorithm to initialize the inference. The implementation of the algorithm, along with the initialization, is also available in **MATLAB** and **Julia** at https://github.com/Alexia1305/OtrisymNMF.
 
 
 
