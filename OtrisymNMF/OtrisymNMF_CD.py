@@ -8,7 +8,7 @@ from .SSPA import SVCA
 from .Utils import orthNNLS
 from scipy.sparse import issparse
 
-def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, init_method=None, verbosity=1):
+def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, init_method=None, verbosity=1,init_seed=None):
     """
     Orthogonal Symmetric Nonnegative Matrix Trifactorization using Coordinate Descent.
     Given a symmetric matrix X >= 0, finds matrices W >= 0 and S >= 0 such that X ≈ WSW' with W'W=I.
@@ -43,6 +43,8 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, i
             Initialization method ("random", "SSPA", "SVCA", "SPA").
         verbosity : int, default=1
             Verbosity level (1 for messages, 0 for silent mode).
+        init_seed : float, optional (default=None)
+            Random seed for the initialization for the experiments
 
     Returns:
         w_best : np.array, shape (n,)
@@ -87,7 +89,9 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, i
             S = (S + S.T) / 2  # Symmetric
         else:
             # Placeholder for proper initialization functions
-            W = initialize_W(X, r, method=init_algo)
+            if init_seed is not None:
+                init_seed += 10*trial
+            W = initialize_W(X, r, method=init_algo,init_seed=init_seed)
             w, v = extract_w_v(W)
             # Normalisation des colonnes de W
             nw = np.zeros(r)
@@ -130,7 +134,7 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, i
 
 
 # Placeholder functions (to be implemented)
-def initialize_W(X, r, method="SSPA"):
+def initialize_W(X, r, method="SSPA",init_seed=None):
     """ Initializes W based on the chosen method."""
 
     if method == "SSPA":
@@ -138,6 +142,8 @@ def initialize_W(X, r, method="SSPA"):
         p=max(2,math.floor(0.1*n/r))
 
         options = {'average': 1}
+        if init_seed is not None:
+            np.random.seed(init_seed)
         WO, K = SSPA(X, r, p,options=options )
 
         norm2x = np.sqrt(np.sum(X ** 2, axis=0))  # Calcul de la norme L2 sur chaque colonne de X
@@ -154,6 +160,8 @@ def initialize_W(X, r, method="SSPA"):
         p = max(2, math.floor(0.1 * n / r))
 
         options = {'average': 1}
+        if init_seed is not None:
+            np.random.seed(init_seed)
         WO, K = SVCA(X, r, p, options=options)
 
         norm2x = np.sqrt(np.sum(X ** 2, axis=0))  # Calcul de la norme L2 sur chaque colonne de X

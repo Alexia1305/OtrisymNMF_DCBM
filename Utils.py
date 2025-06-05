@@ -4,7 +4,7 @@ import pysbm
 import OtrisymNMF
 import networkx as nx
 import numpy as np
-def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=None,init_method="random", verbosity=1,tri=True):
+def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=None,init_method="random", verbosity=1,tri=True,init_seed=None):
     """
        Performs Degree-Corrected Block Model (DCBM) inference using multiple trials with different initializations
        and returns the partition with the highest objective function value.
@@ -28,6 +28,8 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
         tri : boolean, optional (default=True)
             If tri=True, the node partition list is sorted in ascending order (sorted(G.nodes)).
             If tri=False, the original node order in graph G is preserved.
+        init_seed : float, optional (default=None)
+            Random seed for the initialization for the experiments
 
 
        Returns:
@@ -60,15 +62,27 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
                 obj_max_d = obj_value_d
         else:
             if init_method=="SVCA":
-                X = nx.adjacency_matrix(G, nodelist=sorted(G.nodes))
+                if tri:
+                    X = nx.adjacency_matrix(G, nodelist=sorted(G.nodes))
+                else:
+                    X = nx.adjacency_matrix(G)
                 if issparse(X):
                     X = X.toarray()
-                W = OtrisymNMF.initialize_W(X,r,method="SVCA")
+                if init_seed is not None:
+                    init_seed += 10 * i
+                W = OtrisymNMF.initialize_W(X,r,method="SVCA",init_seed=init_seed)
                 v = np.argmax(W, axis=1)
-                degree_corrected_partition = pysbm.NxPartition(
-                    graph=G,
-                    number_of_blocks=r,
-                    representation={node: v[i] for i, node in enumerate(sorted(G.nodes))})
+                if tri == True:
+                    degree_corrected_partition = pysbm.NxPartition(
+                        graph=G,
+                        number_of_blocks=r,
+                        representation={node: v[i] for i, node in enumerate(sorted(G.nodes))})
+                else:
+                    degree_corrected_partition = pysbm.NxPartition(
+                        graph=G,
+                        number_of_blocks=r,
+                        representation={node: v[i] for i, node in enumerate(G.nodes)})
+
                 obj_value_d = degree_corrected_objective_function.calculate(degree_corrected_partition)
                 if obj_value_d > obj_max_d:
                     best_degree_partition = degree_corrected_partition
