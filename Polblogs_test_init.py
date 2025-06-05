@@ -9,7 +9,7 @@ import random, time
 
 def read_graph():
     G = nx.read_gml('Data\polblogs_cleaned.gml', label='id')
-    True_partition = [int(G.nodes[node]['value']) for node in sorted(G.nodes)]
+    True_partition = [int(G.nodes[node]['value']) for node in G.nodes]
 
     return G, True_partition
 
@@ -40,7 +40,7 @@ def main(graph, clusters):
         # KL_EM
         start_time = time.time()
         EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=trials,
-                             init_method="random", tri=False, verbosity=0)
+                             init_method="random", verbosity=0)
         end_time = time.time()
         NMI = normalized_mutual_info_score(clusters, EM_partition)
         results["KL_EM"]["NMI"].append(NMI)
@@ -52,7 +52,7 @@ def main(graph, clusters):
         # KN
         start_time = time.time()
         EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference, numTrials=trials,
-                             init_method="random", tri=False, verbosity=0)
+                             init_method="random", verbosity=0)
         end_time = time.time()
         NMI = normalized_mutual_info_score(clusters, EM_partition)
         results["KN"]["NMI"].append(NMI)
@@ -63,7 +63,7 @@ def main(graph, clusters):
         # MH
         start_time = time.time()
         EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.MetropolisHastingInferenceHundredK, numTrials=trials,
-                             init_method="random", tri=False, verbosity=0)
+                             init_method="random", verbosity=0)
         end_time = time.time()
         NMI = normalized_mutual_info_score(clusters, EM_partition)
         results["MH"]["NMI"].append(NMI)
@@ -86,7 +86,7 @@ def main(graph, clusters):
         # KL_EM initialized by SVCA
         start_time = time.time()
         EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference,
-                             numTrials=trials, init_method="SVCA", tri=False, verbosity=0, init_seed=itt)
+                             numTrials=trials, init_method="SVCA", verbosity=0, init_seed=itt)
         end_time = time.time()
         NMI = normalized_mutual_info_score(clusters, EM_partition)
         results["KL_EM_SVCA"]["NMI"].append(NMI)
@@ -97,7 +97,7 @@ def main(graph, clusters):
         # KN initialized by SVCA
         start_time = time.time()
         EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
-                             numTrials=trials, init_method="SVCA", tri=False, verbosity=0, init_seed=itt)
+                             numTrials=trials, init_method="SVCA", verbosity=0, init_seed=itt)
         end_time = time.time()
         NMI = normalized_mutual_info_score(clusters, EM_partition)
         results["KN_SVCA"]["NMI"].append(NMI)
@@ -108,7 +108,7 @@ def main(graph, clusters):
         # MH initialized by SVCA
         start_time = time.time()
         EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.MetropolisHastingInferenceHundredK,
-                             numTrials=trials, init_method="SVCA", tri=False, verbosity=0, init_seed=itt)
+                             numTrials=trials, init_method="SVCA", verbosity=0, init_seed=itt)
         end_time = time.time()
         NMI = normalized_mutual_info_score(clusters, EM_partition)
         results["MH_SVCA"]["NMI"].append(NMI)

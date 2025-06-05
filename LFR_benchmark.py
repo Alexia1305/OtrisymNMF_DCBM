@@ -60,7 +60,7 @@ def main(list_mu):
 
             print(f"Processed {idx} out of {len(graphs)} graphs.")
 
-            labels = [G.nodes[v]['community'] for v in sorted(G.nodes)]
+            labels = [G.nodes[v]['community'] for v in G.nodes]
             r = max(labels)
 
             # KN
@@ -95,9 +95,9 @@ def main(list_mu):
             #print(NMI)
 
             #OtrisymNMF
-            X = nx.adjacency_matrix(G, nodelist=sorted(G.nodes))
+            X = nx.adjacency_matrix(G, nodelist=G.nodes)
             start_time = time.time()
-            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r,numTrials=10,init_method="SVCA",verbosity=0)
+            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r,numTrials=10,init_method="SVCA",verbosity=0, init_seed=idx)
             end_time = time.time()
             init_time=end_time - start_time
             NMI = normalized_mutual_info_score(labels, v_best)
@@ -108,7 +108,7 @@ def main(list_mu):
 
             #SVCA only
             start_time = time.time()
-            X = nx.adjacency_matrix(G, nodelist=sorted(G.nodes))
+            X = nx.adjacency_matrix(G, nodelist=G.nodes)
             w_best, v, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X, r, numTrials=10, verbosity=0)
             NMI = normalized_mutual_info_score(labels, v)
             end_time = time.time()
@@ -119,7 +119,7 @@ def main(list_mu):
             # KN initialized by SVCA
             start_time = time.time()
             KLG_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
-                                  numTrials=10, init_method="SVCA", verbosity=0)
+                                  numTrials=10, init_method="SVCA", verbosity=0, init_seed=idx)
             end_time = time.time()
             NMI = normalized_mutual_info_score(labels, KLG_partition)
             results["KN_SVCA"]["NMI"].append(NMI)
@@ -129,7 +129,7 @@ def main(list_mu):
             # KL_EM initialized by SVCA
             start_time = time.time()
             EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=10,
-                                 init_method="SVCA", verbosity=0)
+                                 init_method="SVCA", verbosity=0, init_seed=idx)
             end_time = time.time()
             NMI = normalized_mutual_info_score(labels, EM_partition)
             results["KL_EM_SVCA"]["NMI"].append(NMI)
@@ -140,7 +140,7 @@ def main(list_mu):
             start_time = time.time()
             MHA_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
                                   pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,
-                                  init_method="SVCA", verbosity=0)
+                                  init_method="SVCA", verbosity=0, init_seed=idx)
             end_time = time.time()
             NMI = normalized_mutual_info_score(labels, MHA_partition)
             results["MHA250k_SVCA"]["NMI"].append(NMI)
