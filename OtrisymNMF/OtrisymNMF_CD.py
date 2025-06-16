@@ -7,6 +7,8 @@ from .SSPA import SSPA
 from .SSPA import SVCA
 from .Utils import orthNNLS
 from scipy.sparse import issparse
+from scipy.sparse import diags
+from scipy.sparse.linalg import norm
 
 def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, init_method=None, verbosity=1,init_seed=None):
     """
@@ -27,7 +29,7 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, i
     2024 IEEE 34th International Workshop on Machine Learning for Signal Processing (MLSP). IEEE, 2024.
 
     Parameters:
-        X : np.array, shape (n, n)
+        X : np.array or crs_matrix , shape (n, n)
             Symmetric nonnegative matrix (Adjacency matrix of an undirected graph).
         r : int
             Number of columns of W (Number of communities).
@@ -57,9 +59,17 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, i
             Relative error ||X - WSW'||_F / ||X||_F.
     """
     start_time = time.time()
-    if issparse(X):
-        X = X.toarray()
+
     n = X.shape[0]
+    if issparse(X):
+        density = X.nnz / (X.shape[0] * X.shape[1])
+        if n<=1000 and density>0.01:
+            X=X.toarray()
+        elif n<=2500 and density>0.02:
+            X = X.toarray()
+        elif n<=10000 and density>0.05:
+            X = X.toarray()
+
     error_best = float('inf')
 
     if verbosity > 0:
@@ -144,16 +154,37 @@ def initialize_W(X, r, method="SSPA",init_seed=None):
         options = {'average': 1}
         if init_seed is not None:
             np.random.seed(init_seed)
-        WO, K = SSPA(X, r, p,options=options )
 
-        norm2x = np.sqrt(np.sum(X ** 2, axis=0))  # Calcul de la norme L2 sur chaque colonne de X
-        Xn = X * (1 / (norm2x + 1e-16))  # Normalisation de X (évite la division par zéro)
+        if issparse(X):
+
+            WO, K = SSPA(X.tocsc(), r, p, options=options)
+            norm2x_squared = X.multiply(X).sum(axis=0)  # matrice 1 x n (sparse)
+            norm2x_squared = np.array(norm2x_squared).ravel()
+            norm2x = np.sqrt(norm2x_squared)
+            norm2x_safe = norm2x + 1e-16
+
+            # Créer matrice diagonale inverses des normes
+            inv_norms = 1.0 / norm2x_safe
+            D = diags(inv_norms)  # matrice diagonale sparse (n x n)
+
+            # Normaliser X par colonnes : multiplication à droite
+            Xn = X @ D
+
+            HO = orthNNLS(X, WO, Xn)
+
+            # Transposition du résultat
+            W = HO.T
+        else :
+            WO, K = SSPA(X, r, p,options=options )
+
+            norm2x = np.sqrt(np.sum(X ** 2, axis=0))  # Calcul de la norme L2 sur chaque colonne de X
+            Xn = X * (1 / (norm2x + 1e-16))  # Normalisation de X (évite la division par zéro)
 
 
-        HO = orthNNLS(X, WO, Xn)
+            HO = orthNNLS(X, WO, Xn)
 
-        # Transposition du résultat
-        W = HO.T
+            # Transposition du résultat
+            W = HO.T
 
     if method == "SVCA":
         n = X.shape[0]
@@ -162,15 +193,38 @@ def initialize_W(X, r, method="SSPA",init_seed=None):
         options = {'average': 1}
         if init_seed is not None:
             np.random.seed(init_seed)
-        WO, K = SVCA(X, r, p, options=options)
 
-        norm2x = np.sqrt(np.sum(X ** 2, axis=0))  # Calcul de la norme L2 sur chaque colonne de X
-        Xn = X * (1 / (norm2x + 1e-16))  # Normalisation de X (évite la division par zéro)
+        if issparse(X):
 
-        HO = orthNNLS(X, WO, Xn)
+            WO, K = SVCA(X.tocsc(), r, p, options=options)
+            norm2x_squared = X.multiply(X).sum(axis=0)  # matrice 1 x n (sparse)
+            norm2x_squared = np.array(norm2x_squared).ravel()
+            norm2x = np.sqrt(norm2x_squared)
+            norm2x_safe = norm2x + 1e-16
 
-        # Transposition du résultat
-        W = HO.T
+            # Créer matrice diagonale inverses des normes
+            inv_norms = 1.0 / norm2x_safe
+            D = diags(inv_norms)  # matrice diagonale sparse (n x n)
+
+            # Normaliser X par colonnes : multiplication à droite
+            Xn = X @ D
+
+            HO = orthNNLS(X, WO, Xn)
+
+            # Transposition du résultat
+            W = HO.T
+
+
+        else:
+            WO, K = SVCA(X, r, p, options=options)
+
+            norm2x = np.sqrt(np.sum(X ** 2, axis=0))  # Calcul de la norme L2 sur chaque colonne de X
+            Xn = X * (1 / (norm2x + 1e-16))  # Normalisation de X (évite la division par zéro)
+
+            HO = orthNNLS(X, WO, Xn)
+
+            # Transposition du résultat
+            W = HO.T
 
 
     return W
@@ -208,12 +262,21 @@ def update_W(X, S, w, v):
     # Mise à jour de W
     for i in range(n):
         vi_new, wi_new, f_new = -1, -1, np.inf
+        if issparse(X):
+            rowX = X[i, :]  # ligne sparse
+            cols = rowX.indices
+            vals = rowX.data
+        Xii = X[i, i]
+
 
         for k in range(r):
             # Calcul des coefficients pour la minimisation
             c3 = S[k, k] ** 2
-            c1 = 2 * (wp2[k] - (w[i] * S[v[i], k]) ** 2) - 2 * S[k, k] * X[i, i]
-            c0 = -4 * sum(X[i, p] * w[p] * S[v[p], k] for p in np.nonzero(X[i, :])[0] if p != i)
+            c1 = 2 * (wp2[k] - (w[i] * S[v[i], k]) ** 2) - 2 * S[k, k] * Xii
+            if issparse(X):
+                c0 = -4 * sum(val * w[p] * S[v[p], k] for val, p in zip(vals, cols) if p != i)
+            else:
+                c0 = -4 * sum(X[i, p] * w[p] * S[v[p], k] for p in np.nonzero(X[i, :])[0] if p != i)
 
             # Résolution des racines avec la méthode de Cardan
             roots = cardan(4 * c3, 0, 2 * c1, c0)
@@ -344,7 +407,10 @@ def compute_error(X, S, w, v):
     i, j, val = find(X)
     for k in range(len(val)) :
         error+=(val[k]-S[v[i[k]],v[j[k]]]*w[i[k]]*w[j[k]])**2
-    error=np.sqrt(error)/np.linalg.norm(X, 'fro')
+    if issparse(X):
+        error=np.sqrt(error)/norm(X, 'fro')
+    else:
+        error=np.sqrt(error)/np.linalg.norm(X, 'fro')
     return error
 
 def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
@@ -352,7 +418,7 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
         Perform community detection using the SVCA (Smooth VCA).
 
         Parameters:
-        - X: ndarray or sparse matrix (Adjacency matrix of the graph)
+        - X: ndarray or sparse matrix csr_matrix (Adjacency matrix of the graph)
         - r: int (Number of communities)
         - numTrials: int (Number of trials to find the best decomposition, default=1)
         - verbosity: int (Level of verbosity for printing progress, default=1)
@@ -364,8 +430,7 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
         - error_best: float (Reconstruction error of the best trial)
         """
 
-    if issparse(X):
-        X=X.toarray()
+
     n = X.shape[0]
     error_best = float('inf')
     if verbosity > 0:

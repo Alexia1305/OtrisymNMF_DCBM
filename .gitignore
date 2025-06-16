@@ -161,3 +161,15 @@ cython_debug/
 /.idea
 simple_examples.ipynb
 simple_examples.ipynb
+Test_scalabilité2.py
+Test_scalabilité.py
+Test_scalabilité.py
+Test_scalabilité.py
+Test_scalabilité.py
+mu_0.0_resultsSVCA.csv
+mu_0.1_resultsSVCA.csv
+mu_0.2_resultsSVCA.csv
+mu_0.3_resultsSVCA.csv
+mu_0.4_resultsSVCA.csv
+mu_0.5_resultsSVCA.csv
+mu_0.6_resultsSVCA.csv

@@ -1,6 +1,9 @@
 import numpy as np
 from scipy.sparse.linalg import svds
-
+from scipy.sparse import issparse
+from scipy.sparse import csr_matrix
+from scipy.sparse import csc_matrix
+from scipy.sparse import lil_matrix
 
 def update_orth_basis(V, v):
     """
@@ -16,7 +19,7 @@ def update_orth_basis(V, v):
     if V.size == 0:
         # If V is empty, normalize v and set it as the first basis vector
         V = v / np.linalg.norm(v).reshape(1, -1)
-        V=V.T
+        V = V.T
     else:
         # Project v onto the orthogonal complement of V
         v = v - V @ (V.T @ v)
@@ -60,7 +63,7 @@ def SSPA(X, r, p, options=None):
         options = {}
 
     # Set default options if not provided
-    X=X.astype('float')
+    X = X.astype('float')
     lra = options.get('lra', 0)
     average = options.get('average', 0)
 
@@ -72,7 +75,12 @@ def SSPA(X, r, p, options=None):
         Z = X.copy()
 
     V = np.array([])  # Initialize the orthogonal basis
-    normX2 = np.sum(X ** 2, axis=0)  # Compute squared L2 norm of each column of X
+    if issparse(X):
+        X_squared = X.copy()
+        X_squared.data **= 2
+        normX2 = np.array(X_squared.sum(axis=0)).ravel()
+    else:
+        normX2 = np.sum(X ** 2, axis=0)  # Compute squared L2 norm of each column of X
 
     W = np.zeros((X.shape[0], r))  # Initialize W matrix
     K = np.zeros((r, p), dtype=int)  # Store indices of selected data points
@@ -80,14 +88,18 @@ def SSPA(X, r, p, options=None):
     for k in range(r):
         # Select SPA direction (column with maximum norm)
         spb = np.argmax(normX2)
-        diru = X[:, spb]
+        if issparse(X):
+            diru = X[:, spb].toarray().ravel()
+        else:
+            diru = X[:, spb]
+
 
         # Ensure orthogonality to previously extracted columns
         if k >= 1:
             diru -= np.dot(V, np.dot(V.T, diru))
 
         # Compute inner product with data matrix
-        u = np.dot(diru.T, X)
+        u = diru.T@ X
 
         # Sort values and select indices corresponding to largest values
         sorted_indices = np.argsort(-u)  # Descending order
@@ -95,25 +107,40 @@ def SSPA(X, r, p, options=None):
 
         # Compute new column for W
         if p == 1:
-            W[:, k] = Z[:, K[k, 0]]
+            if issparse(Z):
+                W[:, k] = Z[:, K[k, 0]].toarray().ravel()
+            else:
+                W[:, k] = Z[:, K[k, 0]]
         else:
             if average == 1:
-                W[:, k] = np.mean(Z[:, K[k, :]], axis=1).T
+                if issparse(Z):
+                    subZ = Z[:, K[k, :]]
+                    row_sums = subZ.sum(axis=1).A1  # vecteur numpy 1D
+                    num_cols = subZ.shape[1]
+                    row_means = row_sums / num_cols
+
+                    W[:, k] = row_means
+                else:
+                    W[:, k] = np.mean(Z[:, K[k, :]], axis=1).T
             else:
-                W[:, k] = np.median(Z[:, K[k, :]], axis=1).T
+                if issparse(Z):
+                    W[:, k] = np.median(Z[:, K[k, :]].toarray(), axis=1)
+                else:
+                    W[:, k] = np.median(Z[:, K[k, :]], axis=1).T
 
         # Update orthogonal basis
         V = update_orth_basis(V, W[:, k])
 
         # Update squared L2 norm of columns
-        normX2 -= (np.dot(V[:, -1].T, X)) ** 2
+        normX2 -= (V[:, -1].T @ X) ** 2
 
     # If low-rank approximation was used, project W back
     if lra == 1:
         W = np.dot(U, W)
 
     return W, K
-def SVCA(X,r,p,options=None):
+
+def SVCA(X, r, p, options=None):
     """
         Smoothed Vertex Component Analysis(SVCA)
 
@@ -123,7 +150,7 @@ def SVCA(X,r,p,options=None):
         to it (called the p proximal latent points).
 
         Parameters:
-            X (numpy.ndarray): Input data matrix of size (m, n).
+            X (numpy.ndarray or csc_matrix): Input data matrix of size (m, n).
             r (int): Number of columns of W.
             p (int): Number of proximal latent points.
             options (dict, optional):
@@ -155,7 +182,6 @@ def SVCA(X,r,p,options=None):
         # Calcul des vecteurs singuliers
     U, S, Vt = svds(X, k=r)  # U contient les premiers r vecteurs singuliers de X
 
-
     if options['lra'] == 1:
         X = np.dot(S, Vt)  # Remplace X par son approximation de faible rang
 
@@ -178,7 +204,7 @@ def SVCA(X,r,p,options=None):
             diru = diru - np.dot(V, np.dot(V.T, diru))
 
         # Produit scalaire avec la matrice de données
-        u = np.dot(diru.T, X)
+        u = diru.T @ X
 
         # Trier les entrées et sélectionner la direction maximisant |u|
         b = np.argsort(u)
@@ -192,12 +218,29 @@ def SVCA(X,r,p,options=None):
 
         # Calcul de la "vertex"
         if p == 1:
-            W[:, k] = X[:, K[k, :]]
+            if issparse(X):
+                W[:, k] = X[:, K[k, :]].toarray().ravel()
+            else:
+                W[:, k] = X[:, K[k, :]]
+
         else:
             if options['average'] == 1:
-                W[:, k] = np.mean(X[:, K[k, :]], axis=1)
+                if issparse(X):
+                    subX = X[:, K[k, :]]
+                    row_sums = subX.sum(axis=1).A1  # vecteur numpy 1D
+                    num_cols = subX.shape[1]
+                    row_means = row_sums / num_cols
+
+                    W[:, k] = row_means
+                else:
+                    W[:, k] = np.mean(X[:, K[k, :]], axis=1)
+
+
             else:
-                W[:, k] = np.median(X[:, K[k, :]], axis=1)
+                if issparse(X):
+                    W[:, k] = np.median(X[:, K[k, :]].toarray(), axis=1)
+                else:
+                    W[:, k] = np.median(X[:, K[k, :]], axis=1)
 
         # Mise à jour du projecteur
         V = update_orth_basis(V, W[:, k])

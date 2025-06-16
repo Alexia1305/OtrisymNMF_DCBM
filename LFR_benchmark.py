@@ -150,9 +150,9 @@ def main(list_mu):
         summary = {}
         for algo, data in results.items():
             summary[algo] = {
-                "NMI moyen": np.round(np.mean(data["NMI"]), 5),
-                "Erreur type NMI": np.round(np.std(data["NMI"], ddof=1), 2),
-                "Temps moyen (s)": np.round(np.mean(data["Time"]), 5),
+                "NMI moyen": np.round(np.mean(data["NMI"]), 4),
+                "Erreur type NMI": np.round(np.std(data["NMI"], ddof=1), 4),
+                "Temps moyen (s)": np.round(np.mean(data["Time"]), 2),
                 "Erreur type Temps": np.round(np.std(data["Time"], ddof=1), 2)
             }
 
@@ -162,16 +162,16 @@ def main(list_mu):
         # Results Display
         print(df_results)
 
-        # # Sauvegarde des résultats dans un fichier CSV
-        # results_filename = f"mu_{mu:.1f}_resultsSVCA.csv"
-        # df_results.to_csv(results_filename)
-        # print(f"Résultats enregistrés dans '{results_filename}'\n")
+        # Sauvegarde des résultats dans un fichier CSV
+        results_filename = f"mu_{mu:.1f}_resultsSVCA.csv"
+        df_results.to_csv(results_filename)
+        print(f"Résultats enregistrés dans '{results_filename}'\n")
 
 
 if __name__ == "__main__":
 
     #Options TEST
-    list_mu = [0.5]  # mu between 0 and 0.6
+    list_mu = np.arange(0.5, 0.7, 0.1)  # mu between 0 and 0.6
 
     random.seed(42)  # Fixer la seed
     main(list_mu)
