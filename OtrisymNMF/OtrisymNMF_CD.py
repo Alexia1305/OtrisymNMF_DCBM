@@ -432,6 +432,14 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
 
 
     n = X.shape[0]
+    if issparse(X):
+        density = X.nnz / (X.shape[0] * X.shape[1])
+        if n <= 1000 and density > 0.01:
+            X = X.toarray()
+        elif n <= 2500 and density > 0.02:
+            X = X.toarray()
+        elif n <= 10000 and density > 0.05:
+            X = X.toarray()
     error_best = float('inf')
     if verbosity > 0:
         print(f'Running {numTrials} Trials in Series')
