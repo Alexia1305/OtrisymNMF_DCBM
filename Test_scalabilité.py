@@ -9,3 +9,6 @@ np.random.seed(100)
 w, v, S, error = OtrisymNMF.OtrisymNMF_CD(X, 2,numTrials=100,verbosity=0,init_seed=2)
 w2, v2, S2, error2 = OtrisymNMF.OtrisymNMF_CD(X.toarray(), 2,numTrials=100,verbosity=0,init_seed=2)
 print('ok')
+import pysbm
+
+pysbm.EMInference(G,)

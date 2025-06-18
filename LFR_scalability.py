@@ -63,16 +63,17 @@ def main(list_n):
 
             labels = [G.nodes[v]['community'] for v in G.nodes]
             r = max(labels)
+            print(r)
 
-            # # KN
+            # #KN
             # start_time=time.time()
             # KLG_partition=DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,pysbm.KarrerInference, numTrials=10,
-            #                     init_method="random", verbosity=0)
+            #                     init_method="random", verbosity=1)
             # end_time=time.time()
             # NMI=normalized_mutual_info_score(labels,KLG_partition)
             # results["KN"]["NMI"].append(NMI)
             # results["KN"]["Time"].append(end_time-start_time)
-            # #print(NMI)
+            # print(NMI)
             #
             # # KL_EM
             # start_time = time.time()
@@ -95,30 +96,33 @@ def main(list_n):
             # results["MHA250k"]["Time"].append(end_time - start_time)
             # #print(NMI)
             #
-            # #OtrisymNMF
-            # X = nx.adjacency_matrix(G, nodelist=G.nodes)
-            # start_time = time.time()
-            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r,numTrials=10,init_method="SVCA",verbosity=0, init_seed=idx)
-            # end_time = time.time()
-            # init_time=end_time - start_time
-            # NMI = normalized_mutual_info_score(labels, v_best)
-            # results["OtrisymNMF"]["NMI"].append(NMI)
-            # results["OtrisymNMF"]["Time"].append(end_time - start_time)
-            # #print(NMI)
-
-
-            #SVCA only
-            start_time = time.time()
+            #OtrisymNMF
             X = nx.adjacency_matrix(G, nodelist=G.nodes)
-            w_best, v, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X, r, numTrials=1, verbosity=0)
-            NMI = normalized_mutual_info_score(labels, v)
+            savemat("matrice_2000.mat", {"X": X, "label": labels})
+            start_time = time.time()
+            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X,r,numTrials=10,init_method="SSPA",time_limit=60*10, init_seed=idx)
             end_time = time.time()
+            NMI = normalized_mutual_info_score(labels, v_best)
+            results["OtrisymNMF"]["NMI"].append(NMI)
+            results["OtrisymNMF"]["Time"].append(end_time - start_time)
+            print(NMI)
+            print(end_time - start_time)
+            break;
+            #
+            #SVCA only
+            X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            start_time = time.time()
+            w_best, v, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X,50, numTrials=1, verbosity=0)
+            end_time = time.time()
+            print(end_time - start_time)
+            break
+            NMI = normalized_mutual_info_score(labels, v)
             results["SVCA"]["NMI"].append(NMI)
             results["SVCA"]["Time"].append(end_time - start_time)
-            print(end_time - start_time)
+
             print(NMI)
 
-            # # KN initialized by SVCA
+            # KN initialized by SVCA
             # start_time = time.time()
             # KLG_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
             #                       numTrials=10, init_method="SVCA", verbosity=0, init_seed=idx)
@@ -126,7 +130,8 @@ def main(list_n):
             # NMI = normalized_mutual_info_score(labels, KLG_partition)
             # results["KN_SVCA"]["NMI"].append(NMI)
             # results["KN_SVCA"]["Time"].append(end_time - start_time)
-            # #print(NMI)
+            # break
+            #print(NMI)
             #
             # # KL_EM initialized by SVCA
             # start_time = time.time()
@@ -173,7 +178,7 @@ def main(list_n):
 if __name__ == "__main__":
 
     #Options TEST
-    list_n = [50000]
+    list_n = [5000]
 
     random.seed(42)  # Fixer la seed
     main(list_n)

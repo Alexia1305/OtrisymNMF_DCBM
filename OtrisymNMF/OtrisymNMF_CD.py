@@ -10,7 +10,7 @@ from scipy.sparse import issparse
 from scipy.sparse import diags
 from scipy.sparse.linalg import norm
 
-def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, init_method=None, verbosity=1,init_seed=None):
+def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None):
     """
     Orthogonal Symmetric Nonnegative Matrix Trifactorization using Coordinate Descent.
     Given a symmetric matrix X >= 0, finds matrices W >= 0 and S >= 0 such that X ≈ WSW' with W'W=I.
@@ -71,6 +71,11 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, i
             X = X.toarray()
 
     error_best = float('inf')
+    # Precomputations
+    if issparse(X):
+        normX = np.sqrt(np.sum(X.data ** 2))
+    else:
+        normX = np.linalg.norm(X, 'fro')
 
     if verbosity > 0:
         print(f'Running {numTrials} Trials in Series')
@@ -98,12 +103,11 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, i
             S = np.random.rand(r, r)
             S = (S + S.T) / 2  # Symmetric
         else:
-            # Placeholder for proper initialization functions
             if init_seed is not None:
                 init_seed += 10*trial
-            W = initialize_W(X, r, method=init_algo,init_seed=init_seed)
+            W = initialize_W(X, r,method=init_algo,init_seed=init_seed)
             w, v = extract_w_v(W)
-            # Normalisation des colonnes de W
+            # Normalization columns of W
             nw = np.zeros(r)
             for i in range(n):
                 nw[v[i]] += w[i] ** 2
@@ -113,10 +117,11 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, i
             S = update_S(X, r, w, v)
 
         # Iterative update
-        prev_error = compute_error(X, S, w, v)
+        prev_error = compute_error(normX, S)
         error = prev_error
 
         for iteration in range(maxiter):
+            print("itt")
             if time.time() - start_time > time_limit:
                 print('Time limit passed')
                 break
@@ -125,7 +130,7 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, i
             S = update_S(X, r, w, v)
 
             prev_error = error
-            error = compute_error(X, S, w, v)
+            error = compute_error(normX, S)
 
             if error < delta or abs(prev_error - error) < delta:
                 break
@@ -134,8 +139,8 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-3, time_limit=300, i
 
         if error <= error_best:
             w_best, v_best, S_best, error_best = w, v, S, error
-            if error_best <= delta or time.time() - start_time > time_limit:
-                break
+        if error_best <= delta or time.time() - start_time > time_limit:
+            break
 
         if verbosity > 0:
             print(f'Trial {trial + 1}/{numTrials} with {init_algo}: Error {error:.4e} | Best: {error_best:.4e}')
@@ -399,19 +404,19 @@ def update_S(X, r, w, v):
 
     return S
 
-
-
-def compute_error(X, S, w, v):
+def compute_error(normX, S):
     """ Computes error ||X - WSW'||_F / ||X||_F."""
-    error=0
-    i, j, val = find(X)
-    for k in range(len(val)) :
-        error+=(val[k]-S[v[i[k]],v[j[k]]]*w[i[k]]*w[j[k]])**2
-    if issparse(X):
-        error=np.sqrt(error)/norm(X, 'fro')
-    else:
-        error=np.sqrt(error)/np.linalg.norm(X, 'fro')
+    error = np.sqrt(normX**2-np.linalg.norm(S, 'fro')**2)/normX
     return error
+def compute_error_rdegenerate(X,S,v,w):
+    """ Computes error ||X - WSW'||_F / ||X||_F."""
+    # WTW!=I
+    error = 0;
+    n = X.shape[0]
+    for i in range(n):
+        for j in range(n):
+            error += (X[i,j]-S[v[i],v[j]]*w[i]*w[j])**2
+    return np.sqrt(error)/np.linalg.norm(X,'fro')
 
 def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
     """
@@ -441,6 +446,10 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
         elif n <= 10000 and density > 0.05:
             X = X.toarray()
     error_best = float('inf')
+    if issparse(X):
+        normX = np.sqrt(np.sum(X.data ** 2))
+    else:
+        normX = np.linalg.norm(X, 'fro')
     if verbosity > 0:
         print(f'Running {numTrials} Trials in Series')
 
@@ -458,7 +467,7 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
         S = update_S(X, r, w, v)
 
 
-        error = compute_error(X, S, w, v)
+        error = compute_error(normX, S)
 
 
 

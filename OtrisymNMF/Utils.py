@@ -44,6 +44,9 @@ def orthNNLS(M, U, Mn=None):
     # Normalize columns of U
     norm2u = np.sqrt(np.sum(U ** 2, axis=0))  # norm2u is the L2 norm of each column of U
     Un = U * (1 / (norm2u + 1e-16))  # Avoid division by zero
+    if issparse(M):
+        Mn = Mn.tocsc()
+        M = M.tocsc()
 
     # Calculate the matrix A, which is the angles between columns of M and U
     A = Mn.T @ Un  # A is (n, r), matrix of angles
@@ -59,6 +62,6 @@ def orthNNLS(M, U, Mn=None):
         if issparse(M):
             V[b[i], i] = (M[:, i].T @ U[:, b[i]] )[0] / norm2u[b[i]] ** 2
         else:
-            V[b[i], i] = np.dot(M[:, i], U[:, b[i]]) / norm2u[b[i]] ** 2
+            V[b[i], i] = np.dot(M[:, i].T, U[:, b[i]]) / norm2u[b[i]] ** 2
 
     return V
