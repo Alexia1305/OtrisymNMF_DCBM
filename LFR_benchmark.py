@@ -95,16 +95,16 @@ def main(list_mu):
             # #print(NMI)
 
             #OtrisymNMF
-            X = nx.adjacency_matrix(G, nodelist=G.nodes)
-            start_time = time.time()
-            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r,numTrials=10,init_method="SVCA",verbosity=0, init_seed=idx,delta=1e-5)
-            end_time = time.time()
-            init_time=end_time - start_time
-            NMI = normalized_mutual_info_score(labels, v_best)
-            results["OtrisymNMF"]["NMI"].append(NMI)
-            results["OtrisymNMF"]["Time"].append(end_time - start_time)
-            print(NMI)
-            print(end_time - start_time)
+            # X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            # start_time = time.time()
+            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r,numTrials=10,init_method="SVCA",verbosity=0, init_seed=idx,delta=1e-5)
+            # end_time = time.time()
+            # init_time=end_time - start_time
+            # NMI = normalized_mutual_info_score(labels, v_best)
+            # results["OtrisymNMF"]["NMI"].append(NMI)
+            # results["OtrisymNMF"]["Time"].append(end_time - start_time)
+            # print(NMI)
+            # print(end_time - start_time)
 
             # OtrisymNMF
             X = nx.adjacency_matrix(G, nodelist=G.nodes)
@@ -172,7 +172,7 @@ def main(list_mu):
                 "Erreur type Temps": np.round(np.std(data["Time"], ddof=1), 2)
             }
 
-
+        break
         df_results = pd.DataFrame.from_dict(summary, orient="index")
         print(f"\nRésultats pour mu={mu:.1f}:")
         # Results Display

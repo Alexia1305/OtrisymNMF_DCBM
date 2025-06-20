@@ -9,7 +9,7 @@ from .Utils import orthNNLS
 from scipy.sparse import issparse
 from scipy.sparse import diags
 from scipy.sparse.linalg import norm
-
+@profile
 def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None):
     """
     Orthogonal Symmetric Nonnegative Matrix Trifactorization using Coordinate Descent.

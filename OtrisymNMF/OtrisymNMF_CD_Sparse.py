@@ -9,7 +9,8 @@ from .Utils import orthNNLS
 from scipy.sparse import issparse
 from scipy.sparse import diags
 from scipy.sparse.linalg import norm
-
+from scipy.sparse import diags
+@profile
 def OtrisymNMF_CD_Sparse(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None):
     """
     Orthogonal Symmetric Nonnegative Matrix Trifactorization using Coordinate Descent.
@@ -76,6 +77,7 @@ def OtrisymNMF_CD_Sparse(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit
         np.where(np.diff(I) != 0)[0] + 1,
         [len(I)]
     ))
+    diagX = X.diagonal()
 
 
     if verbosity > 0:
@@ -136,7 +138,7 @@ def OtrisymNMF_CD_Sparse(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit
 
             for i in range(n):
                 # b coefficients for the r problems ax^4+bx^2+cx
-                b = 2 * (wp2 - (w[i] * S[v[i], :]) ** 2) - 2 * X[i,i]*dgS
+                b = 2 * (wp2 - (w[i] * S[v[i], :]) ** 2) - 2 * diagX[i]*dgS
 
                 # c coefficients
                 ind = np.arange(rowStart[i], rowStart[i + 1])
