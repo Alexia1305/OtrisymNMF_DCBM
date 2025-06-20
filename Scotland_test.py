@@ -95,7 +95,7 @@ def main(graph, clusters):
         # OtrisymNMF
         start_time = time.time()
         X = nx.adjacency_matrix(graph)
-        w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, init_method="random", numTrials=runs, verbosity=0)
+        w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, init_method="random", numTrials=runs, verbosity=0,init_seed=itt)
         end_time = time.time()
         NMI = normalized_mutual_info_score(clusters, v_best)
         results["OtrisymNMF"]["NMI"].append(NMI)
@@ -160,14 +160,14 @@ def main(graph, clusters):
         print(
             f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests}")
 
-    # with open('Scotland.txt', 'w') as file:
-    #     for algo, data in results.items():
-    #         # Calcul des statistiques
-    #         nmi_mean = np.mean(data['NMI'])
-    #         nmi_std = np.std(data['NMI'], ddof=1)
-    #
-    #         # Enregistrer les résultats dans le fichier texte
-    #         file.write(f"Algorithm: {algo}, NMI Mean: {nmi_mean}, NMI Std: {nmi_std}\n")
+    with open('Scotland.txt', 'w') as file:
+        for algo, data in results.items():
+            # Calcul des statistiques
+            nmi_mean = np.mean(data['NMI'])
+            nmi_std = np.std(data['NMI'], ddof=1)
+
+            # Enregistrer les résultats dans le fichier texte
+            file.write(f"Algorithm: {algo}, NMI Mean: {nmi_mean}, NMI Std: {nmi_std}\n")
 
 
 if __name__ == "__main__":

@@ -63,47 +63,47 @@ def main(list_mu):
             labels = [G.nodes[v]['community'] for v in G.nodes]
             r = max(labels)
 
-            # KN
-            start_time=time.time()
-            KLG_partition=DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,pysbm.KarrerInference, numTrials=10,
-                                init_method="random", verbosity=0)
-            end_time=time.time()
-            NMI=normalized_mutual_info_score(labels,KLG_partition)
-            results["KN"]["NMI"].append(NMI)
-            results["KN"]["Time"].append(end_time-start_time)
-            #print(NMI)
-
-            # KL_EM
-            start_time = time.time()
-            EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=10,
-                                 init_method="random", verbosity=0)
-            end_time = time.time()
-            NMI = normalized_mutual_info_score(labels, EM_partition)
-            results["KL_EM"]["NMI"].append(NMI)
-            results["KL_EM"]["Time"].append(end_time - start_time)
-            #print(NMI)
-
-            # MHA250
-            start_time = time.time()
-            MHA_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
-                                  pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,init_method="random",
-                                  verbosity=0)
-            end_time = time.time()
-            NMI = normalized_mutual_info_score(labels, MHA_partition)
-            results["MHA250k"]["NMI"].append(NMI)
-            results["MHA250k"]["Time"].append(end_time - start_time)
-            #print(NMI)
+            # # KN
+            # start_time=time.time()
+            # KLG_partition=DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,pysbm.KarrerInference, numTrials=10,
+            #                     init_method="random", verbosity=0)
+            # end_time=time.time()
+            # NMI=normalized_mutual_info_score(labels,KLG_partition)
+            # results["KN"]["NMI"].append(NMI)
+            # results["KN"]["Time"].append(end_time-start_time)
+            # #print(NMI)
+            #
+            # # KL_EM
+            # start_time = time.time()
+            # EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=10,
+            #                      init_method="random", verbosity=0)
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, EM_partition)
+            # results["KL_EM"]["NMI"].append(NMI)
+            # results["KL_EM"]["Time"].append(end_time - start_time)
+            # #print(NMI)
+            #
+            # # MHA250
+            # start_time = time.time()
+            # MHA_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
+            #                       pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,init_method="random",
+            #                       verbosity=0)
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, MHA_partition)
+            # results["MHA250k"]["NMI"].append(NMI)
+            # results["MHA250k"]["Time"].append(end_time - start_time)
+            # #print(NMI)
 
             #OtrisymNMF
             X = nx.adjacency_matrix(G, nodelist=G.nodes)
             start_time = time.time()
-            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r,numTrials=10,init_method="SVCA",verbosity=0, init_seed=idx)
+            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r,numTrials=10,init_method="SVCA",verbosity=0, init_seed=idx,delta=1e-5)
             end_time = time.time()
             init_time=end_time - start_time
             NMI = normalized_mutual_info_score(labels, v_best)
             results["OtrisymNMF"]["NMI"].append(NMI)
             results["OtrisymNMF"]["Time"].append(end_time - start_time)
-            #print(NMI)
+            print(NMI)
 
 
             #SVCA only
@@ -114,38 +114,38 @@ def main(list_mu):
             end_time = time.time()
             results["SVCA"]["NMI"].append(NMI)
             results["SVCA"]["Time"].append(end_time - start_time)
-            #print(NMI)
+            print(NMI)
 
-            # KN initialized by SVCA
-            start_time = time.time()
-            KLG_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
-                                  numTrials=10, init_method="SVCA", verbosity=0, init_seed=idx)
-            end_time = time.time()
-            NMI = normalized_mutual_info_score(labels, KLG_partition)
-            results["KN_SVCA"]["NMI"].append(NMI)
-            results["KN_SVCA"]["Time"].append(end_time - start_time)
-            #print(NMI)
-
-            # KL_EM initialized by SVCA
-            start_time = time.time()
-            EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=10,
-                                 init_method="SVCA", verbosity=0, init_seed=idx)
-            end_time = time.time()
-            NMI = normalized_mutual_info_score(labels, EM_partition)
-            results["KL_EM_SVCA"]["NMI"].append(NMI)
-            results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
-            #print(NMI)
-
-            # MHA250 initialized by SVCA
-            start_time = time.time()
-            MHA_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
-                                  pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,
-                                  init_method="SVCA", verbosity=0, init_seed=idx)
-            end_time = time.time()
-            NMI = normalized_mutual_info_score(labels, MHA_partition)
-            results["MHA250k_SVCA"]["NMI"].append(NMI)
-            results["MHA250k_SVCA"]["Time"].append(end_time - start_time)
-            #print(NMI)
+            # # KN initialized by SVCA
+            # start_time = time.time()
+            # KLG_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
+            #                       numTrials=10, init_method="SVCA", verbosity=0, init_seed=idx)
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, KLG_partition)
+            # results["KN_SVCA"]["NMI"].append(NMI)
+            # results["KN_SVCA"]["Time"].append(end_time - start_time)
+            # #print(NMI)
+            #
+            # # KL_EM initialized by SVCA
+            # start_time = time.time()
+            # EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=10,
+            #                      init_method="SVCA", verbosity=0, init_seed=idx)
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, EM_partition)
+            # results["KL_EM_SVCA"]["NMI"].append(NMI)
+            # results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
+            # #print(NMI)
+            #
+            # # MHA250 initialized by SVCA
+            # start_time = time.time()
+            # MHA_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
+            #                       pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,
+            #                       init_method="SVCA", verbosity=0, init_seed=idx)
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, MHA_partition)
+            # results["MHA250k_SVCA"]["NMI"].append(NMI)
+            # results["MHA250k_SVCA"]["Time"].append(end_time - start_time)
+            # #print(NMI)
 
         summary = {}
         for algo, data in results.items():
@@ -171,7 +171,7 @@ def main(list_mu):
 if __name__ == "__main__":
 
     #Options TEST
-    list_mu = np.arange(0.5, 0.7, 0.1)  # mu between 0 and 0.6
+    list_mu = np.arange(0, 0.7, 0.1)  # mu between 0 and 0.6
 
     random.seed(42)  # Fixer la seed
     main(list_mu)

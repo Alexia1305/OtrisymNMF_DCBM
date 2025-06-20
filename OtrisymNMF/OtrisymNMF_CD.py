@@ -121,7 +121,6 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
         error = prev_error
 
         for iteration in range(maxiter):
-            print("itt")
             if time.time() - start_time > time_limit:
                 print('Time limit passed')
                 break
