@@ -104,6 +104,22 @@ def main(list_mu):
             results["OtrisymNMF"]["NMI"].append(NMI)
             results["OtrisymNMF"]["Time"].append(end_time - start_time)
             print(NMI)
+            print(end_time - start_time)
+
+            # OtrisymNMF
+            X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            start_time = time.time()
+            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD_Sparse(X, r, numTrials=10, init_method="SVCA",
+                                                                          verbosity=0, init_seed=idx, delta=1e-5)
+            end_time = time.time()
+            init_time = end_time - start_time
+            NMI = normalized_mutual_info_score(labels, v_best)
+            results["OtrisymNMF"]["NMI"].append(NMI)
+            results["OtrisymNMF"]["Time"].append(end_time - start_time)
+            print(NMI)
+            print(end_time - start_time)
+
+            break;
 
 
             #SVCA only
@@ -171,7 +187,7 @@ def main(list_mu):
 if __name__ == "__main__":
 
     #Options TEST
-    list_mu = np.arange(0, 0.7, 0.1)  # mu between 0 and 0.6
+    list_mu = np.arange(0.5, 0.7, 0.1)  # mu between 0 and 0.6
 
     random.seed(42)  # Fixer la seed
     main(list_mu)

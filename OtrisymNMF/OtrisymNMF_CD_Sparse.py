@@ -10,7 +10,7 @@ from scipy.sparse import issparse
 from scipy.sparse import diags
 from scipy.sparse.linalg import norm
 
-def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None):
+def OtrisymNMF_CD_Sparse(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None):
     """
     Orthogonal Symmetric Nonnegative Matrix Trifactorization using Coordinate Descent.
     Given a symmetric matrix X >= 0, finds matrices W >= 0 and S >= 0 such that X ≈ WSW' with W'W=I.
@@ -29,7 +29,7 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
     2024 IEEE 34th International Workshop on Machine Learning for Signal Processing (MLSP). IEEE, 2024.
 
     Parameters:
-        X : np.array or crs_matrix , shape (n, n)
+        X : crs_matrix , shape (n, n)
             Symmetric nonnegative matrix (Adjacency matrix of an undirected graph).
         r : int
             Number of columns of W (Number of communities).
@@ -64,10 +64,19 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
     error_best = float('inf')
 
     # Precomputations
-    if issparse(X):
-        normX = np.sqrt(np.sum(X.data ** 2))
-    else:
-        normX = np.linalg.norm(X, 'fro')
+
+    normX = np.sqrt(np.sum(X.data ** 2))
+    I, J, V = find(X)
+    perm = np.argsort(I)
+    I = I[perm]
+    J = J[perm]
+    V = V[perm]
+    rowStart = np.concatenate((
+        [0],
+        np.where(np.diff(I) != 0)[0] + 1,
+        [len(I)]
+    ))
+
 
     if verbosity > 0:
         print(f'Running {numTrials} Trials in Series')
@@ -86,27 +95,25 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
             v = np.random.randint(0, r, size=n)
             w = np.random.rand(n)
             # Normalisation des colonnes de W
-            nw = np.zeros(r)
-            for i in range(n):
-                nw[v[i]] += w[i] ** 2
-            nw = np.sqrt(nw)
-            # w /= nw[v]
-            w = np.where(nw[v] != 0, w / nw[v], 0)
-            S = np.random.rand(r, r)
-            S = (S + S.T) / 2  # Symmetric
+
+
         else:
             if init_seed is not None:
                 init_seed += 10*trial
             W = initialize_W(X, r,method=init_algo,init_seed=init_seed)
             w, v = extract_w_v(W)
-            # Normalization columns of W
-            nw = np.zeros(r)
-            for i in range(n):
-                nw[v[i]] += w[i] ** 2
-            nw = np.sqrt(nw)
-            # w /= nw[v]
-            w = np.where(nw[v] != 0, w / nw[v], 0)
-            S = update_S(X, r, w, v)
+
+
+        # Normalization of w
+        nw = np.bincount(v, weights=w ** 2, minlength=r)
+        nw = np.sqrt(nw)
+        w = np.divide(w, nw[v], out=np.zeros_like(w), where=nw[v] != 0)
+
+        # Compute of S
+        prodVal = w[I] * w[J] * V  # w_i * w_j * X(i,j)
+        S = np.zeros((r, r))
+        np.add.at(S, (v[I], v[J]), prodVal)
+        dgS = np.diag(S)
 
         # Iterative update
         prev_error = compute_error(normX, S)
@@ -117,8 +124,62 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
                 print('Time limit passed')
                 break
 
-            w, v = update_W(X, S, w, v)
-            S = update_S(X, r, w, v)
+            # Update W
+
+            # Pré-calculs pour éviter une double boucle sur "n"
+            wp2 = np.zeros(r)
+            S2 = S**2
+            w2 = w**2
+            for k in range(r):
+                wp2[k] = np.sum(w2 * S2[v, k])
+
+
+            for i in range(n):
+                # b coefficients for the r problems ax^4+bx^2+cx
+                b = 2 * (wp2 - (w[i] * S[v[i], :]) ** 2) - 2 * X[i,i]*dgS
+
+                # c coefficients
+                ind = np.arange(rowStart[i], rowStart[i + 1])
+                mask = J[ind] != i
+                cols_i = J[ind[mask]]
+                xip = V[ind[mask]]
+                c = -4 * np.dot(xip * w[cols_i], S[v[cols_i], :])
+
+                vi_new, wi_new, f_new = -1, -1, np.inf
+                for k in range(r):
+
+                    # Cardan resolution for min ax^4+bx^2+cx
+                    roots = cardan(4 * S2[k,k], 0, 2 * b[k], c[k])
+
+                    # best positive solution
+                    x = np.sqrt(r / n) # default value
+                    min_value = S2[k,k] * (x ** 4) + b[k] * (x ** 2) + c[k] * x
+                    for sol in roots:
+                        value = S2[k,k] * (sol ** 4) + b[k] * (sol ** 2) + c[k] * sol
+                        if sol > 0 and value < min_value:
+                            x, min_value = sol, value
+
+                    if S2[k,k] * x ** 4 + b[k] * x ** 2 + c[k] * x < f_new:
+                        f_new, wi_new, vi_new = S2[k, k] * x ** 4 + b[k] * x ** 2 + c[k] * x, x, k
+
+                # update wp2
+
+                wp2 = wp2 - (w[i] * S[v[i], :]) ** 2 + (wi_new * S[vi_new, :]) ** 2
+
+                # Mise à jour des valeurs de w et v
+                w[i], v[i] = wi_new, vi_new
+
+            # Normalization of w
+            nw = np.bincount(v, weights=w ** 2, minlength=r)
+            nw = np.sqrt(nw)
+            w = np.divide(w, nw[v], out=np.zeros_like(w), where=nw[v] != 0)
+
+            # Compute of S
+            prodVal = w[I] * w[J] * V  # w_i * w_j * X(i,j)
+            S = np.zeros((r, r))
+            np.add.at(S, (v[I], v[J]), prodVal)
+            dgS = np.diag(S)
+
 
             prev_error = error
             error = compute_error(normX, S)
@@ -427,20 +488,14 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
         """
 
 
-    n = X.shape[0]
-    if issparse(X):
-        density = X.nnz / (X.shape[0] * X.shape[1])
-        if n <= 1000 and density > 0.01:
-            X = X.toarray()
-        elif n <= 2500 and density > 0.02:
-            X = X.toarray()
-        elif n <= 10000 and density > 0.05:
-            X = X.toarray()
+
+    I, J, V = find(X)
+    perm = np.argsort(I)
+    I = I[perm]
+    J = J[perm]
+    V = V[perm]
     error_best = float('inf')
-    if issparse(X):
-        normX = np.sqrt(np.sum(X.data ** 2))
-    else:
-        normX = np.linalg.norm(X, 'fro')
+    normX = np.sqrt(np.sum(X.data ** 2))
     if verbosity > 0:
         print(f'Running {numTrials} Trials in Series')
 
@@ -449,13 +504,16 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
         # Placeholder for proper initialization functions
         W = initialize_W(X, r, method="SVCA")
         w, v = extract_w_v(W)
-        # Normalisation des colonnes de W
-        nw = np.zeros(r)
-        for i in range(n):
-            nw[v[i]] += w[i] ** 2
+        # Normalization of w
+        nw = np.bincount(v, weights=w ** 2, minlength=r)
         nw = np.sqrt(nw)
-        w /= nw[v]
-        S = update_S(X, r, w, v)
+        w = np.divide(w, nw[v], out=np.zeros_like(w), where=nw[v] != 0)
+
+        # Compute of S
+        prodVal = w[I] * w[J] * V  # w_i * w_j * X(i,j)
+        S = np.zeros((r, r))
+        np.add.at(S, (v[I], v[J]), prodVal)
+        dgS = np.diag(S)
 
 
         error = compute_error(normX, S)
