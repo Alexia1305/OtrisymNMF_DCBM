@@ -1,9 +1,8 @@
 import numpy as np
 from scipy.sparse.linalg import svds
 from scipy.sparse import issparse
-from scipy.sparse import csr_matrix
 from scipy.sparse import csc_matrix
-from scipy.sparse import lil_matrix
+
 
 def update_orth_basis(V, v):
     """

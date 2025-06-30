@@ -7,8 +7,7 @@ from .SSPA import SSPA
 from .SSPA import SVCA
 from .Utils import orthNNLS
 from scipy.sparse import issparse
-from scipy.sparse import diags
-from scipy.sparse.linalg import norm
+
 
 def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None):
     """
@@ -60,22 +59,18 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
     """
     start_time = time.time()
 
-    n = X.shape[0]
+    # dense format numpy
     if issparse(X):
-        density = X.nnz / (X.shape[0] * X.shape[1])
-        if n<=1000 and density>0.01:
-            X=X.toarray()
-        elif n<=2500 and density>0.02:
-            X = X.toarray()
-        elif n<=10000 and density>0.05:
-            X = X.toarray()
+        X = X.toarray()
 
+    n = X.shape[0]
     error_best = float('inf')
+
     # Precomputations
-    if issparse(X):
-        normX = np.sqrt(np.sum(X.data ** 2))
-    else:
-        normX = np.linalg.norm(X, 'fro')
+
+    normX = np.linalg.norm(X, 'fro')
+
+    ## TRIALS
 
     if verbosity > 0:
         print(f'Running {numTrials} Trials in Series')
@@ -89,7 +84,8 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
         else:
             init_algo = init_method
 
-        # Initialization
+        ### INITIALIZATION ###
+        # Random
         if init_algo == "random":
             v = np.random.randint(0, r, size=n)
             w = np.random.rand(n)
@@ -102,9 +98,11 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
             w = np.where(nw[v] != 0, w / nw[v], 0)
             S = np.random.rand(r, r)
             S = (S + S.T) / 2  # Symmetric
+        # SVCA or SSPA
         else:
             if init_seed is not None:
                 init_seed += 10*trial
+            # Iitialization of W with SVCA or SSPA
             W = initialize_W(X, r,method=init_algo,init_seed=init_seed)
             w, v = extract_w_v(W)
             # Normalization columns of W
@@ -114,9 +112,10 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
             nw = np.sqrt(nw)
             # w /= nw[v]
             w = np.where(nw[v] != 0, w / nw[v], 0)
+            # Computation of S given W
             S = update_S(X, r, w, v)
 
-        # Iterative update
+        ### ITERATIVE UPDATE ###
         prev_error = compute_error(normX, S)
         error = prev_error
 
@@ -124,13 +123,14 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
             if time.time() - start_time > time_limit:
                 print('Time limit passed')
                 break
-
+            # Update W given S
             w, v = update_W(X, S, w, v)
+            # Update S given W
             S = update_S(X, r, w, v)
 
             prev_error = error
             error = compute_error(normX, S)
-
+            # If no more improvements
             if error < delta or abs(prev_error - error) < delta:
                 break
         if iteration == maxiter-1:
@@ -159,36 +159,16 @@ def initialize_W(X, r, method="SSPA",init_seed=None):
         if init_seed is not None:
             np.random.seed(init_seed)
 
-        if issparse(X):
+        WO, K = SSPA(X, r, p,options=options )
 
-            WO, K = SSPA(X.tocsc(), r, p, options=options)
-            norm2x_squared = X.multiply(X).sum(axis=0)  # matrice 1 x n (sparse)
-            norm2x_squared = np.array(norm2x_squared).ravel()
-            norm2x = np.sqrt(norm2x_squared)
-            norm2x_safe = norm2x + 1e-16
-
-            # Créer matrice diagonale inverses des normes
-            inv_norms = 1.0 / norm2x_safe
-            D = diags(inv_norms)  # matrice diagonale sparse (n x n)
-
-            # Normaliser X par colonnes : multiplication à droite
-            Xn = X @ D
-
-            HO = orthNNLS(X, WO, Xn)
-
-            # Transposition du résultat
-            W = HO.T
-        else :
-            WO, K = SSPA(X, r, p,options=options )
-
-            norm2x = np.sqrt(np.sum(X ** 2, axis=0))  # Calcul de la norme L2 sur chaque colonne de X
-            Xn = X * (1 / (norm2x + 1e-16))  # Normalisation de X (évite la division par zéro)
+        norm2x = np.sqrt(np.sum(X ** 2, axis=0))  # Calcul de la norme L2 sur chaque colonne de X
+        Xn = X * (1 / (norm2x + 1e-16))  # Normalisation de X (évite la division par zéro)
 
 
-            HO = orthNNLS(X, WO, Xn)
+        HO = orthNNLS(X, WO, Xn)
 
-            # Transposition du résultat
-            W = HO.T
+        # Transposition du résultat
+        W = HO.T
 
     if method == "SVCA":
         n = X.shape[0]
@@ -198,37 +178,16 @@ def initialize_W(X, r, method="SSPA",init_seed=None):
         if init_seed is not None:
             np.random.seed(init_seed)
 
-        if issparse(X):
 
-            WO, K = SVCA(X.tocsc(), r, p, options=options)
-            norm2x_squared = X.multiply(X).sum(axis=0)  # matrice 1 x n (sparse)
-            norm2x_squared = np.array(norm2x_squared).ravel()
-            norm2x = np.sqrt(norm2x_squared)
-            norm2x_safe = norm2x + 1e-16
+        WO, K = SVCA(X, r, p, options=options)
 
-            # Créer matrice diagonale inverses des normes
-            inv_norms = 1.0 / norm2x_safe
-            D = diags(inv_norms)  # matrice diagonale sparse (n x n)
+        norm2x = np.sqrt(np.sum(X ** 2, axis=0))  # Calcul de la norme L2 sur chaque colonne de X
+        Xn = X * (1 / (norm2x + 1e-16))  # Normalisation de X (évite la division par zéro)
 
-            # Normaliser X par colonnes : multiplication à droite
-            Xn = X @ D
+        HO = orthNNLS(X, WO, Xn)
 
-            HO = orthNNLS(X, WO, Xn)
-
-            # Transposition du résultat
-            W = HO.T
-
-
-        else:
-            WO, K = SVCA(X, r, p, options=options)
-
-            norm2x = np.sqrt(np.sum(X ** 2, axis=0))  # Calcul de la norme L2 sur chaque colonne de X
-            Xn = X * (1 / (norm2x + 1e-16))  # Normalisation de X (évite la division par zéro)
-
-            HO = orthNNLS(X, WO, Xn)
-
-            # Transposition du résultat
-            W = HO.T
+        # Transposition du résultat
+        W = HO.T
 
 
     return W
@@ -266,10 +225,6 @@ def update_W(X, S, w, v):
     # Mise à jour de W
     for i in range(n):
         vi_new, wi_new, f_new = -1, -1, np.inf
-        if issparse(X):
-            rowX = X[i, :]  # ligne sparse
-            cols = rowX.indices
-            vals = rowX.data
         Xii = X[i, i]
 
 
@@ -277,10 +232,8 @@ def update_W(X, S, w, v):
             # Calcul des coefficients pour la minimisation
             c3 = S[k, k] ** 2
             c1 = 2 * (wp2[k] - (w[i] * S[v[i], k]) ** 2) - 2 * S[k, k] * Xii
-            if issparse(X):
-                c0 = -4 * sum(val * w[p] * S[v[p], k] for val, p in zip(vals, cols) if p != i)
-            else:
-                c0 = -4 * sum(X[i, p] * w[p] * S[v[p], k] for p in np.nonzero(X[i, :])[0] if p != i)
+
+            c0 = -4 * sum(X[i, p] * w[p] * S[v[p], k] for p in np.nonzero(X[i, :])[0] if p != i)
 
             # Résolution des racines avec la méthode de Cardan
             roots = cardan(4 * c3, 0, 2 * c1, c0)
@@ -407,16 +360,6 @@ def compute_error(normX, S):
     """ Computes error ||X - WSW'||_F / ||X||_F."""
     error = np.sqrt(normX**2-np.linalg.norm(S, 'fro')**2)/normX
     return error
-def compute_error_rdegenerate(X,S,v,w):
-    """ Computes error ||X - WSW'||_F / ||X||_F."""
-    # WTW!=I
-    error = 0;
-    n = X.shape[0]
-    for i in range(n):
-        for j in range(n):
-            error += (X[i,j]-S[v[i],v[j]]*w[i]*w[j])**2
-    return np.sqrt(error)/np.linalg.norm(X,'fro')
-
 def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
     """
         Perform community detection using the SVCA (Smooth VCA).
@@ -437,18 +380,11 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
 
     n = X.shape[0]
     if issparse(X):
-        density = X.nnz / (X.shape[0] * X.shape[1])
-        if n <= 1000 and density > 0.01:
-            X = X.toarray()
-        elif n <= 2500 and density > 0.02:
-            X = X.toarray()
-        elif n <= 10000 and density > 0.05:
-            X = X.toarray()
+        X = X.toarray()
+
     error_best = float('inf')
-    if issparse(X):
-        normX = np.sqrt(np.sum(X.data ** 2))
-    else:
-        normX = np.linalg.norm(X, 'fro')
+
+    normX = np.linalg.norm(X, 'fro')
     if verbosity > 0:
         print(f'Running {numTrials} Trials in Series')
 

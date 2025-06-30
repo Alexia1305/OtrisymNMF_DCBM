@@ -1126,7 +1126,6 @@ class KarrerInference(Inference):
     def infer_stochastic_block_model(self):
         try:
             for _ in range(100):
-                print("itt")
                 self.infer_stepwise()
             else:
                 raise Exception("Could not find minimum in 100 steps" + str(self.partition.get_representation()) + str(

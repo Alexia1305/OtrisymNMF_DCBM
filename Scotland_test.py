@@ -35,9 +35,9 @@ def read_graph():
 
 
 def main(graph, clusters):
-    nbr_tests = 100
+    nbr_tests = 10
     r = 2
-    runs = 1
+    runs = 5
     results = {
         "OtrisymNMF": {"NMI": [], "Success_rate": [], "Time": []},
         "KL_EM": {"NMI": [], "Success_rate": [] ,"Time": []},
