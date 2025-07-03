@@ -1,50 +1,11 @@
-from scipy.sparse import csr_matrix
-from scipy.sparse import csc_matrix
-import numpy as np
-from scipy import sparse
-import time
-n=10000
-A=np.random.rand(n,n)
-M=sparse.random(n,n,density=0.0001,format='csr', dtype=np.float64, data_rvs=np.random.rand)
-print("csr")
-start_time = time.time()
-M*A
-end_time = time.time()
-print(end_time - start_time)
+import numpy
+from scipy.io import loadmat
+import OtrisymNMF
+# Charger le fichier .mat
+data = loadmat('matrice_2000.mat')
 
-start_time = time.time()
-M.T*A
-end_time = time.time()
-print(end_time - start_time)
-
-start_time = time.time()
-A*M
-end_time = time.time()
-print(end_time - start_time)
-
-start_time = time.time()
-A*M.T
-end_time = time.time()
-print(end_time - start_time)
-
-print("csc")
-M=M.tocsc()
-start_time = time.time()
-M*A
-end_time = time.time()
-print(end_time - start_time)
-
-start_time = time.time()
-M.T*A
-end_time = time.time()
-print(end_time - start_time)
-
-start_time = time.time()
-A*M
-end_time = time.time()
-print(end_time - start_time)
-
-start_time = time.time()
-A*M.T
-end_time = time.time()
-print(end_time - start_time)
+# Accéder à une matrice particulière
+X = data['X']
+r=201
+w_best, v_best, S_best, error_best=OtrisymNMF.OtrisymNMF_CD_Sdirect(X, r, numTrials=1, maxiter=1000, delta=1e-5, time_limit=60, init_method="SSPA")
+print(error_best)

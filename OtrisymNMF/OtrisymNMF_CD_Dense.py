@@ -398,15 +398,6 @@ def compute_error(normX, S):
     """ Computes error ||X - WSW'||_F / ||X||_F."""
     error = np.sqrt(normX**2-np.linalg.norm(S, 'fro')**2)/normX
     return error
-def compute_error_rdegenerate(X,S,v,w):
-    """ Computes error ||X - WSW'||_F / ||X||_F."""
-    # WTW!=I
-    error = 0;
-    n = X.shape[0]
-    for i in range(n):
-        for j in range(n):
-            error += (X[i,j]-S[v[i],v[j]]*w[i]*w[j])**2
-    return np.sqrt(error)/np.linalg.norm(X,'fro')
 
 def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
     """

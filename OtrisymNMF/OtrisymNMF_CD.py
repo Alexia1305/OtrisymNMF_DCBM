@@ -115,7 +115,7 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
         prodVal = w[I] * w[J] * V  # w_i * w_j * X(i,j)
         S = np.zeros((r, r))
         np.add.at(S, (v[I], v[J]), prodVal)
-        dgS = np.diag(S)
+        dgS = np.diag(S).copy()
 
         # Iterative update
         prev_error = compute_error(normX, S)
@@ -180,8 +180,259 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
             prodVal = w[I] * w[J] * V  # w_i * w_j * X(i,j)
             S = np.zeros((r, r))
             np.add.at(S, (v[I], v[J]), prodVal)
-            dgS = np.diag(S)
+            dgS = np.diag(S).copy()
 
+
+            prev_error = error
+            error = compute_error(normX, S)
+
+            if error < delta or abs(prev_error - error) < delta:
+                break
+        if iteration == maxiter-1:
+            print('Not converged')
+
+        if error <= error_best:
+            w_best, v_best, S_best, error_best = w, v, S, error
+        if error_best <= delta or time.time() - start_time > time_limit:
+            break
+
+        if verbosity > 0:
+            print(f'Trial {trial + 1}/{numTrials} with {init_algo}: Error {error:.4e} | Best: {error_best:.4e}')
+
+    return w_best, v_best, S_best, error_best
+
+def OtrisymNMF_CD_Sdirect(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None):
+    """
+    version with S updated directly after the update of a column of W
+    Orthogonal Symmetric Nonnegative Matrix Trifactorization using Coordinate Descent.
+    Given a symmetric matrix X >= 0, finds matrices W >= 0 and S >= 0 such that X ≈ WSW' with W'W=I.
+    W is represented by:
+    - v: indices of the nonzero columns of W for each row.
+    - w: values of the nonzero elements in each row of W.
+
+    Application to community detection:
+        - X is the adjacency matrix of an undirected graph.
+        - OtrisymNMF detects r communities.
+        - v assigns each node to a community.
+        - w indicates the importance of a node within its community.
+        - S describes interactions between the r communities.
+
+    "Orthogonal Symmetric Nonnegative Matrix Tri-Factorization."
+    2024 IEEE 34th International Workshop on Machine Learning for Signal Processing (MLSP). IEEE, 2024.
+
+    Parameters:
+        X : crs_matrix , shape (n, n)
+            Symmetric nonnegative matrix (Adjacency matrix of an undirected graph).
+        r : int
+            Number of columns of W (Number of communities).
+        numTrials : int, default=1
+            Number of trials with different initializations.
+        maxiter : int, default=1000
+            Maximum iterations for each trial.
+        delta : float, default=1e-7
+            Convergence tolerance.
+        time_limit : int, default=300
+            Time limit in seconds.
+        init_method : str, default=None
+            Initialization method ("random", "SSPA", "SVCA", "SPA").
+        verbosity : int, default=1
+            Verbosity level (1 for messages, 0 for silent mode).
+        init_seed : float, optional (default=None)
+            Random seed for the initialization for the experiments
+
+    Returns:
+        w_best : np.array, shape (n,)
+            Values of the nonzero elements for each row.
+        v_best : np.array, shape (n,)
+            Indices of the nonzero columns of W.
+        S_best : np.array, shape (r, r)
+            Central matrix.
+        error_best : float
+            Relative error ||X - WSW'||_F / ||X||_F.
+    """
+    start_time = time.time()
+    if not issparse(X):
+        X = csr_matrix(X)
+    n = X.shape[0]
+    error_best = float('inf')
+
+    # Precomputations
+
+    normX = np.sqrt(np.sum(X.data ** 2))
+    I, J, V = find(X)
+    perm = np.argsort(I)
+    I = I[perm]
+    J = J[perm]
+    V = V[perm]
+    rowStart = np.concatenate((
+        [0],
+        np.where(np.diff(I) != 0)[0] + 1,
+        [len(I)]
+    ))
+    diagX = X.diagonal()
+
+
+    if verbosity > 0:
+        print(f'Running {numTrials} Trials in Series')
+
+    for trial in range(numTrials):
+        w = np.zeros(n)
+        v = np.zeros(n, dtype=int)
+
+        if init_method is None:
+            init_algo = "SSPA" if trial == 0 else "SVCA"
+        else:
+            init_algo = init_method
+
+        # Initialization
+        if init_algo == "random":
+            base = np.arange(r)
+            rest = np.random.randint(0, r, size=n - r)
+            v = np.concatenate([base, rest])
+            np.random.shuffle(v)
+
+
+        else:
+            if init_seed is not None:
+                init_seed += 10*trial
+            W = initialize_W(X, r,method=init_algo,init_seed=init_seed)
+            w, v = extract_w_v(W)
+
+
+        # Normalization of w
+        nw = np.bincount(v, weights=w ** 2, minlength=r)
+        nw = np.sqrt(nw)
+        w = np.divide(w, nw[v], out=np.zeros_like(w), where=nw[v] != 0)
+
+        # Compute of S
+        prodVal = w[I] * w[J] * V  # w_i * w_j * X(i,j)
+        S = np.zeros((r, r))
+        np.add.at(S, (v[I], v[J]), prodVal)
+        dgS = np.diag(S).copy()
+
+        # Matrix G = W^TXW  and  d = ||W(:,k)||^2
+        d = np.ones(r)
+        G = S.copy()
+
+
+        # Iterative update
+        prev_error = compute_error(normX, S)
+        error = prev_error
+
+        for iteration in range(maxiter):
+            if time.time() - start_time > time_limit:
+                print('Time limit passed')
+                break
+
+            # Update W
+
+            # Pré-calculs pour éviter une double boucle sur "n"
+            wp2 = np.zeros(r)
+            S2 = S**2
+            w2 = w**2
+            for k in range(r):
+                wp2[k] = np.sum(w2 * S2[v, k])
+
+
+            for i in range(n):
+                # b coefficients for the r problems ax^4+bx^2+cx
+                tempB=(w[i]/d[v[i]])*(G[v[i],:].flatten()/d) #%w(i)*S(v(i),:)
+                b = 2 * (wp2 - tempB ** 2) - 2 * diagX[i]*dgS
+
+                # c coefficients
+                ind = np.arange(rowStart[i], rowStart[i + 1])
+                mask = J[ind] != i
+                cols_i = J[ind[mask]]
+                xip = V[ind[mask]]
+
+                tempC=(xip*w[cols_i])/d[v[cols_i]]
+                Gscl = G[v[cols_i], :] / d[np.newaxis,:]
+                c = -4 * (tempC.T@ Gscl)
+
+                vi_new, wi_new, f_new = -1, -1, np.inf
+                for k in range(r):
+                    S2kk=(G[k,k]/(d[k]**2))**2
+                    # Cardan resolution for min ax^4+bx^2+cx
+                    roots = cardan(4 * S2kk, 0, 2 * b[k], c[k])
+
+                    # best positive solution
+                    x = np.sqrt(r / n) # default value
+                    min_value = S2kk * (x ** 4) + b[k] * (x ** 2) + c[k] * x
+                    for sol in roots:
+                        value = S2kk  * (sol ** 4) + b[k] * (sol ** 2) + c[k] * sol
+                        if sol > 0 and value < min_value:
+                            x, min_value = sol, value
+
+                    if S2kk * x ** 4 + b[k] * x ** 2 + c[k] * x < f_new:
+                        f_new, wi_new, vi_new = S2kk * x ** 4 + b[k] * x ** 2 + c[k] * x, x, k
+
+                # for the update of p
+                G_old = G[v[i], :].flatten()
+                G_best = G[vi_new, :].flatten()
+                oldRow_p = (G_old ** 2) / (d[v[i]] * (d ** 2))
+                bestRow_p = (G_best ** 2) / (d[vi_new] * (d ** 2))
+
+                # update of d
+                d[v[i]] -= w[i] ** 2
+                d[vi_new] += wi_new ** 2
+
+                # update of G
+                coeffVec = xip.flatten() * w[cols_i]
+
+                # Remove the old contribution
+                delta_old = np.zeros(r)
+                np.add.at(delta_old, v[cols_i], w[i] * coeffVec)
+                delta_old[v[i]] *= 2
+                G[v[i], :] -= delta_old
+                G[:, v[i]] = G[v[i], :].T
+
+                # Add the new contribution
+                delta_new = np.zeros(r)
+                np.add.at(delta_new, v[cols_i], wi_new * coeffVec)
+                delta_new[vi_new] *= 2
+                G[vi_new, :] += delta_new
+                G[:, vi_new] = G[vi_new, :].T
+
+                # Update of diagonal
+                G[v[i], v[i]] -= w[i] ** 2 * diagX[i]
+                G[vi_new, vi_new] += wi_new ** 2 * diagX[i]
+
+                # update of  wp2
+                newRow_old = (G[v[i], :].flatten() ** 2) / (d[v[i]] * (d ** 2))
+                newRow_best = (G[vi_new, :] .flatten()** 2) / (d[vi_new] * (d ** 2))
+
+                if v[i] != vi_new:
+                    wp2 = wp2 - oldRow_p - bestRow_p + newRow_old + newRow_best
+                else:
+                    wp2 = wp2 - oldRow_p + newRow_old
+
+                tmp = G[:, v[i]].flatten() ** 2 / d
+                wp2[v[i]] = np.sum(tmp) / (d[v[i]] ** 2)
+
+                tmp = G[:, vi_new] ** 2 / d
+                wp2[vi_new] = np.sum(tmp) / (d[vi_new] ** 2)
+
+                # Mise à jour de dgS
+                dgS[v[i]] = G[v[i], v[i]] / (d[v[i]] ** 2)
+                dgS[vi_new] = G[vi_new, vi_new] / (d[vi_new] ** 2)
+
+                #Update of w et v with the new values
+                w[i], v[i] = wi_new, vi_new
+
+            # Normalization of w
+            nw = np.bincount(v, weights=w ** 2, minlength=r)
+            nw = np.sqrt(nw)
+            w = np.divide(w, nw[v], out=np.zeros_like(w), where=nw[v] != 0)
+
+            # Compute of S
+            prodVal = w[I] * w[J] * V  # w_i * w_j * X(i,j)
+            S = np.zeros((r, r))
+            np.add.at(S, (v[I], v[J]), prodVal)
+            dgS = np.diag(S).copy()
+
+            # Matrix G=WtXW and d=||W(:,k)||^2
+            d = np.ones(r)
+            G = S.copy()
 
             prev_error = error
             error = compute_error(normX, S)
@@ -376,15 +627,6 @@ def compute_error(normX, S):
     """ Computes error ||X - WSW'||_F / ||X||_F."""
     error = np.sqrt(normX**2-np.linalg.norm(S, 'fro')**2)/normX
     return error
-def compute_error_rdegenerate(X,S,v,w):
-    """ Computes error ||X - WSW'||_F / ||X||_F."""
-    # WTW!=I
-    error = 0;
-    n = X.shape[0]
-    for i in range(n):
-        for j in range(n):
-            error += (X[i,j]-S[v[i],v[j]]*w[i]*w[j])**2
-    return np.sqrt(error)/np.linalg.norm(X,'fro')
 
 def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
     """
@@ -429,7 +671,7 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
         prodVal = w[I] * w[J] * V  # w_i * w_j * X(i,j)
         S = np.zeros((r, r))
         np.add.at(S, (v[I], v[J]), prodVal)
-        dgS = np.diag(S)
+        dgS = np.diag(S).copy()
 
 
         error = compute_error(normX, S)
