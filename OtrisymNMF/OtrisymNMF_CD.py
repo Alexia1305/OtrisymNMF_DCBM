@@ -398,23 +398,33 @@ def OtrisymNMF_CD_Sdirect(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limi
                 G[vi_new, vi_new] += wi_new ** 2 * diagX[i]
 
                 # update of  wp2
-                newRow_old = (G[v[i], :].flatten() ** 2) / (d[v[i]] * (d ** 2))
-                newRow_best = (G[vi_new, :] .flatten()** 2) / (d[vi_new] * (d ** 2))
+
+                newRow_old = np.where((d[v[i]] * (d ** 2))!=0, (G[v[i], :].flatten() ** 2) / (d[v[i]] * (d ** 2)),0)
+                newRow_best = np.where((d[vi_new] * (d ** 2)) !=0,(G[vi_new, :] .flatten()** 2) / (d[vi_new] * (d ** 2)),0)
 
                 if v[i] != vi_new:
                     wp2 = wp2 - oldRow_p - bestRow_p + newRow_old + newRow_best
                 else:
                     wp2 = wp2 - oldRow_p + newRow_old
 
-                tmp = G[:, v[i]].flatten() ** 2 / d
-                wp2[v[i]] = np.sum(tmp) / (d[v[i]] ** 2)
+                tmp = np.where(d!=0, (G[:, v[i]].flatten()) ** 2 / d,0)
+                if d[v[i]] != 0 :
+                    wp2[v[i]] = np.sum(tmp) / (d[v[i]] ** 2)
+                    dgS[v[i]] = G[v[i], v[i]] / (d[v[i]] ** 2)
+                else :
+                    wp2[v[i]]=0
+                    dgS[v[i]] =0
 
-                tmp = G[:, vi_new] ** 2 / d
-                wp2[vi_new] = np.sum(tmp) / (d[vi_new] ** 2)
+                tmp = np.where(d!=0,G[:, vi_new] ** 2 / d,0)
+                if d[vi_new]!= 0:
+                    dgS[vi_new] = G[vi_new, vi_new] / (d[vi_new] ** 2)
+                    wp2[vi_new] = np.sum(tmp) / (d[vi_new] ** 2)
+                else :
+                    wp2[vi_new] = 0
+                    dgS[vi_new] = 0
+                    # Mise à jour de dgS
 
-                # Mise à jour de dgS
-                dgS[v[i]] = G[v[i], v[i]] / (d[v[i]] ** 2)
-                dgS[vi_new] = G[vi_new, vi_new] / (d[vi_new] ** 2)
+
 
                 #Update of w et v with the new values
                 w[i], v[i] = wi_new, vi_new
