@@ -46,9 +46,12 @@ def main(list_mu):
         graphs = read_graphs_from_files(graphs_folder, n)
         results = {
             "OtrisymNMF": {"NMI": [], "Time": []},
+            "OtrisymNMF_S": {"NMI": [], "Time": []},
             "KN": {"NMI": [], "Time": []},
             "KL_EM": {"NMI": [], "Time": []},
             "MHA250k": {"NMI": [], "Time": []},
+            "OtrisymNMF_SVCA": {"NMI": [], "Time": []},
+            "OtrisymNMF_S_SVCA": {"NMI": [], "Time": []},
             "SVCA": {"NMI": [], "Time": []},
             "KN_SVCA": {"NMI": [], "Time": []},
             "KL_EM_SVCA": {"NMI": [], "Time": []},
@@ -62,6 +65,29 @@ def main(list_mu):
 
             labels = [G.nodes[v]['community'] for v in G.nodes]
             r = max(labels)
+
+            # OtrisymNMF
+            X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            start_time = time.time()
+            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, numTrials=10, init_method="random",
+                                                                          verbosity=0, init_seed=idx, delta=1e-5)
+            end_time = time.time()
+            NMI = normalized_mutual_info_score(labels, v_best)
+            results["OtrisymNMF"]["NMI"].append(NMI)
+            results["OtrisymNMF"]["Time"].append(end_time - start_time)
+
+            # OtrisymNMF_S
+            X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            start_time = time.time()
+            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD_Sdirect(X, r, numTrials=10,
+                                                                                  init_method="random",
+                                                                                  verbosity=0, init_seed=idx,
+                                                                                  delta=1e-5)
+            end_time = time.time()
+
+            NMI = normalized_mutual_info_score(labels, v_best)
+            results["OtrisymNMF_S"]["NMI"].append(NMI)
+            results["OtrisymNMF_S"]["Time"].append(end_time - start_time)
 
             # # KN
             # start_time=time.time()
@@ -95,42 +121,38 @@ def main(list_mu):
             # #print(NMI)
 
             #OtrisymNMF
-            # X = nx.adjacency_matrix(G, nodelist=G.nodes)
-            # start_time = time.time()
-            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r,numTrials=10,init_method="SVCA",verbosity=0, init_seed=idx,delta=1e-5)
-            # end_time = time.time()
-            # init_time=end_time - start_time
-            # NMI = normalized_mutual_info_score(labels, v_best)
-            # results["OtrisymNMF"]["NMI"].append(NMI)
-            # results["OtrisymNMF"]["Time"].append(end_time - start_time)
-            # print(NMI)
-            # print(end_time - start_time)
-
-            # OtrisymNMF
             X = nx.adjacency_matrix(G, nodelist=G.nodes)
             start_time = time.time()
-            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD_Sparse(X, r, numTrials=10, init_method="SVCA",
+            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r,numTrials=10,init_method="SVCA",verbosity=0, init_seed=idx,delta=1e-5)
+            end_time = time.time()
+            NMI = normalized_mutual_info_score(labels, v_best)
+            results["OtrisymNMF_SVCA"]["NMI"].append(NMI)
+            results["OtrisymNMF_SVCA"]["Time"].append(end_time - start_time)
+
+
+
+            # OtrisymNMF_S
+            X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            start_time = time.time()
+            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD_Sdirect(X, r, numTrials=10, init_method="SVCA",
                                                                           verbosity=0, init_seed=idx, delta=1e-5)
             end_time = time.time()
-            init_time = end_time - start_time
+
             NMI = normalized_mutual_info_score(labels, v_best)
-            results["OtrisymNMF"]["NMI"].append(NMI)
-            results["OtrisymNMF"]["Time"].append(end_time - start_time)
-            print(NMI)
-            print(end_time - start_time)
-
-            break;
+            results["OtrisymNMF_S_SVCA"]["NMI"].append(NMI)
+            results["OtrisymNMF_S_SVCA"]["Time"].append(end_time - start_time)
 
 
-            #SVCA only
-            start_time = time.time()
-            X = nx.adjacency_matrix(G, nodelist=G.nodes)
-            w_best, v, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X, r, numTrials=10, verbosity=0)
-            NMI = normalized_mutual_info_score(labels, v)
-            end_time = time.time()
-            results["SVCA"]["NMI"].append(NMI)
-            results["SVCA"]["Time"].append(end_time - start_time)
-            print(NMI)
+
+            # #SVCA only
+            # start_time = time.time()
+            # X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            # w_best, v, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X, r, numTrials=10, verbosity=0)
+            # NMI = normalized_mutual_info_score(labels, v)
+            # end_time = time.time()
+            # results["SVCA"]["NMI"].append(NMI)
+            # results["SVCA"]["Time"].append(end_time - start_time)
+
 
             # # KN initialized by SVCA
             # start_time = time.time()
@@ -179,7 +201,7 @@ def main(list_mu):
         print(df_results)
 
         # Sauvegarde des résultats dans un fichier CSV
-        results_filename = f"mu_{mu:.1f}_resultsSVCA.csv"
+        results_filename = f"mu_{mu:.1f}_resultsOtri.csv"
         df_results.to_csv(results_filename)
         print(f"Résultats enregistrés dans '{results_filename}'\n")
 
@@ -187,7 +209,7 @@ def main(list_mu):
 if __name__ == "__main__":
 
     #Options TEST
-    list_mu = np.arange(0.5, 0.7, 0.1)  # mu between 0 and 0.6
+    list_mu = np.arange(0, 0.7, 0.1)  # mu between 0 and 0.6
 
     random.seed(42)  # Fixer la seed
     main(list_mu)

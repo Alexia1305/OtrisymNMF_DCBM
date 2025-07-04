@@ -10,6 +10,7 @@ from scipy.sparse import issparse
 from scipy.sparse import diags
 from scipy.sparse.linalg import norm
 from scipy.sparse import diags
+
 def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None):
     """
     Orthogonal Symmetric Nonnegative Matrix Trifactorization using Coordinate Descent.
@@ -94,9 +95,13 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
 
         # Initialization
         if init_algo == "random":
-            v = np.random.randint(0, r, size=n)
-            w = np.random.rand(n)
-            # Normalisation des colonnes de W
+            if init_seed is not None:
+                init_seed += 10 * trial
+                np.random.seed(init_seed)
+            base = np.arange(r)
+            rest = np.random.randint(0, r, size=n - r)
+            v = np.concatenate([base, rest])
+            np.random.shuffle(v)
 
 
         else:
@@ -286,6 +291,9 @@ def OtrisymNMF_CD_Sdirect(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limi
 
         # Initialization
         if init_algo == "random":
+            if init_seed is not None:
+                init_seed += 10 * trial
+                np.random.seed(init_seed)
             base = np.arange(r)
             rest = np.random.randint(0, r, size=n - r)
             v = np.concatenate([base, rest])
@@ -336,7 +344,10 @@ def OtrisymNMF_CD_Sdirect(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limi
 
             for i in range(n):
                 # b coefficients for the r problems ax^4+bx^2+cx
-                tempB=(w[i]/d[v[i]])*(G[v[i],:].flatten()/d) #%w(i)*S(v(i),:)
+                if d[v[i]] != 0:
+                    tempB = (w[i]/d[v[i]])*safe_div_where_nonzero(G[v[i],:].flatten(),d) #%w(i)*S(v(i),:)
+                else:
+                    tempB = np.zeros(r)
                 b = 2 * (wp2 - tempB ** 2) - 2 * diagX[i]*dgS
 
                 # c coefficients
@@ -345,13 +356,18 @@ def OtrisymNMF_CD_Sdirect(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limi
                 cols_i = J[ind[mask]]
                 xip = V[ind[mask]]
 
-                tempC=(xip*w[cols_i])/d[v[cols_i]]
-                Gscl = G[v[cols_i], :] / d[np.newaxis,:]
+                tempC = safe_div_where_nonzero( (xip*w[cols_i]),d[v[cols_i]])
+                d_safe = np.where(d == 0, 1, d)  # remplacer 0 par 1 temporairement pour éviter division par zéro
+                Gscl = G[v[cols_i], :] / d_safe[np.newaxis, :]
+                Gscl[:, d == 0] = 0
                 c = -4 * (tempC.T@ Gscl)
 
                 vi_new, wi_new, f_new = -1, -1, np.inf
                 for k in range(r):
-                    S2kk=(G[k,k]/(d[k]**2))**2
+                    if d[k] !=0:
+                        S2kk = (G[k,k]/(d[k]**2))**2
+                    else:
+                        S2kk = 0
                     # Cardan resolution for min ax^4+bx^2+cx
                     roots = cardan(4 * S2kk, 0, 2 * b[k], c[k])
 
@@ -369,8 +385,8 @@ def OtrisymNMF_CD_Sdirect(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limi
                 # for the update of p
                 G_old = G[v[i], :].flatten()
                 G_best = G[vi_new, :].flatten()
-                oldRow_p = (G_old ** 2) / (d[v[i]] * (d ** 2))
-                bestRow_p = (G_best ** 2) / (d[vi_new] * (d ** 2))
+                oldRow_p = safe_div_where_nonzero((G_old ** 2) , (d[v[i]] * (d ** 2)))
+                bestRow_p = safe_div_where_nonzero((G_best ** 2) , (d[vi_new] * (d ** 2)))
 
                 # update of d
                 d[v[i]] -= w[i] ** 2
@@ -399,15 +415,15 @@ def OtrisymNMF_CD_Sdirect(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limi
 
                 # update of  wp2
 
-                newRow_old = np.where((d[v[i]] * (d ** 2))!=0, (G[v[i], :].flatten() ** 2) / (d[v[i]] * (d ** 2)),0)
-                newRow_best = np.where((d[vi_new] * (d ** 2)) !=0,(G[vi_new, :] .flatten()** 2) / (d[vi_new] * (d ** 2)),0)
+                newRow_old = safe_div_where_nonzero( (G[v[i], :].flatten() ** 2) , (d[v[i]] * (d ** 2)))
+                newRow_best = safe_div_where_nonzero((G[vi_new, :] .flatten()** 2) , (d[vi_new] * (d ** 2)))
 
                 if v[i] != vi_new:
                     wp2 = wp2 - oldRow_p - bestRow_p + newRow_old + newRow_best
                 else:
                     wp2 = wp2 - oldRow_p + newRow_old
 
-                tmp = np.where(d!=0, (G[:, v[i]].flatten()) ** 2 / d,0)
+                tmp = safe_div_where_nonzero( (G[:, v[i]].flatten()) ** 2, d)
                 if d[v[i]] != 0 :
                     wp2[v[i]] = np.sum(tmp) / (d[v[i]] ** 2)
                     dgS[v[i]] = G[v[i], v[i]] / (d[v[i]] ** 2)
@@ -415,7 +431,7 @@ def OtrisymNMF_CD_Sdirect(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limi
                     wp2[v[i]]=0
                     dgS[v[i]] =0
 
-                tmp = np.where(d!=0,G[:, vi_new] ** 2 / d,0)
+                tmp = safe_div_where_nonzero(G[:, vi_new] ** 2 , d)
                 if d[vi_new]!= 0:
                     dgS[vi_new] = G[vi_new, vi_new] / (d[vi_new] ** 2)
                     wp2[vi_new] = np.sum(tmp) / (d[vi_new] ** 2)
@@ -621,7 +637,7 @@ def cardan(a, b, c, d):
 
     else:
         epsilon = -1e-300
-        phi = math.acos(-q / (2 * math.sqrt(-27 / (p ** 3 + epsilon))))
+        phi = math.acos(-(q / 2) * math.sqrt(-27 / (p ** 3 + epsilon)))
         z1 = 2 * math.sqrt(-p / 3) * math.cos(phi / 3)
         z2 = 2 * math.sqrt(-p / 3) * math.cos((phi + 2 * math.pi) / 3)
         z3 = 2 * math.sqrt(-p / 3) * math.cos((phi + 4 * math.pi) / 3)
@@ -696,3 +712,13 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
             print(f'Trial {trial + 1}/{numTrials} with SVCA: Error {error:.4e} | Best: {error_best:.4e}')
 
     return w_best, v_best, S_best, error_best
+
+def safe_div_where_nonzero(A, B):
+    """
+    Fait A / B là où B != 0, sinon met 0. Évite les warnings NumPy.
+    A et B doivent avoir la même forme.
+    """
+    result = np.zeros_like(A, dtype=float)
+    mask = B != 0
+    result[mask] = A[mask] / B[mask]
+    return result

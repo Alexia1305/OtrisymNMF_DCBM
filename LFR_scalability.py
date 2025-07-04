@@ -98,16 +98,16 @@ def main(list_n):
             #
             #OtrisymNMF
             X = nx.adjacency_matrix(G, nodelist=G.nodes)
-            # start_time = time.time()
-            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X,r,numTrials=10,init_method="SVCA",time_limit=60*10, init_seed=idx,delta=1e-5)
-            # end_time = time.time()
-            # NMI = normalized_mutual_info_score(labels, v_best)
-            # results["OtrisymNMF"]["NMI"].append(NMI)
-            # results["OtrisymNMF"]["Time"].append(end_time - start_time)
-            # print(NMI)
-            # print(end_time - start_time)
             start_time = time.time()
-            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD_Sdirect(X, r, numTrials=10, init_method="SVCA",
+            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X,r,numTrials=1,init_method="SVCA",time_limit=60*10, init_seed=idx,delta=1e-5)
+            end_time = time.time()
+            NMI = normalized_mutual_info_score(labels, v_best)
+            results["OtrisymNMF"]["NMI"].append(NMI)
+            results["OtrisymNMF"]["Time"].append(end_time - start_time)
+            print(NMI)
+            print(end_time - start_time)
+            start_time = time.time()
+            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD_Sdirect(X, r, numTrials=1, init_method="SVCA",
                                                                           time_limit=60 * 10, init_seed=idx,delta=1e-5)
             end_time = time.time()
             NMI = normalized_mutual_info_score(labels, v_best)
@@ -120,7 +120,7 @@ def main(list_n):
             #SVCA only
             X = nx.adjacency_matrix(G, nodelist=G.nodes)
             start_time = time.time()
-            w_best, v, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X,50, numTrials=1, verbosity=0)
+            w_best, v, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X,r, numTrials=1, verbosity=0)
             end_time = time.time()
             print(end_time - start_time)
             break
@@ -186,7 +186,7 @@ def main(list_n):
 if __name__ == "__main__":
 
     #Options TEST
-    list_n = [2000]
+    list_n = [5000]
 
     random.seed(42)  # Fixer la seed
     main(list_n)

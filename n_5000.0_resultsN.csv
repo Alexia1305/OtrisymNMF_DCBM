@@ -1,9 +1,9 @@
 ,NMI moyen,Erreur type NMI,Temps moyen (s),Erreur type Temps
-OtrisymNMF,,,,
+OtrisymNMF,0.9029,0.0033,185.59,16.84
 KN,,,,
 KL_EM,,,,
 MHA250k,,,,
-SVCA,0.8899,0.0078,57.01,13.82
+SVCA,,,,
 KN_SVCA,,,,
 KL_EM_SVCA,,,,
 MHA250k_SVCA,,,,
