@@ -1,10 +1,10 @@
-Algorithm: OtrisymNMF, NMI Mean: nan, NMI Std: nan
-Algorithm: OtrisymNMF_S, NMI Mean: nan, NMI Std: nan
+Algorithm: OtrisymNMF, NMI Mean: 0.42233583941886016, NMI Std: 0.41570264028418713
+Algorithm: OtrisymNMF_S, NMI Mean: 0.42436369796241535, NMI Std: 0.41543261368299805
 Algorithm: KL_EM, NMI Mean: nan, NMI Std: nan
 Algorithm: KN, NMI Mean: nan, NMI Std: nan
 Algorithm: MH, NMI Mean: nan, NMI Std: nan
-Algorithm: OtrisymNMF_SVCA, NMI Mean: 0.7450920334544873, NMI Std: 0.35785449037292044
-Algorithm: OtrisymNMF_S_SVCA, NMI Mean: 0.7450920334544873, NMI Std: 0.35785449037292044
+Algorithm: OtrisymNMF_SVCA, NMI Mean: 0.7884067593300261, NMI Std: 0.29579625485141425
+Algorithm: OtrisymNMF_S_SVCA, NMI Mean: 0.7977610881264144, NMI Std: 0.28033343523256404
 Algorithm: KL_EM_SVCA, NMI Mean: nan, NMI Std: nan
 Algorithm: KN_SVCA, NMI Mean: nan, NMI Std: nan
 Algorithm: MH_SVCA, NMI Mean: nan, NMI Std: nan

@@ -4,6 +4,7 @@ from __future__ import division
 import random as rd
 import networkx as nx
 import numpy as np
+import time
 from numpy import linalg as la
 from sklearn import cluster as cl
 
@@ -26,7 +27,7 @@ class Inference(object):
     title = "Forgot to replace title"
     short_title = "Forgot to replace short title"
 
-    def __init__(self, graph, objective_function, partition):
+    def __init__(self, graph, objective_function, partition, time_limit=None):
         """
 
         :param graph:
@@ -39,6 +40,7 @@ class Inference(object):
         self._objective_function = objective_function
         self.partition = partition
         self.node_moves = 0
+        self.time_limit = time_limit
 
     def infer_stochastic_block_model(self, *args):
         """Get stochastic block model"""
@@ -67,8 +69,8 @@ class MetropolisInference(Inference):
     title = "Metropolis Inference"
     short_title = "MA 5k"
 
-    def __init__(self, graph, objective_function, partition, use_delta=True):
-        super(MetropolisInference, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, time_limit=None, use_delta=True):
+        super(MetropolisInference, self).__init__(graph, objective_function, partition,time_limit=time_limit)
         objective_function.old_value = objective_function.calculate(partition)
         self.steps = 0
         self.use_delta = use_delta
@@ -162,8 +164,8 @@ class PeixotoInference(Inference):
                                    NewmanReinertNonDegreeCorrected)
 
     def __init__(self, graph, objective_function, partition, no_partition_reset=False, limit_possible_blocks=False,
-                 add_additional_mergers=True, mcmc_steps=100):
-        super(PeixotoInference, self).__init__(graph, objective_function, partition)
+                 add_additional_mergers=True, mcmc_steps=100, time_limit=None):
+        super(PeixotoInference, self).__init__(graph, objective_function, partition, time_limit=time_limit)
         # in the actual setting need to know the final blocksize and therefore take the value from partition
         self.aimed_b = partition.B
         # create a partition with every node in a own block
@@ -566,8 +568,8 @@ class MetropolisHastingInference(Inference):
     title = "Metropolis Hasting Inference"
     short_title = "MHA 1k"
 
-    def __init__(self, graph, objective_function, partition, limit_possible_blocks=False):
-        super(MetropolisHastingInference, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, limit_possible_blocks=False, time_limit=None):
+        super(MetropolisHastingInference, self).__init__(graph, objective_function, partition, time_limit=time_limit)
         # free parameter of the metropolis hasting markov chain
         self.epsilon = 0.1
         self.beta_zero = None
@@ -1000,8 +1002,8 @@ class MetropolisHastingInferenceTenK(MetropolisHastingInference):
     title = "Metropolis Hasting Inference 10k"
     short_title = "MHA 10k"
 
-    def __init__(self, graph, objective_function, partition):
-        super(MetropolisHastingInferenceTenK, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, time_limit=None):
+        super(MetropolisHastingInferenceTenK, self).__init__(graph, objective_function, partition, time_limit=time_limit)
         self.default_number_of_steps = 10000
 
 
@@ -1010,8 +1012,8 @@ class MetropolisHastingInferenceFiftyK(MetropolisHastingInference):
     title = "Metropolis Hasting Inference 50k"
     short_title = "MHA 50k"
 
-    def __init__(self, graph, objective_function, partition):
-        super(MetropolisHastingInferenceFiftyK, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, time_limit=None):
+        super(MetropolisHastingInferenceFiftyK, self).__init__(graph, objective_function, partition, time_limit=time_limit)
         self.default_number_of_steps = 50000
 
 
@@ -1020,8 +1022,8 @@ class MetropolisHastingInferenceHundredK(MetropolisHastingInference):
     title = "Metropolis Hasting Inference 100k"
     short_title = "MHA 100k"
 
-    def __init__(self, graph, objective_function, partition):
-        super(MetropolisHastingInferenceHundredK, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, time_limit=None):
+        super(MetropolisHastingInferenceHundredK, self).__init__(graph, objective_function, partition, time_limit=time_limit)
         self.default_number_of_steps = 100000
 
 
@@ -1030,8 +1032,8 @@ class MetropolisHastingInferenceTwoHundredFiftyK(MetropolisHastingInference):
     title = "Metropolis Hasting Inference 250k"
     short_title = "MHA 250k"
 
-    def __init__(self, graph, objective_function, partition):
-        super(MetropolisHastingInferenceTwoHundredFiftyK, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, time_limit=None):
+        super(MetropolisHastingInferenceTwoHundredFiftyK, self).__init__(graph, objective_function, partition, time_limit=time_limit)
         self.default_number_of_steps = 250000
 
 
@@ -1040,8 +1042,8 @@ class MetropolisHastingInferenceFiveHundredK(MetropolisHastingInference):
     title = "Metropolis Hasting Inference 500k"
     short_title = "MHA 500k"
 
-    def __init__(self, graph, objective_function, partition):
-        super(MetropolisHastingInferenceFiveHundredK, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, time_limit=None):
+        super(MetropolisHastingInferenceFiveHundredK, self).__init__(graph, objective_function, partition, time_limit= time_limit)
         self.default_number_of_steps = 500000
 
 
@@ -1061,8 +1063,8 @@ class MetropolisHastingInferenceSimulatedAnnealingCauchyFiftyK(MetropolisHasting
     title = "Metropolis Hasting Inference Simulated Annealing Cauchy 50k"
     short_title = "MHAC 50k"
 
-    def __init__(self, graph, objective_function, partition):
-        super(MetropolisHastingInferenceSimulatedAnnealingCauchy, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, time_limit=None):
+        super(MetropolisHastingInferenceSimulatedAnnealingCauchy, self).__init__(graph, objective_function, partition, time_limit=time_limit)
         self.default_number_of_steps = 50000
 
 
@@ -1072,8 +1074,8 @@ class MetropolisHastingInferenceSimulatedAnnealingCauchyTwoHundredFiftyK(
     title = "Metropolis Hasting Inference Simulated Annealing Cauchy 250k"
     short_title = "MHAC 250k"
 
-    def __init__(self, graph, objective_function, partition):
-        super(MetropolisHastingInferenceSimulatedAnnealingCauchy, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, time_limit=None):
+        super(MetropolisHastingInferenceSimulatedAnnealingCauchy, self).__init__(graph, objective_function, partition, time_limit=time_limit)
         self.default_number_of_steps = 250000
 
 
@@ -1093,8 +1095,8 @@ class MetropolisHastingInferenceSimulatedAnnealingBoltzmanFiftyK(MetropolisHasti
     title = "Metropolis Hasting Inference Simulated Annealing Boltzman 50k"
     short_title = "MHAB 50k"
 
-    def __init__(self, graph, objective_function, partition):
-        super(MetropolisHastingInferenceSimulatedAnnealingBoltzman, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, time_limit=None):
+        super(MetropolisHastingInferenceSimulatedAnnealingBoltzman, self).__init__(graph, objective_function, partition, time_limit=time_limit)
         self.default_number_of_steps = 50000
 
 
@@ -1104,8 +1106,8 @@ class MetropolisHastingInferenceSimulatedAnnealingBoltzmanTwoHundredFiftyK(
     title = "Metropolis Hasting Inference Simulated Annealing Boltzman 250k"
     short_title = "MHAB 250k"
 
-    def __init__(self, graph, objective_function, partition):
-        super(MetropolisHastingInferenceSimulatedAnnealingBoltzman, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, time_limit=None):
+        super(MetropolisHastingInferenceSimulatedAnnealingBoltzman, self).__init__(graph, objective_function, partition, time_limit = time_limit)
         self.default_number_of_steps = 250000
 
 
@@ -1117,16 +1119,16 @@ class KarrerInference(Inference):
     title = "Karrer Inference"
     short_title = "KL-G"
 
-    def __init__(self, graph, objective_function, partition, no_negative_move=False, limit_possible_blocks=False):
-        super(KarrerInference, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, no_negative_move=False, limit_possible_blocks=False, time_limit=None):
+        super(KarrerInference, self).__init__(graph, objective_function, partition, time_limit=time_limit)
         self.no_negative_move = no_negative_move
         self.limit_possible_blocks = limit_possible_blocks
         self._last_objective_value = float('-inf')
 
     def infer_stochastic_block_model(self):
         try:
+            start = time.time()
             for _ in range(100):
-                print("itt")
                 self.infer_stepwise()
             else:
                 raise Exception("Could not find minimum in 100 steps" + str(self.partition.get_representation()) + str(
@@ -1199,9 +1201,9 @@ class KarrerInferenceNoNegativeMove(KarrerInference):
     title = "Karrer Inference with no negative move"
     short_title = "KL-G nn"
 
-    def __init__(self, graph, objective_function, partition, limit_possible_blocks=False):
+    def __init__(self, graph, objective_function, partition, limit_possible_blocks=False, time_limit=None):
         super(KarrerInferenceNoNegativeMove, self).__init__(graph, objective_function, partition, no_negative_move=True,
-                                                            limit_possible_blocks=limit_possible_blocks)
+                                                            limit_possible_blocks=limit_possible_blocks, time_limit=time_limit)
 
 
 class EMInference(Inference):
@@ -1209,26 +1211,40 @@ class EMInference(Inference):
     title = "Expectation Maximization Inference"
     short_title = "KL-EM"
 
-    def __init__(self, graph, objective_function, partition, with_toggle_detection=True, limit_possible_blocks=False):
-        super(EMInference, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, with_toggle_detection=True, limit_possible_blocks=False, time_limit=None):
+        super(EMInference, self).__init__(graph, objective_function, partition, time_limit=time_limit)
         self.with_toggle_detection = with_toggle_detection
         self._old_value = self._objective_function.calculate(partition)
         self.limit_possible_blocks = limit_possible_blocks
 
     def infer_stochastic_block_model(self):
         if self.partition.is_graph_directed():
+            start = time.time()
             try:
                 for _ in range(2 * len(self.graph)):
+                    if self.time_limit is not None:
+                        if time.time()-start > self.time_limit:
+                            break
                     self.infer_stepwise_directed()
+                if self.time_limit is not None:
+                    if time.time() - start > self.time_limit:
+                        print("Time limit reached")
                 else:
                     print("EMInference: could not find an optimal partition in", 2 * len(self.graph), "steps",
                           self.partition.get_representation(), self.graph.edges())
             except StopIteration:
                 pass
         else:
+            start = time.time()
             try:
                 for _ in range(2 * len(self.graph)):
+                    if self.time_limit is not None:
+                        if time.time() - start > self.time_limit:
+                            break
                     self.infer_stepwise_undirected()
+                if self.time_limit is not None:
+                    if time.time() - start > self.time_limit:
+                        print("Time limit reached")
                 else:
                     print("EMInference: could not find an optimal partition in", 2 * len(self.graph), "steps",
                           self.partition.get_representation(), self.graph.edges())
@@ -1406,8 +1422,8 @@ class KerninghanLinInference(Inference):
     title = "Kerninghan-Lin"
     short_title = "KL"
 
-    def __init__(self, graph, objective_function, partition, no_negative_move=False):
-        super(KerninghanLinInference, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, no_negative_move=False, time_limit=None):
+        super(KerninghanLinInference, self).__init__(graph, objective_function, partition, time_limit=time_limit)
         self.no_negative_move = no_negative_move
         # always check for improvement as additional condition to break the loop
         self._last_objective_value = objective_function.calculate(partition)
@@ -1690,9 +1706,9 @@ class KerninghanLinInferenceNoNegative(KerninghanLinInference):
     title = "Kerninghan-Lin No Negative Moves"
     short_title = "KL nn"
 
-    def __init__(self, graph, objective_function, partition):
+    def __init__(self, graph, objective_function, partition, time_limit=None):
         super(KerninghanLinInferenceNoNegative, self).__init__(graph, objective_function, partition,
-                                                               no_negative_move=True)
+                                                               no_negative_move=True, time_limit=time_limit)
 
 
 class SpectralInference(Inference):
@@ -1701,8 +1717,8 @@ class SpectralInference(Inference):
 
     # based on Krzakala 2013: "Spectral redemption in clustering sparse networks"
 
-    def __init__(self, graph, objective_function, partition):
-        super(SpectralInference, self).__init__(graph, objective_function, partition)
+    def __init__(self, graph, objective_function, partition, time_limit=None):
+        super(SpectralInference, self).__init__(graph, objective_function, partition, time_limit=time_limit)
         self.A = nx.to_numpy_matrix(self.graph)
         self.partition = partition
 

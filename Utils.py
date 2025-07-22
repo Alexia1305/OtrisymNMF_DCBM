@@ -4,7 +4,8 @@ import pysbm
 import OtrisymNMF
 import networkx as nx
 import numpy as np
-def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=None,init_method="random", verbosity=1,init_seed=None):
+import time
+def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=None,init_method="random", verbosity=1,init_seed=None,time_limit=None):
     """
        Performs Degree-Corrected Block Model (DCBM) inference using multiple trials with different initializations
        and returns the partition with the highest objective function value.
@@ -27,6 +28,8 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
            Level of verbosity for logging (not used in the function).
         init_seed : float, optional (default=None)
             Random seed for the initialization for the experiments
+        time_limit : float, optional (default=None)
+            Time limit for inference
 
 
        Returns:
@@ -36,6 +39,7 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
            of the graph.
            The partition with the best (highest) objective function value is returned.
        """
+    start = time.time()
     obj_max_d = -float('inf')
     best_degree_partition = pysbm.NxPartition(
         graph=G,
@@ -78,16 +82,24 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
                     graph=G,
                     number_of_blocks=r,
                 )
-
-
+        time_limit2 = None
+        if time_limit is not None:
+            time_limit2 = time_limit-(time.time()-start)
+            if time_limit2 < 0:
+                break
         degree_corrected_inference = inference_algo(G, degree_corrected_objective_function,
-                                                    degree_corrected_partition)
+                                                    degree_corrected_partition, time_limit=time_limit2)
         degree_corrected_inference.infer_stochastic_block_model()
         obj_value_d = degree_corrected_objective_function.calculate(degree_corrected_partition)
 
         if obj_value_d > obj_max_d:
             best_degree_partition = degree_corrected_partition
             obj_max_d = obj_value_d
+        if time_limit is not None:
+            if time.time()-start > time_limit:
+                print("Time limit reached")
+                break
+
     if verbosity:
         print(f"Best logP : {obj_max_d}")
 

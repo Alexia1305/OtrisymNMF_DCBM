@@ -37,39 +37,39 @@ def main(graph, clusters):
 
 
 
-        # KL_EM
-        start_time = time.time()
-        EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=trials,
-                             init_method="random", verbosity=0)
-        end_time = time.time()
-        NMI = normalized_mutual_info_score(clusters, EM_partition)
-        results["KL_EM"]["NMI"].append(NMI)
-        results["KL_EM"]["Time"].append(end_time-start_time)
-        if NMI >= 0.72867696256281:
-            results["KL_EM"]["Success_rate"].append(1)
-
-
-        # KN
-        start_time = time.time()
-        EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference, numTrials=trials,
-                             init_method="random", verbosity=0)
-        end_time = time.time()
-        NMI = normalized_mutual_info_score(clusters, EM_partition)
-        results["KN"]["NMI"].append(NMI)
-        results["KN"]["Time"].append(end_time - start_time)
-        if NMI >= 0.72867696256281:
-            results["KN"]["Success_rate"].append(1)
-
-        # MH
-        start_time = time.time()
-        EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.MetropolisHastingInferenceHundredK, numTrials=trials,
-                             init_method="random", verbosity=0)
-        end_time = time.time()
-        NMI = normalized_mutual_info_score(clusters, EM_partition)
-        results["MH"]["NMI"].append(NMI)
-        results["MH"]["Time"].append(end_time - start_time)
-        if NMI >= 0.72867696256281:
-            results["MH"]["Success_rate"].append(1)
+        # # KL_EM
+        # start_time = time.time()
+        # EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=trials,
+        #                      init_method="random", verbosity=0)
+        # end_time = time.time()
+        # NMI = normalized_mutual_info_score(clusters, EM_partition)
+        # results["KL_EM"]["NMI"].append(NMI)
+        # results["KL_EM"]["Time"].append(end_time-start_time)
+        # if NMI >= 0.72867696256281:
+        #     results["KL_EM"]["Success_rate"].append(1)
+        #
+        #
+        # # KN
+        # start_time = time.time()
+        # EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference, numTrials=trials,
+        #                      init_method="random", verbosity=0)
+        # end_time = time.time()
+        # NMI = normalized_mutual_info_score(clusters, EM_partition)
+        # results["KN"]["NMI"].append(NMI)
+        # results["KN"]["Time"].append(end_time - start_time)
+        # if NMI >= 0.72867696256281:
+        #     results["KN"]["Success_rate"].append(1)
+        #
+        # # MH
+        # start_time = time.time()
+        # EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.MetropolisHastingInferenceHundredK, numTrials=trials,
+        #                      init_method="random", verbosity=0)
+        # end_time = time.time()
+        # NMI = normalized_mutual_info_score(clusters, EM_partition)
+        # results["MH"]["NMI"].append(NMI)
+        # results["MH"]["Time"].append(end_time - start_time)
+        # if NMI >= 0.72867696256281:
+        #     results["MH"]["Success_rate"].append(1)
 
 
         # OtrisymNMF
@@ -83,38 +83,38 @@ def main(graph, clusters):
         if NMI >= 0.722389545475209:
             results["OtrisymNMF"]["Success_rate"].append(1)
 
-        # KL_EM initialized by SVCA
-        start_time = time.time()
-        EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference,
-                             numTrials=trials, init_method="SVCA", verbosity=0, init_seed=itt)
-        end_time = time.time()
-        NMI = normalized_mutual_info_score(clusters, EM_partition)
-        results["KL_EM_SVCA"]["NMI"].append(NMI)
-        results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
-        if NMI >= 0.72867696256281:
-            results["KL_EM_SVCA"]["Success_rate"].append(1)
-
-        # KN initialized by SVCA
-        start_time = time.time()
-        EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
-                             numTrials=trials, init_method="SVCA", verbosity=0, init_seed=itt)
-        end_time = time.time()
-        NMI = normalized_mutual_info_score(clusters, EM_partition)
-        results["KN_SVCA"]["NMI"].append(NMI)
-        results["KN_SVCA"]["Time"].append(end_time - start_time)
-        if NMI >= 0.72867696256281:
-            results["KN_SVCA"]["Success_rate"].append(1)
-
-        # MH initialized by SVCA
-        start_time = time.time()
-        EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.MetropolisHastingInferenceHundredK,
-                             numTrials=trials, init_method="SVCA", verbosity=0, init_seed=itt)
-        end_time = time.time()
-        NMI = normalized_mutual_info_score(clusters, EM_partition)
-        results["MH_SVCA"]["NMI"].append(NMI)
-        results["MH_SVCA"]["Time"].append(end_time - start_time)
-        if NMI >= 0.72867696256281:
-            results["MH_SVCA"]["Success_rate"].append(1)
+        # # KL_EM initialized by SVCA
+        # start_time = time.time()
+        # EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference,
+        #                      numTrials=trials, init_method="SVCA", verbosity=0, init_seed=itt)
+        # end_time = time.time()
+        # NMI = normalized_mutual_info_score(clusters, EM_partition)
+        # results["KL_EM_SVCA"]["NMI"].append(NMI)
+        # results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
+        # if NMI >= 0.72867696256281:
+        #     results["KL_EM_SVCA"]["Success_rate"].append(1)
+        #
+        # # KN initialized by SVCA
+        # start_time = time.time()
+        # EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
+        #                      numTrials=trials, init_method="SVCA", verbosity=0, init_seed=itt)
+        # end_time = time.time()
+        # NMI = normalized_mutual_info_score(clusters, EM_partition)
+        # results["KN_SVCA"]["NMI"].append(NMI)
+        # results["KN_SVCA"]["Time"].append(end_time - start_time)
+        # if NMI >= 0.72867696256281:
+        #     results["KN_SVCA"]["Success_rate"].append(1)
+        #
+        # # MH initialized by SVCA
+        # start_time = time.time()
+        # EM_partition = DC_BM(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.MetropolisHastingInferenceHundredK,
+        #                      numTrials=trials, init_method="SVCA", verbosity=0, init_seed=itt)
+        # end_time = time.time()
+        # NMI = normalized_mutual_info_score(clusters, EM_partition)
+        # results["MH_SVCA"]["NMI"].append(NMI)
+        # results["MH_SVCA"]["Time"].append(end_time - start_time)
+        # if NMI >= 0.72867696256281:
+        #     results["MH_SVCA"]["Success_rate"].append(1)
 
         # OtrisymNMF initialized by SVCA
         start_time = time.time()

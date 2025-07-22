@@ -194,8 +194,6 @@ def main(list_mu):
                 "Temps moyen (s)": np.round(np.mean(data["Time"]), 2),
                 "Erreur type Temps": np.round(np.std(data["Time"], ddof=1), 2)
             }
-
-        break
         df_results = pd.DataFrame.from_dict(summary, orient="index")
         print(f"\nRésultats pour mu={mu:.1f}:")
         # Results Display
@@ -210,7 +208,7 @@ def main(list_mu):
 if __name__ == "__main__":
 
     #Options TEST
-    list_mu = np.arange(0, 0.7, 0.1)  # mu between 0 and 0.6
+    list_mu = np.arange(0, 0.4, 0.1)  # mu between 0 and 0.6
 
     random.seed(42)  # Fixer la seed
     main(list_mu)

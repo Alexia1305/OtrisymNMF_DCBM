@@ -42,11 +42,15 @@ def read_graphs_from_files(graphs_folder, n):
 def main(list_n):
     """ Test LFR benchmark """
 
+    numTrials = 1
+    Time_limit = 5*60
+
     for n in list_n:
         graphs_folder = f"Data/LFR_N/n_{n}"
         graphs = read_graphs_from_files(graphs_folder, n)
         results = {
-            "OtrisymNMF": {"NMI": [], "Time": []},
+            "OtrisymNMF_SVCA": {"NMI": [], "Time": []},
+            "OtrisymNMF_S_SVCA": {"NMI": [], "Time": []},
             "KN": {"NMI": [], "Time": []},
             "KL_EM": {"NMI": [], "Time": []},
             "MHA250k": {"NMI": [], "Time": []},
@@ -99,36 +103,35 @@ def main(list_n):
             #OtrisymNMF
             X = nx.adjacency_matrix(G, nodelist=G.nodes)
             start_time = time.time()
-            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X,r,numTrials=1,init_method="SVCA",time_limit=60*10, init_seed=idx,delta=1e-5)
+            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X,r,numTrials=numTrials,init_method="SVCA",time_limit=Time_limit, init_seed=idx,delta=1e-5)
             end_time = time.time()
             NMI = normalized_mutual_info_score(labels, v_best)
-            results["OtrisymNMF"]["NMI"].append(NMI)
-            results["OtrisymNMF"]["Time"].append(end_time - start_time)
+            results["OtrisymNMF_SVCA"]["NMI"].append(NMI)
+            results["OtrisymNMF_SVCA"]["Time"].append(end_time - start_time)
             print(NMI)
             print(end_time - start_time)
+
+            #OtrisymNMF_S
             start_time = time.time()
-            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD_Sdirect(X, r, numTrials=1, init_method="SVCA",
-                                                                          time_limit=60 * 10, init_seed=idx,delta=1e-5)
+            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, numTrials=numTrials, init_method="SVCA",
+                                                                          time_limit=Time_limit, init_seed=idx,delta=1e-5,update_rule="S_direct")
             end_time = time.time()
             NMI = normalized_mutual_info_score(labels, v_best)
-            results["OtrisymNMF"]["NMI"].append(NMI)
-            results["OtrisymNMF"]["Time"].append(end_time - start_time)
+            results["OtrisymNMF_S_SVCA"]["NMI"].append(NMI)
+            results["OtrisymNMF_S_SVCA"]["Time"].append(end_time - start_time)
             print(NMI)
             print(end_time - start_time)
-            break;
-            #
+
             #SVCA only
             X = nx.adjacency_matrix(G, nodelist=G.nodes)
             start_time = time.time()
-            w_best, v, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X,r, numTrials=1, verbosity=0)
+            w_best, v, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X,r, numTrials=numTrials, verbosity=0)
             end_time = time.time()
-            print(end_time - start_time)
-            break
             NMI = normalized_mutual_info_score(labels, v)
             results["SVCA"]["NMI"].append(NMI)
             results["SVCA"]["Time"].append(end_time - start_time)
-
             print(NMI)
+            print(end_time - start_time)
 
             # KN initialized by SVCA
             # start_time = time.time()
@@ -141,15 +144,16 @@ def main(list_n):
             # break
             #print(NMI)
             #
-            # # KL_EM initialized by SVCA
-            # start_time = time.time()
-            # EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=10,
-            #                      init_method="SVCA", verbosity=0, init_seed=idx)
-            # end_time = time.time()
-            # NMI = normalized_mutual_info_score(labels, EM_partition)
-            # results["KL_EM_SVCA"]["NMI"].append(NMI)
-            # results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
-            # #print(NMI)
+            # KL_EM initialized by SVCA
+            start_time = time.time()
+            EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=numTrials,
+                                 init_method="SVCA", verbosity=0, init_seed=idx,time_limit=Time_limit)
+            end_time = time.time()
+            NMI = normalized_mutual_info_score(labels, EM_partition)
+            results["KL_EM_SVCA"]["NMI"].append(NMI)
+            results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
+            print(NMI)
+            print(end_time - start_time)
             #
             # # MHA250 initialized by SVCA
             # start_time = time.time()
