@@ -5,6 +5,7 @@ import OtrisymNMF
 import networkx as nx
 import numpy as np
 import time
+from scipy.sparse import find, csr_matrix
 def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=None,init_method="random", verbosity=1,init_seed=None,time_limit=None):
     """
        Performs Degree-Corrected Block Model (DCBM) inference using multiple trials with different initializations
@@ -60,8 +61,8 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
         else:
             if init_method=="SVCA":
                 X = nx.adjacency_matrix(G)
-                if issparse(X):
-                    X = X.toarray()
+                if not issparse(X):
+                    X = csr_matrix(X)
                 if init_seed is not None:
                     init_seed += 10 * i
                 W = OtrisymNMF.initialize_W(X,r,method="SVCA",init_seed=init_seed)

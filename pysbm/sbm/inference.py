@@ -17,6 +17,7 @@ from .peixotos_flat_sbm import LogLikelihoodOfFlatMicrocanonicalDegreeCorrectedS
 from .peixotos_hierarchical_sbm import LogLikelihoodOfHierarchicalMicrocanonicalDegreeCorrectedSbmWrapper
 from .objective_function_newman_group_size import NewmanReinertDegreeCorrected
 from .objective_function_newman_group_size import NewmanReinertNonDegreeCorrected
+from multiprocessing import Process, Manager
 
 rd.seed()
 
@@ -1241,7 +1242,7 @@ class EMInference(Inference):
                     if self.time_limit is not None:
                         if time.time() - start > self.time_limit:
                             break
-                    self.infer_stepwise_undirected()
+                    self.infer_stepwise_undirected(start)
                 if self.time_limit is not None:
                     if time.time() - start > self.time_limit:
                         print("Time limit reached")
@@ -1257,7 +1258,8 @@ class EMInference(Inference):
         else:
             self.infer_stepwise_undirected()
 
-    def infer_stepwise_undirected(self):
+
+    def infer_stepwise_undirected(self,start):
         """
         For each node retrieve the best block. Then move all nodes to the new best block.
 
@@ -1276,6 +1278,9 @@ class EMInference(Inference):
         nodes_moved = {block: 0 for block in range(self.partition.B)}
 
         for node in self.partition.get_nodes_iter():
+            if self.time_limit is not None:
+                if time.time()-start > self.time_limit:
+                    break
             from_block = self.partition.get_block_of_node(node)
             #     ensure that one don't move the last node out of the block
             if self.partition.get_number_of_nodes_in_block(from_block) - nodes_moved[from_block] == 1:
@@ -1307,6 +1312,10 @@ class EMInference(Inference):
                 nodes_moved[from_block] += 1
                 iteration_moves += 1
                 improve = True
+
+        if self.time_limit is not None:
+            if time.time() - start > self.time_limit:
+                raise StopIteration()
 
         # perform moves
         for move in moves:

@@ -43,7 +43,7 @@ def main(list_n):
     """ Test LFR benchmark """
 
     numTrials = 1
-    Time_limit = 5*60
+    Time_limit = 360
 
     for n in list_n:
         graphs_folder = f"Data/LFR_N/n_{n}"
@@ -100,38 +100,38 @@ def main(list_n):
             # results["MHA250k"]["Time"].append(end_time - start_time)
             # #print(NMI)
             #
-            #OtrisymNMF
-            X = nx.adjacency_matrix(G, nodelist=G.nodes)
-            start_time = time.time()
-            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X,r,numTrials=numTrials,init_method="SVCA",time_limit=Time_limit, init_seed=idx,delta=1e-5)
-            end_time = time.time()
-            NMI = normalized_mutual_info_score(labels, v_best)
-            results["OtrisymNMF_SVCA"]["NMI"].append(NMI)
-            results["OtrisymNMF_SVCA"]["Time"].append(end_time - start_time)
-            print(NMI)
-            print(end_time - start_time)
-
-            #OtrisymNMF_S
-            start_time = time.time()
-            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, numTrials=numTrials, init_method="SVCA",
-                                                                          time_limit=Time_limit, init_seed=idx,delta=1e-5,update_rule="S_direct")
-            end_time = time.time()
-            NMI = normalized_mutual_info_score(labels, v_best)
-            results["OtrisymNMF_S_SVCA"]["NMI"].append(NMI)
-            results["OtrisymNMF_S_SVCA"]["Time"].append(end_time - start_time)
-            print(NMI)
-            print(end_time - start_time)
-
-            #SVCA only
-            X = nx.adjacency_matrix(G, nodelist=G.nodes)
-            start_time = time.time()
-            w_best, v, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X,r, numTrials=numTrials, verbosity=0)
-            end_time = time.time()
-            NMI = normalized_mutual_info_score(labels, v)
-            results["SVCA"]["NMI"].append(NMI)
-            results["SVCA"]["Time"].append(end_time - start_time)
-            print(NMI)
-            print(end_time - start_time)
+            # #OtrisymNMF
+            # X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            # start_time = time.time()
+            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X,r,numTrials=numTrials,init_method="SVCA",time_limit=Time_limit, init_seed=idx,delta=1e-5)
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, v_best)
+            # results["OtrisymNMF_SVCA"]["NMI"].append(NMI)
+            # results["OtrisymNMF_SVCA"]["Time"].append(end_time - start_time)
+            # print(NMI)
+            # print(end_time - start_time)
+            #
+            # #OtrisymNMF_S
+            # start_time = time.time()
+            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, numTrials=numTrials, init_method="SVCA",
+            #                                                               time_limit=Time_limit, init_seed=idx,delta=1e-5,update_rule="S_direct")
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, v_best)
+            # results["OtrisymNMF_S_SVCA"]["NMI"].append(NMI)
+            # results["OtrisymNMF_S_SVCA"]["Time"].append(end_time - start_time)
+            # print(NMI)
+            # print(end_time - start_time)
+            #
+            # #SVCA only
+            # X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            # start_time = time.time()
+            # w_best, v, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X,r, numTrials=numTrials, verbosity=0)
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, v)
+            # results["SVCA"]["NMI"].append(NMI)
+            # results["SVCA"]["Time"].append(end_time - start_time)
+            # print(NMI)
+            # print(end_time - start_time)
 
             # KN initialized by SVCA
             # start_time = time.time()
@@ -190,7 +190,7 @@ def main(list_n):
 if __name__ == "__main__":
 
     #Options TEST
-    list_n = [5000]
+    list_n = [50000]
 
     random.seed(42)  # Fixer la seed
     main(list_n)
