@@ -96,6 +96,9 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
         if obj_value_d > obj_max_d:
             best_degree_partition = degree_corrected_partition
             obj_max_d = obj_value_d
+        if verbosity > 0:
+            print(f'Trial {i + 1}/{numTrials} with {init_method} : logP {obj_value_d:.4e} | Best LogP: {obj_max_d:.4e}')
+
         if time_limit is not None:
             if time.time()-start > time_limit:
                 print("Time limit reached")

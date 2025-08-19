@@ -108,7 +108,7 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
             if init_seed is not None:
                 init_seed += 10*trial
             W = initialize_W(X, r,method=init_algo,init_seed=init_seed)
-            w, v = extract_w_v(W)
+            w, v = extract_w_v(W,r)
 
 
         # Normalization of w
@@ -143,6 +143,9 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
                     wp2[k] = np.sum(w2 * S2[v, k])
 
                 for i in range(n):
+                    if time.time() - start_time > time_limit:
+                        print('Time limit passed')
+                        break
                     # b coefficients for the r problems ax^4+bx^2+cx
                     if d[v[i]] != 0:
                         tempB = (w[i] / d[v[i]]) * safe_div_where_nonzero(G[v[i], :].flatten(), d)  # %w(i)*S(v(i),:)
@@ -281,6 +284,9 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
 
 
                 for i in range(n):
+                    if time.time() - start_time > time_limit:
+                        print('Time limit passed')
+                        break
                     # b coefficients for the r problems ax^4+bx^2+cx
                     b = 2 * (wp2 - (w[i] * S[v[i], :]) ** 2) - 2 * diagX[i]*dgS
 
@@ -338,11 +344,12 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
 
         if error <= error_best:
             w_best, v_best, S_best, error_best = w, v, S, error
+        if verbosity > 0:
+            print(f'Trial {trial + 1}/{numTrials} with {init_algo} in {iteration} iterations: Error {error:.4e} | Best: {error_best:.4e}')
+
         if error_best <= delta or time.time() - start_time > time_limit:
             break
 
-        if verbosity > 0:
-            print(f'Trial {trial + 1}/{numTrials} with {init_algo}: Error {error:.4e} | Best: {error_best:.4e}')
 
     return w_best, v_best, S_best, error_best
 
@@ -433,10 +440,14 @@ def initialize_W(X, r, method="SSPA",init_seed=None):
     return W
 
 
-def extract_w_v(W):
+def extract_w_v(W, r):
     """ Extracts w and v from W."""
     w = np.max(W, axis=1)
     v = np.argmax(W, axis=1)
+    # assign random communities if no assignement
+    zero_indices = np.where(w == 0)[0]
+    random_values = np.random.randint(0, r, size=zero_indices.shape[0])
+    v[zero_indices] = random_values
     return w, v
 
 
@@ -555,7 +566,7 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
 
         # Placeholder for proper initialization functions
         W = initialize_W(X, r, method="SVCA")
-        w, v = extract_w_v(W)
+        w, v = extract_w_v(W,r)
         # Normalization of w
         nw = np.bincount(v, weights=w ** 2, minlength=r)
         nw = np.sqrt(nw)

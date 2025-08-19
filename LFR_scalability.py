@@ -49,78 +49,99 @@ def main(list_n):
         graphs_folder = f"Data/LFR_N/n_{n}"
         graphs = read_graphs_from_files(graphs_folder, n)
         results = {
+            "OtrisymNMF": {"NMI": [], "Time": []},
+            "OtrisymNMF_S": {"NMI": [], "Time": []},
             "OtrisymNMF_SVCA": {"NMI": [], "Time": []},
             "OtrisymNMF_S_SVCA": {"NMI": [], "Time": []},
             "KN": {"NMI": [], "Time": []},
             "KL_EM": {"NMI": [], "Time": []},
-            "MHA250k": {"NMI": [], "Time": []},
             "SVCA": {"NMI": [], "Time": []},
             "KN_SVCA": {"NMI": [], "Time": []},
             "KL_EM_SVCA": {"NMI": [], "Time": []},
-            "MHA250k_SVCA": {"NMI": [], "Time": []},
 
         }
-
+        r_liste=[]
         for idx, G in enumerate(graphs, start=1):
 
             print(f"Processed {idx} out of {len(graphs)} graphs.")
 
             labels = [G.nodes[v]['community'] for v in G.nodes]
             r = max(labels)
+            r_liste.append(r)
             print(r)
 
+            # # OtrisymNMF
+            # X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            # start_time = time.time()
+            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, numTrials=numTrials, init_method="random",
+            #                                                               time_limit=Time_limit, init_seed=idx,
+            #                                                               delta=1e-5, verbosity=0)
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, v_best)
+            # results["OtrisymNMF"]["NMI"].append(NMI)
+            # results["OtrisymNMF"]["Time"].append(end_time - start_time)
+            #
+            # # OtrisymNMF_S
+            # start_time = time.time()
+            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, numTrials=numTrials, init_method="random",
+            #                                                               time_limit=Time_limit, init_seed=idx,
+            #                                                               delta=1e-5, update_rule="S_direct", verbosity=0)
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, v_best)
+            # results["OtrisymNMF_S"]["NMI"].append(NMI)
+            # results["OtrisymNMF_S"]["Time"].append(end_time - start_time)
+            #
+            #
             # #KN
             # start_time=time.time()
-            # KLG_partition=DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,pysbm.KarrerInference, numTrials=10,
-            #                     init_method="random", verbosity=1)
+            # KLG_partition=DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,pysbm.KarrerInference, numTrials=numTrials,
+            #                     init_method="random", verbosity=0, time_limit=Time_limit)
             # end_time=time.time()
             # NMI=normalized_mutual_info_score(labels,KLG_partition)
             # results["KN"]["NMI"].append(NMI)
             # results["KN"]["Time"].append(end_time-start_time)
-            # print(NMI)
+            #
             #
             # # KL_EM
             # start_time = time.time()
-            # EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=10,
-            #                      init_method="random", verbosity=0)
+            # EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=numTrials,
+            #                      init_method="random", verbosity=0, time_limit=Time_limit)
             # end_time = time.time()
             # NMI = normalized_mutual_info_score(labels, EM_partition)
             # results["KL_EM"]["NMI"].append(NMI)
             # results["KL_EM"]["Time"].append(end_time - start_time)
-            # #print(NMI)
             #
-            # # MHA250
-            # start_time = time.time()
-            # MHA_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
-            #                       pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,init_method="random",
-            #                       verbosity=0)
-            # end_time = time.time()
-            # NMI = normalized_mutual_info_score(labels, MHA_partition)
-            # results["MHA250k"]["NMI"].append(NMI)
-            # results["MHA250k"]["Time"].append(end_time - start_time)
-            # #print(NMI)
+            #
+            # # # MHA250
+            # # start_time = time.time()
+            # # MHA_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
+            # #                       pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=numTrials,init_method="random",
+            # #                       verbosity=0, time_limit=Time_limit)
+            # # end_time = time.time()
+            # # NMI = normalized_mutual_info_score(labels, MHA_partition)
+            # # results["MHA250k"]["NMI"].append(NMI)
+            # # results["MHA250k"]["Time"].append(end_time - start_time)
+            # # #print(NMI)
             #
             # #OtrisymNMF
             # X = nx.adjacency_matrix(G, nodelist=G.nodes)
             # start_time = time.time()
-            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X,r,numTrials=numTrials,init_method="SVCA",time_limit=Time_limit, init_seed=idx,delta=1e-5)
+            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X,r,numTrials=numTrials,init_method="SVCA",time_limit=Time_limit, init_seed=idx,delta=1e-5, verbosity=0)
             # end_time = time.time()
             # NMI = normalized_mutual_info_score(labels, v_best)
             # results["OtrisymNMF_SVCA"]["NMI"].append(NMI)
             # results["OtrisymNMF_SVCA"]["Time"].append(end_time - start_time)
-            # print(NMI)
-            # print(end_time - start_time)
+            #
             #
             # #OtrisymNMF_S
             # start_time = time.time()
             # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, numTrials=numTrials, init_method="SVCA",
-            #                                                               time_limit=Time_limit, init_seed=idx,delta=1e-5,update_rule="S_direct")
+            #                                                               time_limit=Time_limit, init_seed=idx,delta=1e-5,update_rule="S_direct", verbosity=0)
             # end_time = time.time()
             # NMI = normalized_mutual_info_score(labels, v_best)
             # results["OtrisymNMF_S_SVCA"]["NMI"].append(NMI)
             # results["OtrisymNMF_S_SVCA"]["Time"].append(end_time - start_time)
-            # print(NMI)
-            # print(end_time - start_time)
+            #
             #
             # #SVCA only
             # X = nx.adjacency_matrix(G, nodelist=G.nodes)
@@ -130,35 +151,31 @@ def main(list_n):
             # NMI = normalized_mutual_info_score(labels, v)
             # results["SVCA"]["NMI"].append(NMI)
             # results["SVCA"]["Time"].append(end_time - start_time)
-            # print(NMI)
-            # print(end_time - start_time)
-
-            # KN initialized by SVCA
+            #
+            # #KN initialized by SVCA
             # start_time = time.time()
             # KLG_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
-            #                       numTrials=10, init_method="SVCA", verbosity=0, init_seed=idx)
+            #                       numTrials=numTrials, init_method="SVCA", verbosity=0, init_seed=idx, time_limit=Time_limit)
             # end_time = time.time()
             # NMI = normalized_mutual_info_score(labels, KLG_partition)
             # results["KN_SVCA"]["NMI"].append(NMI)
             # results["KN_SVCA"]["Time"].append(end_time - start_time)
-            # break
-            #print(NMI)
-            #
+
+
             # KL_EM initialized by SVCA
             start_time = time.time()
             EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=numTrials,
-                                 init_method="SVCA", verbosity=0, init_seed=idx,time_limit=Time_limit)
+                                 init_method="SVCA", verbosity=0, init_seed=idx, time_limit=Time_limit)
             end_time = time.time()
             NMI = normalized_mutual_info_score(labels, EM_partition)
             results["KL_EM_SVCA"]["NMI"].append(NMI)
             results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
+            print(end_time-start_time)
             print(NMI)
-            print(end_time - start_time)
-            #
             # # MHA250 initialized by SVCA
             # start_time = time.time()
             # MHA_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
-            #                       pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,
+            #                       pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=numTrials,
             #                       init_method="SVCA", verbosity=0, init_seed=idx)
             # end_time = time.time()
             # NMI = normalized_mutual_info_score(labels, MHA_partition)
@@ -175,13 +192,20 @@ def main(list_n):
                 "Erreur type Temps": np.round(np.std(data["Time"], ddof=1), 2)
             }
 
+        r_liste.sort()
+        print(r_liste)
+
+        # Results save
+        r_liste_filename = f"n_{n:.1f}_r_liste.txt"
+        with open(r_liste_filename, "w") as f:
+            for item in r_liste:
+                f.write(f"{item}\n")
 
         df_results = pd.DataFrame.from_dict(summary, orient="index")
         print(f"\nRésultats pour n={n:.1f}:")
         # Results Display
         print(df_results)
 
-        # Sauvegarde des résultats dans un fichier CSV
         results_filename = f"n_{n:.1f}_resultsN.csv"
         df_results.to_csv(results_filename)
         print(f"Résultats enregistrés dans '{results_filename}'\n")
@@ -190,7 +214,7 @@ def main(list_n):
 if __name__ == "__main__":
 
     #Options TEST
-    list_n = [50000]
+    list_n = [70000,100000]
 
     random.seed(42)  # Fixer la seed
     main(list_n)

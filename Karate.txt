@@ -1,0 +1,11 @@
+Algorithm: OtrisymNMF, NMI Mean: 0.2045, NMI Std: 0.3407,Time Mean: 0.0218, Time Std: 0.0094 ,One node misclassified 0.22,Two nodes misclassified 0.0
+Algorithm: OtrisymNMF_S, NMI Mean: 0.1507, NMI Std: 0.2943,Time Mean: 0.0805, Time Std: 0.0277 ,One node misclassified 0.15,Two nodes misclassified 0.0
+Algorithm: KL_EM, NMI Mean: 0.2163, NMI Std: 0.278,Time Mean: 0.0063, Time Std: 0.0065 ,One node misclassified 0.0,Two nodes misclassified 0.23
+Algorithm: KN, NMI Mean: 0.1631, NMI Std: 0.247,Time Mean: 0.0034, Time Std: 0.0054 ,One node misclassified 0.0,Two nodes misclassified 0.15
+Algorithm: MH, NMI Mean: 0.1993, NMI Std: 0.3274,Time Mean: 3.0649, Time Std: 0.6403 ,One node misclassified 0.08,Two nodes misclassified 0.13
+Algorithm: OtrisymNMF_SVCA, NMI Mean: 0.6702, NMI Std: 0.3355,Time Mean: 0.0157, Time Std: 0.009 ,One node misclassified 0.8,Two nodes misclassified 0.0
+Algorithm: OtrisymNMF_S_SVCA, NMI Mean: 0.673, NMI Std: 0.3304,Time Mean: 0.0489, Time Std: 0.0209 ,One node misclassified 0.8,Two nodes misclassified 0.0
+Algorithm: KL_EM_SVCA, NMI Mean: 0.5634, NMI Std: 0.2529,Time Mean: 0.009, Time Std: 0.007 ,One node misclassified 0.0,Two nodes misclassified 0.83
+Algorithm: KN_SVCA, NMI Mean: 0.5566, NMI Std: 0.2589,Time Mean: 0.0066, Time Std: 0.0061 ,One node misclassified 0.0,Two nodes misclassified 0.82
+Algorithm: MH_SVCA, NMI Mean: 0.6166, NMI Std: 0.288,Time Mean: 3.7755, Time Std: 0.5067 ,One node misclassified 0.29,Two nodes misclassified 0.33
+Algorithm: SVCA, NMI Mean: 0.52, NMI Std: 0.2471,Time Mean: 0.0018, Time Std: 0.0038 ,One node misclassified 0.0,Two nodes misclassified 0.54

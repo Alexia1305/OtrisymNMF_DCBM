@@ -186,14 +186,15 @@ def main(graph, clusters):
         print(
             f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests}")
 
-    with open('Scotland.txt', 'w') as file:
+    with open('Karate.txt', 'w') as file:
         for algo, data in results.items():
             # Calcul des statistiques
             nmi_mean = np.mean(data['NMI'])
             nmi_std = np.std(data['NMI'], ddof=1)
 
             # Enregistrer les résultats dans le fichier texte
-            file.write(f"Algorithm: {algo}, NMI Mean: {nmi_mean}, NMI Std: {nmi_std}\n")
+            file.write(f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests} \n")
+
 
 
 if __name__ == "__main__":

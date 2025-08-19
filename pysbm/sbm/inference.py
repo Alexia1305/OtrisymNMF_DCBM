@@ -1130,7 +1130,13 @@ class KarrerInference(Inference):
         try:
             start = time.time()
             for _ in range(100):
+                if self.time_limit is not None:
+                    if time.time() - start > self.time_limit:
+                        break
                 self.infer_stepwise()
+            if self.time_limit is not None:
+                if time.time() - start > self.time_limit:
+                    print("Time limit reached")
             else:
                 raise Exception("Could not find minimum in 100 steps" + str(self.partition.get_representation()) + str(
                     self.partition.graph.edges()))
@@ -1238,12 +1244,13 @@ class EMInference(Inference):
         else:
             start = time.time()
             try:
-                for _ in range(2 * len(self.graph)):
+                for iteration in range(2 * len(self.graph)):
                     if self.time_limit is not None:
                         if time.time() - start > self.time_limit:
                             break
                     self.infer_stepwise_undirected(start)
                 if self.time_limit is not None:
+
                     if time.time() - start > self.time_limit:
                         print("Time limit reached")
                 else:
@@ -1278,9 +1285,9 @@ class EMInference(Inference):
         nodes_moved = {block: 0 for block in range(self.partition.B)}
 
         for node in self.partition.get_nodes_iter():
-            if self.time_limit is not None:
-                if time.time()-start > self.time_limit:
-                    break
+            # if self.time_limit is not None:
+            #     if time.time()-start > self.time_limit:
+            #         break
             from_block = self.partition.get_block_of_node(node)
             #     ensure that one don't move the last node out of the block
             if self.partition.get_number_of_nodes_in_block(from_block) - nodes_moved[from_block] == 1:
@@ -1313,9 +1320,10 @@ class EMInference(Inference):
                 iteration_moves += 1
                 improve = True
 
-        if self.time_limit is not None:
-            if time.time() - start > self.time_limit:
-                raise StopIteration()
+        # if self.time_limit is not None:
+        #     if time.time() - start > self.time_limit:
+        #         print("Time limit reached")
+        #         raise StopIteration()
 
         # perform moves
         for move in moves:
