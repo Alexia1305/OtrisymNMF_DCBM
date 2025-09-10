@@ -460,3 +460,69 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
             print(f'Trial {trial + 1}/{numTrials} with SVCA: Error {error:.4e} | Best: {error_best:.4e}')
 
     return w_best, v_best, S_best, error_best
+
+import numpy as np
+import time
+
+def PowMethOTRISYMNMFFixed(X, v, w, maxiter, timelimit):
+    """
+    Power Method for Orthogonal Tri-Symmetric NMF (Fixed partition)
+
+    Parameters
+    ----------
+    X : ndarray, shape (n, n)
+        Input symmetric matrix.
+    v : ndarray, shape (n,)
+        Cluster assignments (labels).
+    w : ndarray, shape (n,)
+        Weight vector to be updated.
+    maxiter : int
+        Maximum number of iterations.
+    timelimit : float
+        Time limit in seconds.
+
+    Returns
+    -------
+    w : ndarray
+        Updated weight vector.
+    e : list of float
+        Relative error per iteration.
+    t : list of float
+        Elapsed times per iteration.
+    """
+
+    t0 = time.process_time()
+    e, t = [], []
+    iter = 1
+
+    r = len(np.unique(v))
+
+
+    nX = np.linalg.norm(X, 'fro')
+    nX2 = nX**2
+
+    # Main loop
+    while iter <= maxiter and (time.process_time() - t0) <= timelimit:
+        for i in range(1, r+1):
+            Ii = np.where(v == i)[0]
+            x = np.zeros(len(Ii))
+
+            for j in range(1, r+1):
+                Ij = np.where(v == j)[0]
+                if len(Ii) > 0 and len(Ij) > 0:
+                    x += (w[Ii].T @ X[np.ix_(Ii, Ij)] @ w[Ij]) * (X[np.ix_(Ii, Ij)] @ w[Ij])
+
+            if np.linalg.norm(x) != 0:
+                w[Ii] = x / np.linalg.norm(x)
+
+        S = update_S(X, r, w, v)
+
+        error = np.sqrt(nX2 - np.linalg.norm(S, 'fro')**2) / nX
+
+        t.append(time.process_time() - t0)
+        e.append(error)
+
+        iter += 1
+
+    return w, v, e, t
+

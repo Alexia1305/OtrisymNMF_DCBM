@@ -11,7 +11,7 @@ from scipy.sparse import diags
 from scipy.sparse.linalg import norm
 from scipy.sparse import diags
 
-def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None):
+def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None,normalized_L=False):
     """
     Orthogonal Symmetric Nonnegative Matrix Trifactorization using Coordinate Descent.
     Given a symmetric matrix X >= 0, finds matrices W >= 0 and S >= 0 such that X ≈ WSW' with W'W=I.
@@ -66,6 +66,11 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
         X = csr_matrix(X)
     n = X.shape[0]
     error_best = float('inf')
+    if normalized_L:
+        # Laplacian normalized
+        D = np.array(X.sum(axis=1)).flatten()
+        D_inv_sqrt = diags(1.0 / np.sqrt(D))
+        X = D_inv_sqrt @ X @ D_inv_sqrt
 
     # Precomputations
 
@@ -354,7 +359,7 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
     return w_best, v_best, S_best, error_best
 
 
-def initialize_W(X, r, method="SSPA",init_seed=None):
+def initialize_W(X, r, method="SVCA",init_seed=None):
     """ Initializes W based on the chosen method."""
 
     if method == "SSPA":

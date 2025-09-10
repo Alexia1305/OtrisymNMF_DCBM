@@ -1,3 +1,5 @@
+from matplotlib import pyplot as plt
+from scipy.sparse import diags
 
 import OtrisymNMF
 import networkx as nx
@@ -67,29 +69,29 @@ def main(list_mu):
             labels = [G.nodes[v]['community'] for v in G.nodes]
             r = max(labels)
 
-            # OtrisymNMF
-            X = nx.adjacency_matrix(G, nodelist=G.nodes)
-            start_time = time.time()
-            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, numTrials=10, init_method="random",
-                                                                          verbosity=0, init_seed=idx, delta=1e-5)
-            end_time = time.time()
-            NMI = normalized_mutual_info_score(labels, v_best)
-            results["OtrisymNMF"]["NMI"].append(NMI)
-            results["OtrisymNMF"]["Time"].append(end_time - start_time)
-            print(NMI)
-            # OtrisymNMF_S
-            X = nx.adjacency_matrix(G, nodelist=G.nodes)
-            start_time = time.time()
-            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, numTrials=10,update_rule="S_direct",
-                                                                                  init_method="random",
-                                                                                  verbosity=0, init_seed=idx,
-                                                                                  delta=1e-5)
-            end_time = time.time()
-
-            NMI = normalized_mutual_info_score(labels, v_best)
-            results["OtrisymNMF_S"]["NMI"].append(NMI)
-            results["OtrisymNMF_S"]["Time"].append(end_time - start_time)
-            print(NMI)
+            # # OtrisymNMF
+            # X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            # start_time = time.time()
+            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, numTrials=10, init_method="random",
+            #                                                               verbosity=0, init_seed=idx, delta=1e-5,normalized_L=True)
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, v_best)
+            # results["OtrisymNMF"]["NMI"].append(NMI)
+            # results["OtrisymNMF"]["Time"].append(end_time - start_time)
+            # print(NMI)
+            # # OtrisymNMF_S
+            # X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            # start_time = time.time()
+            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, numTrials=10,update_rule="S_direct",
+            #                                                                       init_method="random",
+            #                                                                       verbosity=0, init_seed=idx,
+            #                                                                       delta=1e-5,normalized_L=True)
+            # end_time = time.time()
+            #
+            # NMI = normalized_mutual_info_score(labels, v_best)
+            # results["OtrisymNMF_S"]["NMI"].append(NMI)
+            # results["OtrisymNMF_S"]["Time"].append(end_time - start_time)
+            # print(NMI)
             # # KN
             # start_time=time.time()
             # KLG_partition=DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,pysbm.KarrerInference, numTrials=10,
@@ -121,38 +123,41 @@ def main(list_mu):
             # results["MHA250k"]["Time"].append(end_time - start_time)
             # #print(NMI)
 
-            #OtrisymNMF
-            X = nx.adjacency_matrix(G, nodelist=G.nodes)
-            start_time = time.time()
-            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r,numTrials=10,init_method="SVCA",verbosity=0, init_seed=idx,delta=1e-5)
-            end_time = time.time()
-            NMI = normalized_mutual_info_score(labels, v_best)
-            results["OtrisymNMF_SVCA"]["NMI"].append(NMI)
-            results["OtrisymNMF_SVCA"]["Time"].append(end_time - start_time)
-            print(NMI)
-
-
-            # OtrisymNMF_S
-            X = nx.adjacency_matrix(G, nodelist=G.nodes)
-            start_time = time.time()
-            w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, numTrials=10,update_rule="S_direct", init_method="SVCA",
-                                                                          verbosity=0, init_seed=idx, delta=1e-5)
-            end_time = time.time()
-
-            NMI = normalized_mutual_info_score(labels, v_best)
-            results["OtrisymNMF_S_SVCA"]["NMI"].append(NMI)
-            results["OtrisymNMF_S_SVCA"]["Time"].append(end_time - start_time)
-            print(NMI)
-
-
-            # #SVCA only
-            # start_time = time.time()
+            # #OtrisymNMF
             # X = nx.adjacency_matrix(G, nodelist=G.nodes)
-            # w_best, v, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X, r, numTrials=10, verbosity=0)
-            # NMI = normalized_mutual_info_score(labels, v)
+            # start_time = time.time()
+            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r,numTrials=10,init_method="SVCA",verbosity=0, init_seed=idx,delta=1e-5,normalized_L=True)
             # end_time = time.time()
-            # results["SVCA"]["NMI"].append(NMI)
-            # results["SVCA"]["Time"].append(end_time - start_time)
+            # NMI = normalized_mutual_info_score(labels, v_best)
+            # results["OtrisymNMF_SVCA"]["NMI"].append(NMI)
+            # results["OtrisymNMF_SVCA"]["Time"].append(end_time - start_time)
+            # print(NMI)
+            #
+            #
+            # # OtrisymNMF_S
+            # X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            # start_time = time.time()
+            # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, numTrials=10,update_rule="S_direct", init_method="SVCA",
+            #                                                               verbosity=0, init_seed=idx, delta=1e-5,normalized_L=True)
+            # end_time = time.time()
+            #
+            # NMI = normalized_mutual_info_score(labels, v_best)
+            # results["OtrisymNMF_S_SVCA"]["NMI"].append(NMI)
+            # results["OtrisymNMF_S_SVCA"]["Time"].append(end_time - start_time)
+            # print(NMI)
+
+
+            #SVCA only
+            start_time = time.time()
+            X = nx.adjacency_matrix(G, nodelist=G.nodes)
+            # D = np.array(X.sum(axis=1)).flatten()
+            # D_inv_sqrt = diags(1.0 / np.sqrt(D))
+            # X = D_inv_sqrt @ X @ D_inv_sqrt
+            w_best, v, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X, r, numTrials=10, verbosity=0)
+            NMI = normalized_mutual_info_score(labels, v)
+            end_time = time.time()
+            results["SVCA"]["NMI"].append(NMI)
+            results["SVCA"]["Time"].append(end_time - start_time)
 
 
             # # KN initialized by SVCA
@@ -199,16 +204,78 @@ def main(list_mu):
         # Results Display
         print(df_results)
 
-        # Sauvegarde des résultats dans un fichier CSV
-        results_filename = f"mu_{mu:.1f}_resultsOtri.csv"
-        df_results.to_csv(results_filename)
-        print(f"Résultats enregistrés dans '{results_filename}'\n")
+        # # Sauvegarde des résultats dans un fichier CSV
+        # results_filename = f"mu_{mu:.1f}_resultsOtriL.csv"
+        # df_results.to_csv(results_filename)
+        # print(f"Résultats enregistrés dans '{results_filename}'\n")
+
+def displayLFR(mu):
+    """ Test LFR benchmark """
+    n = 1000
+
+    graphs_folder = f"Data/LFR/mu_{mu:.1f}"
+    graphs = read_graphs_from_files(graphs_folder, n)
+    G=graphs[1].copy()
+    labels = [G.nodes[v]['community'] for v in G.nodes]
+    r = max(labels)
+    # Palette de 20 couleurs distinctes
+    cmap = plt.cm.get_cmap("tab20", r)
+    colors = [cmap(i) for i in range(r)]
+    for u, v in G.edges():
+        if G.nodes[u]['community'] == G.nodes[v]['community']:
+            G[u][v]['weight'] = 1.2  # poids fort (attire +)
+            G[u][v]['intra'] = True
+        else:
+            G[u][v]['weight'] = 0.2  # poids faible (repousse)
+            G[u][v]['intra'] = False
+
+    # Formes disponibles (on les réutilisera si r > len(shapes))
+    shapes = ['o', 's', '^', 'v', 'D', 'p', 'h', '8', '*']
+
+    pos = nx.spring_layout(G, weight="weight", seed=42, k=0.15)  # layout du graphe
+
+    plt.figure(figsize=(14, 14))
+
+    for i in range(r):
+        nodes_i = [node for node in G.nodes() if G.nodes[node]['community'] == i+1]
+        nx.draw_networkx_nodes(
+            G, pos,
+            nodelist=nodes_i,
+            node_color=[colors[i]],
+            node_shape=shapes[i % len(shapes)],  # recycle les formes
+            label=f'Comm {i}',
+            node_size=40
+        )
+
+    intra_edges = [(u, v) for u, v in G.edges() if G[u][v]['intra']]
+    nx.draw_networkx_edges(
+        G, pos,
+        edgelist=intra_edges,
+        width=0.3,
+        alpha=0.3,
+        style="solid"
+    )
+
+    # --- Arêtes inter (plus fines, en pointillés) ---
+    inter_edges = [(u, v) for u, v in G.edges() if not G[u][v]['intra']]
+    nx.draw_networkx_edges(
+        G, pos,
+        edgelist=inter_edges,
+        width=0,
+        alpha=0,
+        style="solid"
+    )
+
+    plt.axis('off')
+    # Sauvegarde en PNG haute résolution
+    plt.savefig(f"LFR_mu_{mu:.1f}.png", dpi=300, bbox_inches="tight")
+    plt.show()
 
 
 if __name__ == "__main__":
-
+    #displayLFR(0.1)
     #Options TEST
-    list_mu = np.arange(0, 0.4, 0.1)  # mu between 0 and 0.6
+    list_mu = np.arange(0, 0.7, 0.1)  # mu between 0 and 0.6
 
     random.seed(42)  # Fixer la seed
     main(list_mu)
