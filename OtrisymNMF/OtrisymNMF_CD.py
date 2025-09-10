@@ -80,6 +80,8 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
         np.where(np.diff(I) != 0)[0] + 1,
         [len(I)]
     ))
+    if len(rowStart) < n+1:
+        raise Exception("Nodes without connections detected. Please remove the node from the graph during preprocessing")
     diagX = X.diagonal()
 
 
@@ -354,7 +356,7 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
     return w_best, v_best, S_best, error_best
 
 
-def initialize_W(X, r, method="SSPA",init_seed=None):
+def initialize_W(X, r, method="SVCA",init_seed=None):
     """ Initializes W based on the chosen method."""
 
     if method == "SSPA":
