@@ -91,7 +91,7 @@ This package implements the **Orthogonal Symmetric Nonnegative Matrix Tri-Factor
 The algorithm aims to solve the following optimization problem:
 
 $$
-\min_{W \geq 0, S \geq 0} ||X - WSW^T||_F^2 \quad \text{s.t.} \quad W^TW = I
+\min_{W \geq 0, S \geq 0} \Vert X - WSW^T\Vert_F^2 \quad \text{s.t.} \quad W^TW = I
 $$
 
 Where:
