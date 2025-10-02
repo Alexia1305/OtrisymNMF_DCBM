@@ -1125,15 +1125,18 @@ class KarrerInference(Inference):
         self.no_negative_move = no_negative_move
         self.limit_possible_blocks = limit_possible_blocks
         self._last_objective_value = float('-inf')
+        self.time_per_iteration = []
 
     def infer_stochastic_block_model(self):
         try:
             start = time.time()
             for _ in range(100):
+                it_start = time.time()
                 if self.time_limit is not None:
                     if time.time() - start > self.time_limit:
                         break
-                self.infer_stepwise()
+                self.infer_stepwise(start)
+                self.time_per_iteration.append(round(time.time()-it_start ,4))
             if self.time_limit is not None:
                 if time.time() - start > self.time_limit:
                     print("Time limit reached")
@@ -1143,7 +1146,7 @@ class KarrerInference(Inference):
         except StopIteration:
             pass
 
-    def infer_stepwise(self):
+    def infer_stepwise(self,start):
         saved_representation = self.partition.get_representation()
         improve = 0
         overall_improve = 0
@@ -1151,6 +1154,9 @@ class KarrerInference(Inference):
         iteration_moves = 0
         moves = 0
         for node in self.partition.get_nodes_iter():
+            if self.time_limit is not None:
+                if time.time() - start > self.time_limit:
+                    break
             from_block = self.partition.get_block_of_node(node)
             next_block = from_block
             move_delta = -float("inf")
@@ -1223,16 +1229,19 @@ class EMInference(Inference):
         self.with_toggle_detection = with_toggle_detection
         self._old_value = self._objective_function.calculate(partition)
         self.limit_possible_blocks = limit_possible_blocks
+        self.time_per_iteration = []
 
     def infer_stochastic_block_model(self):
         if self.partition.is_graph_directed():
             start = time.time()
             try:
                 for _ in range(2 * len(self.graph)):
+                    it_start = time.time()
                     if self.time_limit is not None:
                         if time.time()-start > self.time_limit:
                             break
                     self.infer_stepwise_directed()
+                    self.time_per_iteration.append(round(time.time() - it_start, 4))
                 if self.time_limit is not None:
                     if time.time() - start > self.time_limit:
                         print("Time limit reached")
@@ -1245,10 +1254,12 @@ class EMInference(Inference):
             start = time.time()
             try:
                 for iteration in range(2 * len(self.graph)):
+                    it_start = time.time()
                     if self.time_limit is not None:
                         if time.time() - start > self.time_limit:
                             break
                     self.infer_stepwise_undirected(start)
+                    self.time_per_iteration.append(round(time.time() - it_start, 4))
                 if self.time_limit is not None:
 
                     if time.time() - start > self.time_limit:
@@ -1285,9 +1296,9 @@ class EMInference(Inference):
         nodes_moved = {block: 0 for block in range(self.partition.B)}
 
         for node in self.partition.get_nodes_iter():
-            # if self.time_limit is not None:
-            #     if time.time()-start > self.time_limit:
-            #         break
+            if self.time_limit is not None:
+                if time.time()-start > self.time_limit:
+                    break
             from_block = self.partition.get_block_of_node(node)
             #     ensure that one don't move the last node out of the block
             if self.partition.get_number_of_nodes_in_block(from_block) - nodes_moved[from_block] == 1:
@@ -1320,10 +1331,10 @@ class EMInference(Inference):
                 iteration_moves += 1
                 improve = True
 
-        # if self.time_limit is not None:
-        #     if time.time() - start > self.time_limit:
-        #         print("Time limit reached")
-        #         raise StopIteration()
+        if self.time_limit is not None:
+            if time.time() - start > self.time_limit:
+                print("Time limit reached")
+                raise StopIteration()
 
         # perform moves
         for move in moves:

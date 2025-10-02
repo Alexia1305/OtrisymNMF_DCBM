@@ -11,7 +11,7 @@ from scipy.sparse import diags
 from scipy.sparse.linalg import norm
 from scipy.sparse import diags
 
-def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None,normalized_L=False):
+def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None):
     """
     Orthogonal Symmetric Nonnegative Matrix Trifactorization using Coordinate Descent.
     Given a symmetric matrix X >= 0, finds matrices W >= 0 and S >= 0 such that X ≈ WSW' with W'W=I.
@@ -60,17 +60,17 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
             Central matrix.
         error_best : float
             Relative error ||X - WSW'||_F / ||X||_F.
+        time_per_iteration : list[list[float]]
+            Time per iteration for each trial.
+            Each inner list contains the times (in seconds) for every iteration
+            of that specific trial.
     """
     start_time = time.time()
     if not issparse(X):
         X = csr_matrix(X)
     n = X.shape[0]
     error_best = float('inf')
-    if normalized_L:
-        # Laplacian normalized
-        D = np.array(X.sum(axis=1)).flatten()
-        D_inv_sqrt = diags(1.0 / np.sqrt(D))
-        X = D_inv_sqrt @ X @ D_inv_sqrt
+    time_per_iteration = []
 
     # Precomputations
 
@@ -92,6 +92,7 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
         print(f'Running {numTrials} Trials in Series')
 
     for trial in range(numTrials):
+        time_per_iteration.append([])
         if init_method is None:
             init_algo = "SSPA" if trial == 0 else "SVCA"
         else:
@@ -136,6 +137,7 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
             d = np.ones(r)
             G = S.copy()
             for iteration in range(maxiter):
+                start_it = time.time()
                 if time.time() - start_time > time_limit:
                     print('Time limit passed')
                     break
@@ -268,12 +270,13 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
 
                 prev_error = error
                 error = compute_error(normX, S)
-
+                time_per_iteration[-1].append(time.time()-start_it)
                 if error < delta or abs(prev_error - error) < delta:
                     break
         else:
             ################### Original version #################################
             for iteration in range(maxiter):
+                start_it = time.time()
                 if time.time() - start_time > time_limit:
                     print('Time limit passed')
                     break
@@ -341,6 +344,8 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
                 prev_error = error
                 error = compute_error(normX, S)
 
+                time_per_iteration[-1].append(round(time.time() - start_it, 4))
+
                 if error < delta or abs(prev_error - error) < delta:
                     break
 
@@ -356,7 +361,7 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
             break
 
 
-    return w_best, v_best, S_best, error_best
+    return w_best, v_best, S_best, error_best,time_per_iteration
 
 
 def initialize_W(X, r, method="SVCA",init_seed=None):
@@ -538,7 +543,7 @@ def compute_error(normX, S):
     error = np.sqrt(normX**2-np.linalg.norm(S, 'fro')**2)/normX
     return error
 
-def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
+def Community_detection_SVCA(X, r, numTrials=1,verbosity=1,init_seed=None):
     """
         Perform community detection using the SVCA (Smooth VCA).
 
@@ -570,7 +575,9 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1):
     for trial in range(numTrials):
 
         # Placeholder for proper initialization functions
-        W = initialize_W(X, r, method="SVCA")
+        if init_seed is not None:
+            init_seed += 10 * trial
+        W = initialize_W(X, r, method="SVCA",init_seed=init_seed)
         w, v = extract_w_v(W,r)
         # Normalization of w
         nw = np.bincount(v, weights=w ** 2, minlength=r)

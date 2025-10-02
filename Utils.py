@@ -6,7 +6,7 @@ import networkx as nx
 import numpy as np
 import time
 from scipy.sparse import find, csr_matrix
-def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=None,init_method="random", verbosity=1,init_seed=None,time_limit=None):
+def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=None,init_method="random", verbosity=1,init_seed=None,time_limit=None,need_time=False):
     """
        Performs Degree-Corrected Block Model (DCBM) inference using multiple trials with different initializations
        and returns the partition with the highest objective function value.
@@ -47,6 +47,7 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
         number_of_blocks=r,
     )
     degree_corrected_objective_function = objective_function(is_directed=False)
+    time_per_iteration=[]
     for i in range(numTrials):
         if init_partition is not None:
 
@@ -92,7 +93,8 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
                                                     degree_corrected_partition, time_limit=time_limit2)
         degree_corrected_inference.infer_stochastic_block_model()
         obj_value_d = degree_corrected_objective_function.calculate(degree_corrected_partition)
-
+        if need_time:
+            time_per_iteration.append(degree_corrected_inference.time_per_iteration)
         if obj_value_d > obj_max_d:
             best_degree_partition = degree_corrected_partition
             obj_max_d = obj_value_d
@@ -106,5 +108,7 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
 
     if verbosity:
         print(f"Best logP : {obj_max_d}")
-
-    return [best_degree_partition.get_block_of_node(node) for node in G.nodes]
+    if need_time:
+        return [best_degree_partition.get_block_of_node(node) for node in G.nodes], time_per_iteration
+    else:
+        return [best_degree_partition.get_block_of_node(node) for node in G.nodes]
