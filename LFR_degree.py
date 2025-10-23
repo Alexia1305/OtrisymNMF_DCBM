@@ -40,15 +40,15 @@ def read_graphs_from_files(graphs_folder, n):
     return graphs
 
 
-def main(list_n):
+def main(list_n,degree):
     """ Test LFR benchmark """
 
-    numTrials = 1000
+    numTrials = 10
+    Time_limit = 10000
+    n = 1000
 
-
-
-    for n in list_n:
-        graphs_folder = f"Data/LFR_N/n_{n}"
+    for mu in list_mu:
+        graphs_folder = f"Data/LFR_D/d{degree}/mu_{mu}"
         graphs = read_graphs_from_files(graphs_folder, n)
         results = {
             "OtrisymNMF": {"NMI": [], "AMI":[], "Time": [], "Trials": [], "Nbr_iterations":[],"Time_iterations":[]},
@@ -67,7 +67,7 @@ def main(list_n):
             labels = [G.nodes[v]['community'] for v in G.nodes]
             r = max(labels)
             r_liste.append(r)
-            Time_limit = (n/100)
+
 
             # OtrisymNMF
             X = nx.adjacency_matrix(G, nodelist=G.nodes)
@@ -179,25 +179,30 @@ def main(list_n):
 
             }
 
-        with open(f"results/Test_scalability_time2/n_{n:.1f}_results.json", "w") as f:
+        with open(f"results/LFR_degree/mu_{mu:.1f}_results.json", "w") as f:
             json.dump(results, f, indent=4)
 
 
         df_results = pd.DataFrame.from_dict(summary, orient="index")
-        print(f"\nRésultats pour n={n:.1f}:")
+        print(f"\nRésultats pour mu={mu:.1f}:")
         # Results Display
         print(df_results)
 
-        results_filename = f"results/Test_scalability_time2/n_{n:.1f}_results.csv"
+        results_filename = f"results/LFR_degree/mu_{mu:.1f}_results.csv"
         df_results.to_csv(results_filename)
         print(f"Résultats enregistrés dans '{results_filename}'\n")
+
+        r_liste_filename = f"results/LFR_degree/mu_{mu:.1f}_r_liste.txt"
+        with open(r_liste_filename, "w") as f:
+            for item in r_liste:
+                f.write(f"{item}\n")
 
 
 if __name__ == "__main__":
 
     #Options TEST
-    list_n = [50000, 100000]
-
+    list_mu = [0.4]
+    degree = 40
     random.seed(42)  # Fixer la seed
-    main(list_n)
+    main(list_mu,degree)
 

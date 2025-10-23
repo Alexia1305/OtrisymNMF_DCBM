@@ -1,0 +1,7 @@
+,Mean NMI,SD NMI,Mean AMI,SD AMI,Mean Time (s),SD Time (s),Mean Nbr of trials,SD Nbr of trials,Mean Nbr of iterations,SD Nbr of iterations,Mean Time of one iteration,SD Time of one iteration
+OtrisymNMF,0.7475,0.0709,0.7367,0.0761,23.2,4.67,10.0,0.0,15.3,2.11,0.14,0.02
+OtrisymNMF_SVCA,1.0,0.0,1.0,0.0,7.2,1.62,10.0,0.0,3.5,0.71,0.15,0.02
+KN,0.9056,0.013,0.9014,0.013,78.21,11.92,10.0,0.0,8.5,1.84,0.72,0.19
+KL_EM,0.9531,0.0169,0.951,0.0176,83.3,12.32,10.0,0.0,19.9,3.7,0.44,0.15
+KN_SVCA,1.0,0.0,1.0,0.0,17.44,4.61,10.0,0.0,1.6,4.06,0.68,0.05
+KL_EM_SVCA,1.0,0.0,1.0,0.0,15.55,5.81,10.0,0.0,1.6,3.75,0.38,0.02
