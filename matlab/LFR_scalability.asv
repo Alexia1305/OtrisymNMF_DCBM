@@ -1,5 +1,5 @@
 clear all; clc; close all;
-n_liste = [1000];
+n_liste = [20000];
 output_file = 'resultats_LFR.csv';
 
 if ~isfile(output_file)
@@ -7,8 +7,8 @@ if ~isfile(output_file)
     fprintf(fid, 'algo,n,NMI_mean,NMI_std,Time_mean,Time_std,Iterations_mean,Iterations_std,Time_it_mean,Time_it_std\n');
     fclose(fid);
 end
-%algos={'OtrisymNMF_rdm','OtrisymNMF_SVCA','SVCA'};
-algos={'OtrisymNMF_SVCA'};
+algos={'OtrisymNMF_rdm','OtrisymNMF_SVCA','SVCA'};
+
 for n=n_liste
     for a=1:length(algos)
         NMI_list = zeros(1,10);      
@@ -29,26 +29,13 @@ for n=n_liste
             A = sparse(edges(:,1), edges(:,2), 1, n, n);
     
             %Test
-            if strcmp(algos{a},'OtrisymNMF_rdm')
-                [w_best,v_best,S_best,erreur_best,time_global,time_iteration] = OtrisymNMF_CD(A,r,'time_limit',1000,'init',"random",'verbosity',0);
+            if a=='OtrisymNMF_rdm'
+                [w_best,v_best,S_best,erreur_best,time_global,time_iteration] = OtrisymNMF_CD(A,r,'time_limit',1000,'init',"SVCA");
                 NMI_list(g) = nmi(labels,v_best);
                 iter_list(g)=length(time_iteration{1});
                 time_list(g)=time_global;
                 time_it_list = [time_it_list,time_iteration{1}];
-
-            elseif strcmp(algos{a},'OtrisymNMF_SVCA')
-                [w_best,v_best,S_best,erreur_best,time_global,time_iteration] = OtrisymNMF_CD(A,r,'time_limit',1000,'init',"SVCA",'verbosity',0);
-                NMI_list(g) = nmi(labels,v_best);
-                iter_list(g)=length(time_iteration{1});
-                time_list(g)=time_global;
-                time_it_list = [time_it_list,time_iteration{1}];
-            else
-                [w_best,v_best,S_best,erreur_best,time_global,time_trial] = Init_SVCA(A,r,'verbosity',0);      
-                NMI_list(g) = nmi(labels,v_best);
-                iter_list(g)=1;
-                time_list(g)=time_global;
-                time_it_list = [time_it_list,time_trial{1}];
-            end
+            elif a==
 
         
     
@@ -66,11 +53,11 @@ for n=n_liste
         time_it_std=std(cell2mat(time_it_list));
         
         % Display
-        fprintf('%s,n=%d : NMI=%.4f±%.4f, Time=%.2f±%.2f, Iter=%.2f±%.2f, Time_it=%.2f±%.2f \n',algos{a}, n, NMI_mean, NMI_std,time_global_mean,time_global_std, iter_mean, iter_std,time_it_mean,time_it_std);
+        fprintf('OtrisymNMF_SVCA,n=%d : NMI=%.4f±%.4f, Time=%.2f±%.2f, Iter=%.2f±%.2f, Time_it=%.2f±%.2f \n', n, NMI_mean, NMI_std,time_global_mean,time_global_std, iter_mean, iter_std,time_it_mean,time_it_std);
     
         % Writing file CSV
         fid = fopen(output_file,'a');
-        fprintf(fid,'%s,%d,%.4f,%.4f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', algos{a},n, NMI_mean, NMI_std, time_global_mean, time_global_std, iter_mean, iter_std,time_it_mean,time_it_std);
+        fprintf(fid, 'OtrisymNMF_SVCA,%d,%.4f,%.4f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', n, NMI_mean, NMI_std, time_global_mean, time_global_std, iter_mean, iter_std,time_it_mean,time_it_std);
         fclose(fid);
 
     end 
