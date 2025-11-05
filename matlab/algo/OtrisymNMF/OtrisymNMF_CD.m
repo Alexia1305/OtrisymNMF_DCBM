@@ -223,11 +223,13 @@ for trials =1:options.numTrials
                 best_f = inf; best_x = 0; best_k = 1;
                 for k = 1:r
                     S2kk = (G(k,k)/(d(k)^2))^2;
-                    x = cardan_depressed(4*S2kk,0,2*b(k),c(k));
-                    f = S2kk*x^4 + b(k)*x^2 + c(k)*x;
+                    [x,f] = cardan_depressed(4*S2kk,2*b(k),c(k),sqrt(r/n));
+                       
                     if f < best_f
                         best_f = f; best_x = x; best_k = k;
                     end
+                   
+                    
                 end
 
                 % Precomputation
@@ -339,12 +341,8 @@ for trials =1:options.numTrials
                 % Solve r problems  min_x ax^4+bx^2+cx
                 best_f = inf; best_x =sqrt(r/n) ; best_k = 1;
                 for k = 1:r
-                    x = cardan_depressed(4*S2(k,k),0,2*b(k),c(k));
-                    if x<=0
-                        x=sqrt(r/n);
-                    end
-
-                    f = S2(k,k)*x^4 + b(k)*x^2 + c(k)*x;
+                    [x,f] = cardan_depressed(4*S2(k,k),2*b(k),c(k),sqrt(r/n));
+                       
                     if f < best_f
                         best_f = f; best_x = x; best_k = k;
                     end

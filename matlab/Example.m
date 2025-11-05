@@ -7,10 +7,10 @@ load("data/karate.mat")
 
 %OtrisymNMF
 r=2;
-[w,v,S,erreur] = OtrisymNMF_CD(A,r,'numTrials',1);
+[w,v,S,erreur,~,~] = OtrisymNMF_CD(A,r,'numTrials',1);
 disp("NMI of OtrisymNMF partition on karate club : ")
 
-disp(computeNMI(Label_karate,v))
+disp(nmi(Label_karate,v))
 
 % Display network
 G = graph(A);
@@ -43,13 +43,13 @@ end
 num_clusters = max(clusters);
 
 % Network plot
-colors = lines(num_clusters);  % 'lines' est une palette MATLAB, tu peux aussi utiliser jet, parula, etc.
-nodeColors = colors(clusters, :);  % Chaque ligne de nodeColors est la couleur du nœud correspondant
+colors = lines(num_clusters);  
+nodeColors = colors(clusters, :);  
 figure;
-p = plot(G, 'NodeLabel',labels(:));  % Créer le plot du graphe
-p.NodeCData = clusters;  % Utiliser les clusters comme données pour les couleurs
-colormap(colors);        % Appliquer la palette de couleurs
-                % Afficher la barre de couleurs pour avoir une idée des clusters
+p = plot(G, 'NodeLabel',labels(:));  
+p.NodeCData = clusters;  
+colormap(colors);        
+                
 title('Dolphins Network with real partition');
 X=adjacency(G);
 r=2;
@@ -58,7 +58,7 @@ r=2;
 
 [w2,v2,S2,erreur2] = OtrisymNMF_CD(X,r);
 disp("NMI of OtrisymNMF partition on Dolphins : ")
-disp(computeNMI(clusters,v2))
+disp(nmi(clusters,v2))
 
 num_v = max(v2);
 colors = lines(num_v); 

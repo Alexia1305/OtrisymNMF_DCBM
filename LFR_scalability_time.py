@@ -187,7 +187,7 @@ def main(list_n):
         # Results Display
         print(df_results)
 
-        results_filename = f"results/Test_scalability/n_{n:.1f}_results_SVCA.csv"
+        results_filename = f"results/Test_scalability/n_{n:.1f}_results_2.csv"
         df_results.to_csv(results_filename)
         print(f"Résultats enregistrés dans '{results_filename}'\n")
 
@@ -195,7 +195,7 @@ def main(list_n):
 if __name__ == "__main__":
 
     #Options TEST
-    list_n = [1000]
+    list_n = [5000]
 
     random.seed(42)  # Fixer la seed
     main(list_n)

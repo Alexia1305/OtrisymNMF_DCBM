@@ -11,7 +11,7 @@ from scipy.sparse import diags
 from scipy.sparse.linalg import norm
 from scipy.sparse import diags
 
-@profile
+
 def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None):
     """
     Orthogonal Symmetric Nonnegative Matrix Trifactorization using Coordinate Descent.
@@ -310,10 +310,10 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
                     for k in range(r):
 
                         # Cardan resolution for min ax^4+bx^2+cx
-                        roots = cardan(4 * S2[k,k], 0, 2 * b[k], c[k])
+                        roots = cardan_depressed(4 * S2[k,k], 2 * b[k], c[k])
 
                         # best positive solution
-                        x = np.sqrt(r / n) # default value
+                        x = np.sqrt(r / n)  # default value
                         min_value = S2[k,k] * (x ** 4) + b[k] * (x ** 2) + c[k] * x
                         for sol in roots:
                             value = S2[k,k] * (sol ** 4) + b[k] * (sol ** 2) + c[k] * sol
@@ -321,7 +321,7 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
                                 x, min_value = sol, value
 
                         if S2[k,k] * x ** 4 + b[k] * x ** 2 + c[k] * x < f_new:
-                            f_new, wi_new, vi_new = S2[k, k] * x ** 4 + b[k] * x ** 2 + c[k] * x, x, k
+                            f_new, wi_new, vi_new = S2[k,k] * x ** 4 + b[k] * x ** 2 + c[k] * x, x, k
 
                     # update wp2
 
@@ -462,82 +462,32 @@ def extract_w_v(W, r):
     return w, v
 
 
-
-
-
-
-def cardan(a, b, c, d,tol=1e-12):
-    """ Cardano formula to solve ax^3+bx^2+cx+d=0"""
+def cardan_depressed(a, c, d,tol=1e-12):
+    """ Cardano formula to min ax^4+cx^2+dx=0 """
     if abs(a) < tol:
-        if abs(b) < tol:
-            if abs(c) < tol:
-                roots = []
-                return roots
-            else:
-                root1 = -d / c
-                roots = [root1]
-                return roots
-
-        delta = c ** 2 - 4 * b * d
-        root1 = (-c + math.sqrt(delta)) / (2 * b)
-        root2 = (-c - math.sqrt(delta)) / (2 * b)
-
-        if root1 == root2:
-            roots = [root1]
+        if abs(c) < tol:
+            return []
         else:
-            roots = [root1, root2]
-        return roots
+            return [-d / c]
 
-    p = -(b ** 2 / (3 * a ** 2)) + c / a
-    q = ((2 * b ** 3) / (27 * a ** 3)) - ((9 * c * b) / (27 * a ** 2)) + (d / a)
-    delta = -(4 * p ** 3 + 27 * q ** 2)
+    # b=0 t^3+pt+q
+    p = c/a
+    q = d/a
+    Delta = 4*(p**3)+27*(q**2)
 
+    if abs(Delta)<tol :
+        return [0]
+    elif Delta > 0 : # one real solution
+        sqrtD = np.sqrt(Delta / 27)
+        return [np.cbrt((-q + sqrtD) / 2) + np.cbrt((-q - sqrtD) / 2)]
 
+    else : # 3 real different solutions or multiple solution
 
-    if abs(delta) < tol:
-        if abs(p) < tol and abs(q) < tol:
-            root1 = 0
-            roots = [root1]
-        else:
-            root1 = (3 * q) / p
-            root2 = (-3 * q) / (2 * p)
-            roots = [root1, root2]
-        return roots
-    elif delta < -tol:
-        u = (-q + math.sqrt(-delta / 27)) / 2
-        v = (-q - math.sqrt(-delta / 27)) / 2
-
-        if abs(u) < tol:
-            u = 0
-        elif u < 0:
-            u = -(-u) ** (1 / 3)
-        else :
-            u = u ** (1 / 3)
-
-        if abs(v)< tol:
-            v = 0
-        elif v < 0:
-            v = -(-v) ** (1 / 3)
-        else :#v > 0:
-            v = v ** (1 / 3)
-
-
-        root1 = u + v - (b / (3 * a))
-        roots = [root1]
-        return roots
-    else:
-        epsilon = -1e-30
-        phi = math.acos(-(q / 2) * math.sqrt(-27 / (p ** 3 + epsilon)))
-        z1 = 2 * math.sqrt(-p / 3) * math.cos(phi / 3)
-        z2 = 2 * math.sqrt(-p / 3) * math.cos((phi + 2 * math.pi) / 3)
-        z3 = 2 * math.sqrt(-p / 3) * math.cos((phi + 4 * math.pi) / 3)
-
-        root1 = z1 - (b / (3 * a))
-        root2 = z2 - (b / (3 * a))
-        root3 = z3 - (b / (3 * a))
-
-        roots = [root1, root2, root3]
-        return roots
+        r = 2 * np.sqrt(-p / 3)
+        cos_arg = -q / 2 * np.sqrt(-27 / (p ** 3))
+        cos_arg = np.clip(cos_arg, -1, 1)
+        theta = np.arccos(cos_arg) / 3
+        return r * np.cos(np.array([theta, theta + 2 * np.pi / 3, theta + 4 * np.pi / 3]))
 
 def compute_error(normX, S):
     """ Computes error ||X - WSW'||_F / ||X||_F."""
