@@ -1,0 +1,251 @@
+import numpy as np
+from scipy.sparse.linalg import svds
+from scipy.sparse import issparse
+from scipy.sparse import csc_matrix
+
+
+def update_orth_basis(V, v):
+    """
+    Updates the orthonormal basis V by adding a new vector v while ensuring orthogonality.
+
+    Parameters:
+        V (numpy.ndarray): Current orthonormal basis (m x k) where columns are basis vectors.
+        v (numpy.ndarray): New vector to be added (m,).
+
+    Returns:
+        numpy.ndarray: Updated orthonormal basis including v.
+    """
+    if V.size == 0:
+        # If V is empty, normalize v and set it as the first basis vector
+        V = v / np.linalg.norm(v).reshape(1, -1)
+        V = V.T
+    else:
+        # Project v onto the orthogonal complement of V
+        v = v - V @ (V.T @ v)
+        # Normalize v
+        v = v / np.linalg.norm(v)
+        # Append to the basis
+        V = np.column_stack((V, v))
+
+    return V
+
+
+def SVCA(X, r, p, options=None):
+    """
+        Smoothed Vertex Component Analysis(SVCA)
+
+        Heuristic to solve the following problem:
+        Given a matrix X, find a matrix W such that X~=WH for some H>=0,
+        under the assumption that each column of W has p columns of X close
+        to it (called the p proximal latent points).
+
+        Parameters:
+            X (numpy.ndarray or csc_matrix): Input data matrix of size (m, n).
+            r (int): Number of columns of W.
+            p (int): Number of proximal latent points.
+            options (dict, optional):
+                - 'lra' (int):
+                    1 uses a low-rank approximation (LRA) of X in the selection step,
+                    0 (default) does not.
+                - 'average' (int):
+                    1 uses the mean for aggregation,
+                    0 (default) uses the median.
+
+        Returns:
+            W (numpy.ndarray): The matrix such that X ≈ WH.
+            K (numpy.ndarray): Indices of the selected data points (one column per iteration).
+
+            This code is based on the paper Smoothed Separable Nonnegative Matrix Factorization
+            by N. Nadisic, N. Gillis, and C. Kervazo
+            https://arxiv.org/abs/2110.05528
+        """
+    if options is None:
+        options = {}
+
+    X = X.astype('float')
+    if 'lra' not in options:
+        options['lra'] = 0
+    # LOw-rank approximation (LRA) of the input matrix
+    # Default: no low-rank approximations
+
+    # U contains the first r singular vectors of X
+    # Attention the rank of X must be greater than r
+    U, S, Vt = svds(X, k=r)
+
+    if options['lra'] == 1:
+        X = np.dot(S, Vt)  # Remplace X by its LRA
+
+    #  Use of the average or the median [default] to aggregate the extracted
+    # subsets of columns of X
+    if 'average' not in options:
+        options['average'] = 0
+
+    # Projector (I - VV^T)  onto the orthogonal complements of the columns of W
+    # extracted so far.
+    V = np.empty((X.shape[0], 0))
+
+    W = np.zeros((X.shape[0], r))
+    K = np.zeros((r, p), dtype=int)  # Indexes of the selected columns of X
+    # Iterations of SVCA
+    for k in range(r):
+        # random direction in the columns of U subspace
+        diru = np.dot(U, np.random.randn(r))
+
+        # Projection of the random direction to be orthogonal with the previously computed columns of W.
+        if k >= 1:
+            diru = diru - np.dot(V, np.dot(V.T, diru))
+
+        u = diru.T @ X
+
+        # Sorting the entries
+        b = np.argsort(u)
+
+        # if abs(u(b(1))) < abs(u(b(end)))
+        if np.abs(np.median(u[b[:p]])) < np.abs(np.median(u[b[-p:]])):
+            b = b[::-1]  # Inverse
+
+        # Select the indices corresponding to the largest or lowest entries of u
+        K[k, :] = b[:p]
+
+        # Compute vertex
+        if p == 1:
+            if issparse(X):
+                W[:, k] = X[:, K[k, :]].toarray().ravel()
+            else:
+                W[:, k] = X[:, K[k, :]]
+
+        else:
+            if options['average'] == 1:
+                if issparse(X):
+                    subX = X[:, K[k, :]]
+                    row_sums = subX.sum(axis=1).A1
+                    num_cols = subX.shape[1]
+                    row_means = row_sums / num_cols
+
+                    W[:, k] = row_means
+                else:
+                    W[:, k] = np.mean(X[:, K[k, :]], axis=1)
+
+
+            else:
+                if issparse(X):
+                    W[:, k] = np.median(X[:, K[k, :]].toarray(), axis=1)
+                else:
+                    W[:, k] = np.median(X[:, K[k, :]], axis=1)
+
+        # Update the projector
+        V = update_orth_basis(V, W[:, k])
+
+    if options['lra'] == 1:
+        W = np.dot(U, W)  # Put back the endmembers in the original space
+
+    return W, K
+
+
+def SSPA(X, r, p, options=None):
+    """
+    Smoothed Successive Projection Algorithm (SSPA)
+
+    This heuristic algorithm finds a matrix W such that X ≈ WH for some H ≥ 0,
+    under the assumption that each column of W has p columns of X close to it
+    (called the p proximal latent points).
+
+    Parameters:
+        X (numpy.ndarray): Input data matrix of size (m, n).
+        r (int): Number of columns of W.
+        p (int): Number of proximal latent points.
+        options (dict, optional):
+            - 'lra' (int):
+                1 uses a low-rank approximation (LRA) of X in the selection step,
+                0 (default) does not.
+            - 'average' (int):
+                1 uses the mean for aggregation,
+                0 (default) uses the median.
+
+    Returns:
+        W (numpy.ndarray): The matrix such that X ≈ WH.
+        K (numpy.ndarray): Indices of the selected data points (one column per iteration).
+
+        This code is based on the paper Smoothed Separable Nonnegative Matrix Factorization
+        by N. Nadisic, N. Gillis, and C. Kervazo
+        https://arxiv.org/abs/2110.05528
+    """
+    if options is None:
+        options = {}
+
+    # Set default options if not provided
+    X = X.astype('float')
+    lra = options.get('lra', 0)
+    average = options.get('average', 0)
+
+    # Low-rank approximation (LRA) of the input matrix if enabled
+    if lra == 1:
+        U, S, Vt = svds(X, k=r)  # Compute rank-r SVD of X
+        Z = np.dot(np.diag(S), Vt)  # Reconstruct low-rank version
+    else:
+        Z = X.copy()
+
+    V = np.array([])  # Initialize the orthogonal basis
+    if issparse(X):
+        X_squared = X.copy()
+        X_squared.data **= 2
+        normX2 = np.array(X_squared.sum(axis=0)).ravel()
+    else:
+        normX2 = np.sum(X ** 2, axis=0)  # Compute squared L2 norm of each column of X
+
+    W = np.zeros((X.shape[0], r))  # Initialize W matrix
+    K = np.zeros((r, p), dtype=int)  # Store indices of selected data points
+
+    for k in range(r):
+        # Select SPA direction (column with maximum norm)
+        spb = np.argmax(normX2)
+        if issparse(X):
+            diru = X[:, spb].toarray().ravel()
+        else:
+            diru = X[:, spb]
+
+        # Ensure orthogonality to previously extracted columns
+        if k >= 1:
+            diru -= np.dot(V, np.dot(V.T, diru))
+
+        # Compute inner product with data matrix
+        u = diru.T @ X
+
+        # Sort values and select indices corresponding to largest values
+        sorted_indices = np.argsort(-u)  # Descending order
+        K[k, :] = sorted_indices[:p]  # Select top p indices
+
+        # Compute new column for W
+        if p == 1:
+            if issparse(Z):
+                W[:, k] = Z[:, K[k, 0]].toarray().ravel()
+            else:
+                W[:, k] = Z[:, K[k, 0]]
+        else:
+            if average == 1:
+                if issparse(Z):
+                    subZ = Z[:, K[k, :]]
+                    row_sums = subZ.sum(axis=1).A1  # vecteur numpy 1D
+                    num_cols = subZ.shape[1]
+                    row_means = row_sums / num_cols
+
+                    W[:, k] = row_means
+                else:
+                    W[:, k] = np.mean(Z[:, K[k, :]], axis=1).T
+            else:
+                if issparse(Z):
+                    W[:, k] = np.median(Z[:, K[k, :]].toarray(), axis=1)
+                else:
+                    W[:, k] = np.median(Z[:, K[k, :]], axis=1).T
+
+        # Update orthogonal basis
+        V = update_orth_basis(V, W[:, k])
+
+        # Update squared L2 norm of columns
+        normX2 -= (V[:, -1].T @ X) ** 2
+
+    # If low-rank approximation was used, project W back
+    if lra == 1:
+        W = np.dot(U, W)
+
+    return W, K

@@ -1,3 +1,3 @@
 from .OtrisymNMF_CD import *
-from .SSPA import *
+from .SVCA import *
 from .Utils import *

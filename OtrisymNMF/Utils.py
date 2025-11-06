@@ -1,8 +1,8 @@
 import numpy as np
 from scipy.sparse import issparse, diags
 from sklearn.cluster import KMeans
-from .SSPA import SSPA
-from .SSPA import SVCA
+from .SVCA import SSPA
+from .SVCA import SVCA
 
 def orthNNLS(M, U, Mn=None):
     """
@@ -25,19 +25,17 @@ def orthNNLS(M, U, Mn=None):
     if Mn is None:
         # Normalize columns of M
         if issparse(M):
-            norm2x_squared = M.multiply(M).sum(axis=0)  # matrice 1 x n (sparse)
+            norm2x_squared = M.multiply(M).sum(axis=0)
             norm2x_squared = np.array(norm2x_squared).ravel()
             norm2x = np.sqrt(norm2x_squared)
             norm2x_safe = norm2x + 1e-16
-
-            # Créer matrice diagonale inverses des normes
             inv_norms = 1.0 / norm2x_safe
-            D = diags(inv_norms)  # matrice diagonale sparse (n x n)
+            D = diags(inv_norms)
 
-            # Normaliser X par colonnes : multiplication à droite
+            # Normalization of the columns of M
             Mn = M @ D
         else:
-            norm2m = np.sqrt(np.sum(M ** 2, axis=0))  # norm2m is the L2 norm of each column of M
+            norm2m = np.sqrt(np.sum(M ** 2, axis=0))
             Mn = M * (1 / (norm2m + 1e-16))  # Avoid division by zero
 
     m, n = Mn.shape
@@ -125,11 +123,11 @@ def alternatingONMF(X, r, maxiter=100, delta=1e-6, init_algo="k_means"):
         Application to Clustering", Neurocomputing, 141:15–25, 2014.
         """
     if init_algo == "k_means":
-        # Initialisation kmeans
+        # Initialization kmeans
         n = X.shape[1]
         Xnorm = np.zeros_like(X, dtype=float)
 
-        # Normalisation des colonnes
+        # Normalization of the X columns
         for i in range(n):
             col_norm = np.linalg.norm(X[:, i], 2)
             if col_norm != 0:
@@ -144,7 +142,7 @@ def alternatingONMF(X, r, maxiter=100, delta=1e-6, init_algo="k_means"):
         for i in range(n):
             H[a[i], i] = 1.0
 
-        # Orthogonalisation des lignes
+        # Orthogonalization of the rows
         for k in range(r):
             nw = np.linalg.norm(H[k, :], 2)
             if nw != 0:
@@ -156,7 +154,7 @@ def alternatingONMF(X, r, maxiter=100, delta=1e-6, init_algo="k_means"):
         n = X.shape[1]
         p = max(2, int(np.floor(0.1 * n / r)))
         options = {"average": 1}
-        W, K = SVCA(X, r, p, options)  # À implémenter séparément
+        W, K = SVCA(X, r, p, options)
 
     m, n = X.shape
     m, r = W.shape
