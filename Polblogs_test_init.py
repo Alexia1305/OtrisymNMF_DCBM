@@ -74,28 +74,18 @@ def main(graph, clusters):
         #     results["MH"]["Success_rate"].append(1)
 
 
-        # OtrisymNMF
-        start_time = time.time()
-        X = nx.adjacency_matrix(graph)
-        w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, init_method="random", numTrials=trials, verbosity=0)
-        end_time = time.time()
-        NMI = normalized_mutual_info_score(clusters, v_best)
-        results["OtrisymNMF"]["NMI"].append(NMI)
-        results["OtrisymNMF"]["Time"].append(end_time - start_time)
-        if NMI >= 0.722389545475209:
-            results["OtrisymNMF"]["Success_rate"].append(1)
+        # # OtrisymNMF
+        # start_time = time.time()
+        # X = nx.adjacency_matrix(graph)
+        # w_best, v_best, S_best, error_best, time_per_iteration= OtrisymNMF.OtrisymNMF_CD(X, r, init_method="random", numTrials=trials, verbosity=0)
+        # end_time = time.time()
+        # NMI = normalized_mutual_info_score(clusters, v_best)
+        # results["OtrisymNMF"]["NMI"].append(NMI)
+        # results["OtrisymNMF"]["Time"].append(end_time - start_time)
+        # if NMI >= 0.722389545475209:
+        #     results["OtrisymNMF"]["Success_rate"].append(1)
 
-        # OtrisymNMF_S
-        start_time = time.time()
-        X = nx.adjacency_matrix(graph)
-        w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, init_method="random", update_rule="S_direct",
-                                                                      numTrials=trials,verbosity=0)
-        end_time = time.time()
-        NMI = normalized_mutual_info_score(clusters, v_best)
-        results["OtrisymNMF_S"]["NMI"].append(NMI)
-        results["OtrisymNMF_S"]["Time"].append(end_time - start_time)
-        if NMI >= 0.722389545475209:
-            results["OtrisymNMF_S"]["Success_rate"].append(1)
+
 
         # # KL_EM initialized by SVCA
         # start_time = time.time()
@@ -133,7 +123,7 @@ def main(graph, clusters):
         # OtrisymNMF initialized by SVCA
         start_time = time.time()
         X = nx.adjacency_matrix(graph)
-        w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, init_method="SVCA", numTrials=trials,verbosity=0, init_seed=itt)
+        w_best, v_best, S_best, error_best, time_per_iteration = OtrisymNMF.OtrisymNMF_CD(X, r, init_method="SVCA", numTrials=trials,verbosity=0, init_seed=itt)
         end_time = time.time()
         NMI = normalized_mutual_info_score(clusters, v_best)
         results["OtrisymNMF_SVCA"]["NMI"].append(NMI)
@@ -141,27 +131,27 @@ def main(graph, clusters):
         if NMI >=0.722389545475209:
             results["OtrisymNMF_SVCA"]["Success_rate"].append(1)
 
-        # OtrisymNMF_S initialized by SVCA
-        start_time = time.time()
-        X = nx.adjacency_matrix(graph)
-        w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, init_method="SVCA", numTrials=trials,
-                                                                      verbosity=0, init_seed=itt,update_rule="S_direct")
-        end_time = time.time()
-        NMI = normalized_mutual_info_score(clusters, v_best)
-        results["OtrisymNMF_S_SVCA"]["NMI"].append(NMI)
-        results["OtrisymNMF_S_SVCA"]["Time"].append(end_time - start_time)
-        if NMI >= 0.722389545475209:
-            results["OtrisymNMF_S_SVCA"]["Success_rate"].append(1)
-        # SVCA
-        start_time = time.time()
-        X = nx.adjacency_matrix(graph)
-        w_best, v_best, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X, r, numTrials=trials, verbosity=0)
-        end_time = time.time()
-        NMI = normalized_mutual_info_score(clusters, v_best)
-        results["SVCA"]["NMI"].append(NMI)
-        results["SVCA"]["Time"].append(end_time - start_time)
-        if NMI >=0.722389545475209:
-            results["SVCA"]["Success_rate"].append(1)
+        # # OtrisymNMF_S initialized by SVCA
+        # start_time = time.time()
+        # X = nx.adjacency_matrix(graph)
+        # w_best, v_best, S_best, error_best = OtrisymNMF.OtrisymNMF_CD(X, r, init_method="SVCA", numTrials=trials,
+        #                                                               verbosity=0, init_seed=itt,update_rule="S_direct")
+        # end_time = time.time()
+        # NMI = normalized_mutual_info_score(clusters, v_best)
+        # results["OtrisymNMF_S_SVCA"]["NMI"].append(NMI)
+        # results["OtrisymNMF_S_SVCA"]["Time"].append(end_time - start_time)
+        # if NMI >= 0.722389545475209:
+        #     results["OtrisymNMF_S_SVCA"]["Success_rate"].append(1)
+        # # SVCA
+        # start_time = time.time()
+        # X = nx.adjacency_matrix(graph)
+        # w_best, v_best, S_best, error_best = OtrisymNMF.Community_detection_SVCA(X, r, numTrials=trials, verbosity=0)
+        # end_time = time.time()
+        # NMI = normalized_mutual_info_score(clusters, v_best)
+        # results["SVCA"]["NMI"].append(NMI)
+        # results["SVCA"]["Time"].append(end_time - start_time)
+        # if NMI >=0.722389545475209:
+        #     results["SVCA"]["Success_rate"].append(1)
     for algo, data in results.items():
         print(
             f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests}")

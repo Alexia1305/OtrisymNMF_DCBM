@@ -12,7 +12,8 @@ from scipy.sparse.linalg import norm
 from scipy.sparse import diags
 
 
-def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=1e-7, time_limit=300, init_method=None, verbosity=1,init_seed=None):
+def OtrisymNMF_CD(X, r, numTrials=1, update_rule="original", maxiter=1000, delta=1e-7, time_limit=300, init_method=None,
+                  verbosity=1, init_seed=None):
     """
     Orthogonal Symmetric Nonnegative Matrix Trifactorization using Coordinate Descent.
     Given a symmetric matrix X >= 0, finds matrices W >= 0 and S >= 0 such that X ≈ WSW' with W'W=I.
@@ -88,7 +89,6 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
     ))
     diagX = X.diagonal()
 
-
     if verbosity > 0:
         print(f'Running {numTrials} Trials in Series')
 
@@ -113,10 +113,9 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
 
         else:
             if init_seed is not None:
-                init_seed += 10*trial
-            W = initialize_W(X, r,method=init_algo,init_seed=init_seed)
-            w, v = extract_w_v(W,r)
-
+                init_seed += 10 * trial
+            W = initialize_W(X, r, method=init_algo, init_seed=init_seed)
+            w, v = extract_w_v(W, r)
 
         # Normalization of w
         nw = np.bincount(v, weights=w ** 2, minlength=r)
@@ -132,7 +131,7 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
         # Iterative update
         prev_error = compute_error(normX, S)
         error = prev_error
-        if update_rule=="S_direct":
+        if update_rule == "S_direct":
             ################## S direct version ###################################
             # Matrix G = W^TXW  and  d = ||W(:,k)||^2
             d = np.ones(r)
@@ -271,7 +270,7 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
 
                 prev_error = error
                 error = compute_error(normX, S)
-                time_per_iteration[-1].append(time.time()-start_it)
+                time_per_iteration[-1].append(time.time() - start_it)
                 if error < delta or abs(prev_error - error) < delta:
                     break
         else:
@@ -286,18 +285,17 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
 
                 # Pré-calculs pour éviter une double boucle sur "n"
                 wp2 = np.zeros(r)
-                S2 = S**2
-                w2 = w**2
+                S2 = S ** 2
+                w2 = w ** 2
                 for k in range(r):
                     wp2[k] = np.sum(w2 * S2[v, k])
-
 
                 for i in range(n):
                     if time.time() - start_time > time_limit:
                         print('Time limit passed')
                         break
                     # b coefficients for the r problems ax^4+bx^2+cx
-                    b = 2 * (wp2 - (w[i] * S[v[i], :]) ** 2) - 2 * diagX[i]*dgS
+                    b = 2 * (wp2 - (w[i] * S[v[i], :]) ** 2) - 2 * diagX[i] * dgS
 
                     # c coefficients
                     ind = np.arange(rowStart[i], rowStart[i + 1])
@@ -310,18 +308,18 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
                     for k in range(r):
 
                         # Cardan resolution for min ax^4+bx^2+cx
-                        roots = cardan_depressed(4 * S2[k,k], 2 * b[k], c[k])
+                        roots = cardan_depressed(4 * S2[k, k], 2 * b[k], c[k])
 
                         # best positive solution
                         x = np.sqrt(r / n)  # default value
-                        min_value = S2[k,k] * (x ** 4) + b[k] * (x ** 2) + c[k] * x
+                        min_value = S2[k, k] * (x ** 4) + b[k] * (x ** 2) + c[k] * x
                         for sol in roots:
-                            value = S2[k,k] * (sol ** 4) + b[k] * (sol ** 2) + c[k] * sol
+                            value = S2[k, k] * (sol ** 4) + b[k] * (sol ** 2) + c[k] * sol
                             if sol > 0 and value < min_value:
                                 x, min_value = sol, value
 
-                        if S2[k,k] * x ** 4 + b[k] * x ** 2 + c[k] * x < f_new:
-                            f_new, wi_new, vi_new = S2[k,k] * x ** 4 + b[k] * x ** 2 + c[k] * x, x, k
+                        if S2[k, k] * x ** 4 + b[k] * x ** 2 + c[k] * x < f_new:
+                            f_new, wi_new, vi_new = S2[k, k] * x ** 4 + b[k] * x ** 2 + c[k] * x, x, k
 
                     # update wp2
 
@@ -341,7 +339,6 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
                 np.add.at(S, (v[I], v[J]), prodVal)
                 dgS = np.diag(S).copy()
 
-
                 prev_error = error
                 error = compute_error(normX, S)
 
@@ -350,27 +347,27 @@ def OtrisymNMF_CD(X, r, numTrials=1,update_rule="original", maxiter=1000, delta=
                 if error < delta or abs(prev_error - error) < delta:
                     break
 
-        if iteration == maxiter-1:
+        if iteration == maxiter - 1:
             print('Not converged')
 
         if error <= error_best:
             w_best, v_best, S_best, error_best = w, v, S, error
         if verbosity > 0:
-            print(f'Trial {trial + 1}/{numTrials} with {init_algo} in {iteration} iterations: Error {error:.4e} | Best: {error_best:.4e}')
+            print(
+                f'Trial {trial + 1}/{numTrials} with {init_algo} in {iteration} iterations: Error {error:.4e} | Best: {error_best:.4e}')
 
         if error_best <= delta or time.time() - start_time > time_limit:
             break
 
+    return w_best, v_best, S_best, error_best, time_per_iteration
 
-    return w_best, v_best, S_best, error_best,time_per_iteration
 
-
-def initialize_W(X, r, method="SVCA",init_seed=None):
+def initialize_W(X, r, method="SVCA", init_seed=None):
     """ Initializes W based on the chosen method."""
 
     if method == "SSPA":
         n = X.shape[0]
-        p=max(2,math.floor(0.1*n/r))
+        p = max(2, math.floor(0.1 * n / r))
 
         options = {'average': 1}
         if init_seed is not None:
@@ -395,12 +392,11 @@ def initialize_W(X, r, method="SVCA",init_seed=None):
 
             # Transposition du résultat
             W = HO.T
-        else :
-            WO, K = SSPA(X, r, p,options=options )
+        else:
+            WO, K = SSPA(X, r, p, options=options)
 
             norm2x = np.sqrt(np.sum(X ** 2, axis=0))  # Calcul de la norme L2 sur chaque colonne de X
             Xn = X * (1 / (norm2x + 1e-16))  # Normalisation de X (évite la division par zéro)
-
 
             HO = orthNNLS(X, WO, Xn)
 
@@ -447,7 +443,6 @@ def initialize_W(X, r, method="SVCA",init_seed=None):
             # Transposition du résultat
             W = HO.T
 
-
     return W
 
 
@@ -462,8 +457,8 @@ def extract_w_v(W, r):
     return w, v
 
 
-def cardan_depressed(a, c, d,tol=1e-12):
-    """ Cardano formula to min ax^4+cx^2+dx=0 """
+def cardan_depressed(a, c, d, tol=1e-12):
+    """ Cardano formula to find the roots of ax^3+cx+d=0 """
     if abs(a) < tol:
         if abs(c) < tol:
             return []
@@ -471,17 +466,17 @@ def cardan_depressed(a, c, d,tol=1e-12):
             return [-d / c]
 
     # b=0 t^3+pt+q
-    p = c/a
-    q = d/a
-    Delta = 4*(p**3)+27*(q**2)
+    p = c / a
+    q = d / a
+    Delta = 4 * (p ** 3) + 27 * (q ** 2)
 
-    if abs(Delta)<tol :
+    if abs(Delta) < tol:
         return [0]
-    elif Delta > 0 : # one real solution
+    elif Delta > 0:  # one real solution
         sqrtD = np.sqrt(Delta / 27)
         return [np.cbrt((-q + sqrtD) / 2) + np.cbrt((-q - sqrtD) / 2)]
 
-    else : # 3 real different solutions or multiple solution
+    else:  # 3 real different solutions or multiple solution
 
         r = 2 * np.sqrt(-p / 3)
         cos_arg = -q / 2 * np.sqrt(-27 / (p ** 3))
@@ -489,12 +484,14 @@ def cardan_depressed(a, c, d,tol=1e-12):
         theta = np.arccos(cos_arg) / 3
         return r * np.cos(np.array([theta, theta + 2 * np.pi / 3, theta + 4 * np.pi / 3]))
 
+
 def compute_error(normX, S):
     """ Computes error ||X - WSW'||_F / ||X||_F."""
-    error = np.sqrt(normX**2-np.linalg.norm(S, 'fro')**2)/normX
+    error = np.sqrt(normX ** 2 - np.linalg.norm(S, 'fro') ** 2) / normX
     return error
 
-def Community_detection_SVCA(X, r, numTrials=1,verbosity=1,init_seed=None):
+
+def Community_detection_SVCA(X, r, numTrials=1, verbosity=1, init_seed=None):
     """
         Perform community detection using the SVCA (Smooth VCA).
 
@@ -511,8 +508,6 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1,init_seed=None):
         - error_best: float (Reconstruction error of the best trial)
         """
 
-
-
     I, J, V = find(X)
     perm = np.argsort(I)
     I = I[perm]
@@ -528,8 +523,8 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1,init_seed=None):
         # Placeholder for proper initialization functions
         if init_seed is not None:
             init_seed += 10 * trial
-        W = initialize_W(X, r, method="SVCA",init_seed=init_seed)
-        w, v = extract_w_v(W,r)
+        W = initialize_W(X, r, method="SVCA", init_seed=init_seed)
+        w, v = extract_w_v(W, r)
         # Normalization of w
         nw = np.bincount(v, weights=w ** 2, minlength=r)
         nw = np.sqrt(nw)
@@ -539,13 +534,9 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1,init_seed=None):
         prodVal = w[I] * w[J] * V  # w_i * w_j * X(i,j)
         S = np.zeros((r, r))
         np.add.at(S, (v[I], v[J]), prodVal)
-        dgS = np.diag(S).copy()
-
+        
 
         error = compute_error(normX, S)
-
-
-
 
         if error <= error_best:
             w_best, v_best, S_best, error_best = w, v, S, error
@@ -554,6 +545,7 @@ def Community_detection_SVCA(X, r, numTrials=1,verbosity=1,init_seed=None):
             print(f'Trial {trial + 1}/{numTrials} with SVCA: Error {error:.4e} | Best: {error_best:.4e}')
 
     return w_best, v_best, S_best, error_best
+
 
 def safe_div_where_nonzero(A, B):
     """
