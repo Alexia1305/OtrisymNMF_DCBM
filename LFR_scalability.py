@@ -214,7 +214,7 @@ def main(list_n):
 if __name__ == "__main__":
 
     #Options TEST
-    list_n = [1000]
+    list_n = [2000,5000,10000,20000,50000,100000]
 
     random.seed(42)  # Fixer la seed
     main(list_n)
