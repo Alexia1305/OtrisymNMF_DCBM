@@ -100,32 +100,32 @@ def main(list_n):
 
 
 
-            #KN
-            start_time=time.time()
-            KLG_partition,time_per_iteration=DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,pysbm.KarrerInference, numTrials=numTrials,
-                                init_method="random", verbosity=0, time_limit=Time_limit,need_time=True)
-            end_time=time.time()
-            NMI = normalized_mutual_info_score(labels,KLG_partition)
-            AMI = adjusted_mutual_info_score(labels, KLG_partition)
-            results["KN"]["NMI"].append(NMI)
-            results["KN"]["AMI"].append(AMI)
-            results["KN"]["Time"].append(end_time-start_time)
-            results["KN"]["Nbr_iterations"].append(len(time_per_iteration[0]))
-            results["KN"]["Time_iterations"].extend(time_per_iteration[0])
+            # #KN
+            # start_time=time.time()
+            # KLG_partition,time_per_iteration=DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,pysbm.KarrerInference, numTrials=numTrials,
+            #                     init_method="random", verbosity=0, time_limit=Time_limit,need_time=True)
+            # end_time=time.time()
+            # NMI = normalized_mutual_info_score(labels,KLG_partition)
+            # AMI = adjusted_mutual_info_score(labels, KLG_partition)
+            # results["KN"]["NMI"].append(NMI)
+            # results["KN"]["AMI"].append(AMI)
+            # results["KN"]["Time"].append(end_time-start_time)
+            # results["KN"]["Nbr_iterations"].append(len(time_per_iteration[0]))
+            # results["KN"]["Time_iterations"].extend(time_per_iteration[0])
 
 
-            # KL_EM
-            start_time = time.time()
-            EM_partition,time_per_iteration = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=numTrials,
-                                 init_method="random", verbosity=0, time_limit=Time_limit,need_time=True)
-            end_time = time.time()
-            NMI = normalized_mutual_info_score(labels, EM_partition)
-            AMI = adjusted_mutual_info_score(labels, EM_partition)
-            results["KL_EM"]["NMI"].append(NMI)
-            results["KL_EM"]["AMI"].append(AMI)
-            results["KL_EM"]["Time"].append(end_time - start_time)
-            results["KL_EM"]["Nbr_iterations"].append(len(time_per_iteration[0]))
-            results["KL_EM"]["Time_iterations"].extend(time_per_iteration[0])
+            # # KL_EM
+            # start_time = time.time()
+            # EM_partition,time_per_iteration = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=numTrials,
+            #                      init_method="random", verbosity=0, time_limit=Time_limit,need_time=True)
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, EM_partition)
+            # AMI = adjusted_mutual_info_score(labels, EM_partition)
+            # results["KL_EM"]["NMI"].append(NMI)
+            # results["KL_EM"]["AMI"].append(AMI)
+            # results["KL_EM"]["Time"].append(end_time - start_time)
+            # results["KL_EM"]["Nbr_iterations"].append(len(time_per_iteration[0]))
+            # results["KL_EM"]["Time_iterations"].extend(time_per_iteration[0])
 
 
 
@@ -144,32 +144,32 @@ def main(list_n):
 
 
 
-            #KN initialized by SVCA
-            start_time = time.time()
-            KLG_partition,time_per_iteration = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
-                                  numTrials=numTrials, init_method="SVCA", verbosity=0, init_seed=idx, time_limit=Time_limit,need_time=True)
-            end_time = time.time()
-            NMI = normalized_mutual_info_score(labels, KLG_partition)
-            AMI = adjusted_mutual_info_score(labels, KLG_partition)
-            results["KN_SVCA"]["NMI"].append(NMI)
-            results["KN_SVCA"]["AMI"].append(AMI)
-            results["KN_SVCA"]["Time"].append(end_time - start_time)
-            results["KN_SVCA"]["Nbr_iterations"].append(len(time_per_iteration[0]))
-            results["KN_SVCA"]["Time_iterations"].extend(time_per_iteration[0])
-
-
-            # KL_EM initialized by SVCA
-            start_time = time.time()
-            EM_partition,time_per_iteration = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=numTrials,
-                                 init_method="SVCA", verbosity=0, init_seed=idx, time_limit=Time_limit,need_time=True)
-            end_time = time.time()
-            NMI = normalized_mutual_info_score(labels, EM_partition)
-            AMI = adjusted_mutual_info_score(labels, EM_partition)
-            results["KL_EM_SVCA"]["NMI"].append(NMI)
-            results["KL_EM_SVCA"]["AMI"].append(AMI)
-            results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
-            results["KL_EM_SVCA"]["Nbr_iterations"].append(len(time_per_iteration[0]))
-            results["KL_EM_SVCA"]["Time_iterations"].extend(time_per_iteration[0])
+            # #KN initialized by SVCA
+            # start_time = time.time()
+            # KLG_partition,time_per_iteration = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
+            #                       numTrials=numTrials, init_method="SVCA", verbosity=0, init_seed=idx, time_limit=Time_limit,need_time=True)
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, KLG_partition)
+            # AMI = adjusted_mutual_info_score(labels, KLG_partition)
+            # results["KN_SVCA"]["NMI"].append(NMI)
+            # results["KN_SVCA"]["AMI"].append(AMI)
+            # results["KN_SVCA"]["Time"].append(end_time - start_time)
+            # results["KN_SVCA"]["Nbr_iterations"].append(len(time_per_iteration[0]))
+            # results["KN_SVCA"]["Time_iterations"].extend(time_per_iteration[0])
+            #
+            #
+            # # KL_EM initialized by SVCA
+            # start_time = time.time()
+            # EM_partition,time_per_iteration = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=numTrials,
+            #                      init_method="SVCA", verbosity=0, init_seed=idx, time_limit=Time_limit,need_time=True)
+            # end_time = time.time()
+            # NMI = normalized_mutual_info_score(labels, EM_partition)
+            # AMI = adjusted_mutual_info_score(labels, EM_partition)
+            # results["KL_EM_SVCA"]["NMI"].append(NMI)
+            # results["KL_EM_SVCA"]["AMI"].append(AMI)
+            # results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
+            # results["KL_EM_SVCA"]["Nbr_iterations"].append(len(time_per_iteration[0]))
+            # results["KL_EM_SVCA"]["Time_iterations"].extend(time_per_iteration[0])
 
 
 
@@ -214,7 +214,7 @@ def main(list_n):
 if __name__ == "__main__":
 
     #Options TEST
-    list_n = [2000,5000,10000,20000,50000,100000]
+    list_n = [100000]
 
     random.seed(42)  # Fixer la seed
     main(list_n)
