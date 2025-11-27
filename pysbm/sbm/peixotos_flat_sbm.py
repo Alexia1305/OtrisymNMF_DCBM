@@ -12,6 +12,7 @@ from .peixotos_hierarchical_sbm_tools import log_binom
 
 class ModelLogLikelihoodOfFlatMicrocanonicalDegreeCorrectedSbm:
 
+
     def __init__(self):
         super(ModelLogLikelihoodOfFlatMicrocanonicalDegreeCorrectedSbm, self).__init__()
 

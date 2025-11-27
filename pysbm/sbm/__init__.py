@@ -26,3 +26,4 @@ from .hierarchical_inference import PeixotoHierarchicalInference
 from .nxpartitiongraphbased import NxPartitionGraphBased
 from .nxpartitiongraphbased import NxPartitionGraphBasedWithMoveCounter
 from .nxpartitiongraphbased import NxHierarchicalPartition
+from .peixotos_flat_sbm import ModelLogLikelihoodOfFlatMicrocanonicalDegreeCorrectedSbm

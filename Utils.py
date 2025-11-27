@@ -6,7 +6,10 @@ import networkx as nx
 import numpy as np
 import time
 from scipy.sparse import find, csr_matrix
-def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=None,init_method="random", verbosity=1,init_seed=None,time_limit=None,need_time=False):
+
+
+def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=None, init_method="random", verbosity=1,
+          init_seed=None, time_limit=None, need_time=False):
     """
        Performs Degree-Corrected Block Model (DCBM) inference using multiple trials with different initializations
        and returns the partition with the highest objective function value.
@@ -47,7 +50,7 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
         number_of_blocks=r,
     )
     degree_corrected_objective_function = objective_function(is_directed=False)
-    time_per_iteration=[]
+    time_per_iteration = []
     for i in range(numTrials):
         if init_partition is not None:
 
@@ -60,13 +63,13 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
                 best_degree_partition = degree_corrected_partition
                 obj_max_d = obj_value_d
         else:
-            if init_method=="SVCA":
+            if init_method == "SVCA":
                 X = nx.adjacency_matrix(G)
                 if not issparse(X):
                     X = csr_matrix(X)
                 if init_seed is not None:
                     init_seed += 10 * i
-                W = OtrisymNMF.initialize_W(X,r,method="SVCA",init_seed=init_seed)
+                W = OtrisymNMF.initialize_W(X, r, method="SVCA", init_seed=init_seed)
                 v = np.argmax(W, axis=1)
 
                 degree_corrected_partition = pysbm.NxPartition(
@@ -79,14 +82,14 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
                     best_degree_partition = degree_corrected_partition
                     obj_max_d = obj_value_d
 
-            else :
+            else:
                 degree_corrected_partition = pysbm.NxPartition(
                     graph=G,
                     number_of_blocks=r,
                 )
         time_limit2 = None
         if time_limit is not None:
-            time_limit2 = time_limit-(time.time()-start)
+            time_limit2 = time_limit - (time.time() - start)
             if time_limit2 < 0:
                 break
         degree_corrected_inference = inference_algo(G, degree_corrected_objective_function,
@@ -102,7 +105,7 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
             print(f'Trial {i + 1}/{numTrials} with {init_method} : logP {obj_value_d:.4e} | Best LogP: {obj_max_d:.4e}')
 
         if time_limit is not None:
-            if time.time()-start > time_limit:
+            if time.time() - start > time_limit:
                 print("Time limit reached")
                 break
 
@@ -112,3 +115,15 @@ def DC_BM(G, r, objective_function, inference_algo, numTrials=1, init_partition=
         return [best_degree_partition.get_block_of_node(node) for node in G.nodes], time_per_iteration
     else:
         return [best_degree_partition.get_block_of_node(node) for node in G.nodes]
+
+
+def computeMDL(G, r, partition_list, hyperprior=False):
+    partition = pysbm.NxPartition(
+        graph=G,
+        number_of_blocks=r,
+        representation={node: partition_list[i] for i, node in enumerate(G.nodes)})
+    model = pysbm.ModelLogLikelihoodOfFlatMicrocanonicalDegreeCorrectedSbm()
+    if hyperprior:
+        return model.calculate_complete_uniform_hyperprior_undirected(partition)
+    else:
+        return model.calculate_complete_uniform_undirected(partition)

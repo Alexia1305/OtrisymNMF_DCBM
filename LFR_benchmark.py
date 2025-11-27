@@ -78,37 +78,37 @@ def main(list_mu):
             results["OtrisymNMF"]["AMI"].append(adjusted_mutual_info_score(labels,v_best,average_method='max'))
             results["OtrisymNMF"]["Time"].append(end_time - start_time)
 
-            # KN
-            start_time = time.time()
-            KN_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
-                                    numTrials=10,
-                                    init_method="random", verbosity=0)
-            end_time = time.time()
-            results["KN"]["NMI"].append(normalized_mutual_info_score(labels, KN_partition))
-            results["KN"]["AMI"].append(adjusted_mutual_info_score(labels, KN_partition,average_method='max'))
-            results["KN"]["Time"].append(end_time - start_time)
-
-
-            # KL_EM
-            start_time = time.time()
-            EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=10,
-                                 init_method="random", verbosity=0)
-            end_time = time.time()
-            results["KL_EM"]["NMI"].append(normalized_mutual_info_score(labels, EM_partition))
-            results["KL_EM"]["AMI"].append(adjusted_mutual_info_score(labels, EM_partition,average_method='max'))
-            results["KL_EM"]["Time"].append(end_time - start_time)
-
-
-            # MHA250
-            start_time = time.time()
-            MHA_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
-                                  pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,init_method="random",
-                                  verbosity=0)
-            end_time = time.time()
-
-            results["MHA250k"]["NMI"].append(normalized_mutual_info_score(labels, MHA_partition))
-            results["MHA250k"]["AMI"].append(adjusted_mutual_info_score(labels, MHA_partition,average_method='max'))
-            results["MHA250k"]["Time"].append(end_time - start_time)
+            # # KN
+            # start_time = time.time()
+            # KN_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
+            #                         numTrials=10,
+            #                         init_method="random", verbosity=0)
+            # end_time = time.time()
+            # results["KN"]["NMI"].append(normalized_mutual_info_score(labels, KN_partition))
+            # results["KN"]["AMI"].append(adjusted_mutual_info_score(labels, KN_partition,average_method='max'))
+            # results["KN"]["Time"].append(end_time - start_time)
+            #
+            #
+            # # KL_EM
+            # start_time = time.time()
+            # EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=10,
+            #                      init_method="random", verbosity=0)
+            # end_time = time.time()
+            # results["KL_EM"]["NMI"].append(normalized_mutual_info_score(labels, EM_partition))
+            # results["KL_EM"]["AMI"].append(adjusted_mutual_info_score(labels, EM_partition,average_method='max'))
+            # results["KL_EM"]["Time"].append(end_time - start_time)
+            #
+            #
+            # # MHA250
+            # start_time = time.time()
+            # MHA_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
+            #                       pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,init_method="random",
+            #                       verbosity=0)
+            # end_time = time.time()
+            #
+            # results["MHA250k"]["NMI"].append(normalized_mutual_info_score(labels, MHA_partition))
+            # results["MHA250k"]["AMI"].append(adjusted_mutual_info_score(labels, MHA_partition,average_method='max'))
+            # results["MHA250k"]["Time"].append(end_time - start_time)
 
 
             #OtrisymNMF_SVCA
@@ -131,34 +131,34 @@ def main(list_mu):
             results["SVCA"]["AMI"].append(adjusted_mutual_info_score(labels, v,average_method='max'))
             results["SVCA"]["Time"].append(end_time - start_time)
 
-            # KL_EM initialized by SVCA
-            start_time = time.time()
-            EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=10,
-                                 init_method="SVCA", verbosity=0, init_seed=idx)
-            end_time = time.time()
-            results["KL_EM_SVCA"]["NMI"].append(normalized_mutual_info_score(labels, EM_partition))
-            results["KL_EM_SVCA"]["AMI"].append(adjusted_mutual_info_score(labels, EM_partition,average_method='max'))
-            results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
-
-            # KN initialized by SVCA
-            start_time = time.time()
-            KN_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference, numTrials=10,
-                                 init_method="SVCA", verbosity=0, init_seed=idx)
-            end_time = time.time()
-            results["KN_SVCA"]["NMI"].append(normalized_mutual_info_score(labels, KN_partition))
-            results["KN_SVCA"]["AMI"].append(adjusted_mutual_info_score(labels, KN_partition,average_method='max'))
-            results["KN_SVCA"]["Time"].append(end_time - start_time)
-
-
-            # MHA250 initialized by SVCA
-            start_time = time.time()
-            MHA_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
-                                  pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,
-                                  init_method="SVCA", verbosity=0, init_seed=idx)
-            end_time = time.time()
-            results["MHA250k_SVCA"]["NMI"].append(normalized_mutual_info_score(labels, MHA_partition))
-            results["MHA250k_SVCA"]["AMI"].append(adjusted_mutual_info_score(labels, MHA_partition,average_method='max'))
-            results["MHA250k_SVCA"]["Time"].append(end_time - start_time)
+            # # KL_EM initialized by SVCA
+            # start_time = time.time()
+            # EM_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=10,
+            #                      init_method="SVCA", verbosity=0, init_seed=idx)
+            # end_time = time.time()
+            # results["KL_EM_SVCA"]["NMI"].append(normalized_mutual_info_score(labels, EM_partition))
+            # results["KL_EM_SVCA"]["AMI"].append(adjusted_mutual_info_score(labels, EM_partition,average_method='max'))
+            # results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
+            #
+            # # KN initialized by SVCA
+            # start_time = time.time()
+            # KN_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference, numTrials=10,
+            #                      init_method="SVCA", verbosity=0, init_seed=idx)
+            # end_time = time.time()
+            # results["KN_SVCA"]["NMI"].append(normalized_mutual_info_score(labels, KN_partition))
+            # results["KN_SVCA"]["AMI"].append(adjusted_mutual_info_score(labels, KN_partition,average_method='max'))
+            # results["KN_SVCA"]["Time"].append(end_time - start_time)
+            #
+            #
+            # # MHA250 initialized by SVCA
+            # start_time = time.time()
+            # MHA_partition = DC_BM(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
+            #                       pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,
+            #                       init_method="SVCA", verbosity=0, init_seed=idx)
+            # end_time = time.time()
+            # results["MHA250k_SVCA"]["NMI"].append(normalized_mutual_info_score(labels, MHA_partition))
+            # results["MHA250k_SVCA"]["AMI"].append(adjusted_mutual_info_score(labels, MHA_partition,average_method='max'))
+            # results["MHA250k_SVCA"]["Time"].append(end_time - start_time)
 
         summary = {}
         for algo, data in results.items():
@@ -176,7 +176,7 @@ def main(list_mu):
         print(df_results)
 
         # Sauvegarde des résultats dans un fichier CSV
-        results_filename = f"mu_{mu:.1f}_resultsAMI.csv"
+        results_filename = f"mu_{mu:.1f}_resultsAMIverif.csv"
         df_results.to_csv(results_filename)
         print(f"Résultats enregistrés dans '{results_filename}'\n")
 
@@ -246,7 +246,7 @@ def displayLFR(mu):
 if __name__ == "__main__":
     #displayLFR(0.1)
     #Options TEST
-    list_mu = np.arange(0.6, 0.7, 0.1)  # mu between 0 and 0.6
+    list_mu = np.arange(0.2, 0.3, 0.1)  # mu between 0 and 0.6
 
     random.seed(42)  # Fixer la seed
     main(list_mu)

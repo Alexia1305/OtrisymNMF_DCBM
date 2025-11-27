@@ -1,14 +1,14 @@
 clear all; clc; close all;
-n_liste = [1000];
-output_file = 'resultats_LFR.csv';
+n_liste = [1000,2000,5000,10000,20000,50000,100000];
+output_file = 'resultats_LFRfinal.csv';
 
 if ~isfile(output_file)
     fid = fopen(output_file,'w'); 
     fprintf(fid, 'algo,n,NMI_mean,NMI_std,Time_mean,Time_std,Iterations_mean,Iterations_std,Time_it_mean,Time_it_std\n');
     fclose(fid);
 end
-%algos={'OtrisymNMF_rdm','OtrisymNMF_SVCA','SVCA'};
-algos={'OtrisymNMF_SVCA'};
+algos={'OtrisymNMF_rdm','OtrisymNMF_SVCA','SVCA'};
+
 for n=n_liste
     for a=1:length(algos)
         NMI_list = zeros(1,10);      
