@@ -121,15 +121,17 @@ end
 % to a value of lambda. The cell array P contains projections.
 nt=0;
 for Ai=A
-    nt=test+1;
+    nt=nt+1;
     lambda(nt)
     test = all(any(Ai{1}, 2));
     if test==0
         continue
     end
     r=5;
-    [w_best,v_best,S_best,erreur_best,time_global,time_iteration] = OtrisymNMF_CD(Ai{1},r,'time_limit',1000,'init',"SVCA","numTrials",50,'delta',1e-10);
+    [w_best,v_best,S_best,erreur_best,time_global,time_iteration] = OtrisymNMF_CD(Ai{1},r,'time_limit',1000,'init',"SVCA","numTrials",10,'delta',1e-10);
+    [w_best,v_best2,S_best,erreur_best,time_global,time_iteration] = OtrisymNMF_CD(Ai{1},r,'time_limit',1000,'init',"random","numTrials",10,'delta',1e-10);
 
     NMI = nmi(g,v_best)
+    NMI2 = nmi(g,v_best2)
 
 end
