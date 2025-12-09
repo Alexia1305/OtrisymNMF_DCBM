@@ -1,34 +1,43 @@
-clear all; clc; close all;
-n_liste = [1000,2000,5000,10000,20000,50000,100000];
-output_file = 'resultats_LFRfinal.csv';
+%% Test OtrisymNMF on LFR benchmark graphs with different sizes n 
 
+clear all; clc; close all;
+
+% List of network sizes to test
+n_liste = [1000,2000,5000,10000,20000,50000,100000];
+
+% Output CSV file
+output_file = 'resultats_LFRfinal.csv';
 if ~isfile(output_file)
     fid = fopen(output_file,'w'); 
     fprintf(fid, 'algo,n,NMI_mean,NMI_std,Time_mean,Time_std,Iterations_mean,Iterations_std,Time_it_mean,Time_it_std\n');
     fclose(fid);
 end
+
+% List of algorithms to test
 algos={'OtrisymNMF_rdm','OtrisymNMF_SVCA','SVCA'};
 
 for n=n_liste
+
     for a=1:length(algos)
+
         NMI_list = zeros(1,10);      
         iter_list = zeros(1,10);   
         time_list = zeros(1,10);   
         time_it_list={};
-        % Reading LFR network 
+
         for g=1:10
             
-            % Reading the community of each node
+            % Reading LFR network 
             community_file = sprintf('../Data/LFR_N/n_%d/community_%d.dat',n,g);
             data = load(community_file);  % colonnes : node community
             labels = data(:,2);
             r = max(labels);
             network_file=sprintf('../Data/LFR_N/n_%d/network_%d.dat',n,g);
             edges = load(network_file);
-            %adjacency matrix
+            % Adjacency matrix of the graph 
             A = sparse(edges(:,1), edges(:,2), 1, n, n);
     
-            %Test
+            % Community detection 
             if strcmp(algos{a},'OtrisymNMF_rdm')
                 [w_best,v_best,S_best,erreur_best,time_global,time_iteration] = OtrisymNMF_CD(A,r,'time_limit',1000,'init',"random",'verbosity',0);
                 NMI_list(g) = nmi(labels,v_best);
@@ -50,11 +59,6 @@ for n=n_liste
                 time_it_list = [time_it_list,time_trial{1}];
             end
 
-        
-    
-            
-            
-    
         end
         NMI_mean = mean(NMI_list);
         NMI_std = std(NMI_list);

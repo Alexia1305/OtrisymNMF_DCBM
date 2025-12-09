@@ -1,27 +1,28 @@
-% Perform community detection using the SVCA (Smooth VCA).
+% Perform community detection using SVCA (Smooth VCA).
 %
 % function [w,v,S,error] = Init_SVCA(X,r,varargin)
 %
-% Heuristic to solve the following problem:
-% Given a symmetric matrix X>=0, find a matrix W>=0 and a matrix S>=0 such that X~=WSW' with W'W=I,
+% Find a first approximation of  W >= 0 and S >= 0 such that X ≈ WSW' with W'W=I.
 %
 % INPUTS
+%  X: symmetric nonnegative matrix nxn sparse 
+%  r: number of columns of W
 %
-% X: symmetric nonnegative matrix nxn sparse 
-% r: number of columns of W
-%
-% Options
-% - numTrials 1*(default*) :number of trials with different initializations
-% - verbosity :1* to display messages, 0 no display
+% Options (varargin)
+%  numTrials 1*(default*) :number of trials with different initializations
+%  verbosity :1* to display messages, 0 no display
 %
 % OUTPUTS
+%  v: vector of lenght n, v(i) gives the index of the columns of W not nul
+%     for the i-th row
+%  w : vector of lenght n, w(i) gives the value of the non zero element of
+%      the i-th row
+%  S: central matrix rxr 
+%  error: relative error ||X-WSW||_F/||X||_F
+%  time_global: Total Runtime
+%  time_iteration: time_iteration{t}{i} time of iteration i in trial t
 %
-% v: vector of lenght n, v(i) gives the index of the columns of W not nul
-% for the i-th row
-% w : vector of lenght n,w(i) gives the value of the non zero element of
-% the i-th row
-% S: central matrix rxr 
-% error: relative error ||X-WSW||_F/||X||_F
+
 % This code is a supplementary material to the paper
 %  TOCOMPLETE 
 
@@ -61,22 +62,20 @@ I         = I(perm);
 J         = J(perm);
 V         = V(perm);
 
- 
- 
 for trials =1:options.numTrials
     start_trial=tic;
-    % SVCA
-     
+
+    % Estimation of WO=WS by SVCA
     p=max(2,floor(0.1*n/r));
     options1.average=1;
     [WO,~] = SVCA(X,r,p,options1);
     norm2x = sqrt(sum(X.^2, 1));
     Xn = X .* (1 ./ (norm2x + 1e-16));
-
+    % Compute W>=0 s.t. min||X-WOW'||_F W'W=I
     HO = orthNNLS(X, WO, Xn);
     W = HO';
     
-    % construction of v and w given W
+    % Construction of v and w given W
     v=max((W~=0).*(1:r),[],2);
     zero_idx = find(v == 0);
     v(zero_idx) = randi(r, size(zero_idx)); 
@@ -88,16 +87,11 @@ for trials =1:options.numTrials
     w       = w./(colNorm(v)+1e-10);
     
     % Construction of S
-    prodVal = w(I).*w(J).*V; %calcul des termes w_i*w_j*X(i,j)
+    prodVal = w(I).*w(J).*V; % w_i*w_j*X(i,j)
     S       = accumarray([v(I),v(J)],prodVal,[r,r]);
     
-
-
-    %UPDATE 
     erreur_prec= sqrt(normX2-norm(S,'fro')^2)/normX;
     erreur=erreur_prec;
-    
-    
     time_trial{end+1}=toc(start_trial);
     time_global=toc(start);
 

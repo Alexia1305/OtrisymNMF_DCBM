@@ -1,5 +1,5 @@
 clear all; clc; close all;
-mu_liste = [0.6];
+mu_liste = [0.2];
 output_file = 'resultats_LFR2.csv';
 n=1000;
 if ~isfile(output_file)

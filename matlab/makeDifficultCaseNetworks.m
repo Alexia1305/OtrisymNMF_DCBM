@@ -1,3 +1,4 @@
+clear;clc;
 % This code creates "difficult case" bipartite networks that were used as a
 % testbed by Daniel B. Larremore, Aaron Clauset, and Abigail Z. Jacobs in
 % the paper "Efficiently inferring community structure in bipartite

@@ -31,14 +31,14 @@
 % https://arxiv.org/abs/2110.05528
 
 
-function [W,K] = SSPA(X,r,p,options);
+function [W,K] = SSPA(X, r, p, options)
 
 if nargin <= 3
     options = [];
 end
 % Low-rank approximation (LRA) of the input matrix
 % Default: no low-rank approximations
-if ~isfield(options,'lra')
+if ~isfield(options, 'lra')
     options.lra = 0;
 end
 if options.lra == 1
@@ -49,7 +49,7 @@ else
 end
 % Use of the average or the median [default] to aggregate the extracted
 % subsets of columns of X
-if ~isfield(options,'average')
+if ~isfield(options, 'average')
     options.average = 0;
 end
 % Projector onto the orthogonal complements of the columns of X extracted
@@ -62,7 +62,7 @@ normX2 = sum(X.^2);
 % Iterations of SSPA
 for k = 1 : r
     % Select SPA direction
-    [spa,spb] = max( normX2 );
+    [spa, spb] = max( normX2 );
     diru = X(:,spb) ;
     % Projection of the SPA projection, for diru to be orthogonal to the
     % previously extracted columns of W
@@ -72,18 +72,13 @@ for k = 1 : r
     % Inner product with the data matrix
     u = diru'*X;
     % Sorting the entries en selecting the direction maximizing u
-    [a,b] = sort(u,'descend');
+    [a, b] = sort(u, 'descend');
     % Select the indices correspondind to the largest entries of u
     K(k,:) = b(1:p);
     % Compute vertex
     if p == 1
         W(:,k) = Z(:,K(k,:));
     else
-%         if options.average == 1
-%             W(:,k) = mean( Z(:,K(k,:))' )';
-%         else
-%             W(:,k) = median( Z(:,K(k,:))' )';
-%         end
         if options.average == 1
             W(:,k) = mean( Z(:,K(k,:))' )';
         elseif options.average == 3
