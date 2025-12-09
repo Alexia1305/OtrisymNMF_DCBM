@@ -12,7 +12,7 @@ from scipy.sparse import diags
 def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_method=None,
                   verbosity=1, init_seed=None):
     """
-    Orthogonal Symmetric Nonnegative Matrix Trifactorization using Coordinate Descent.
+    Orthogonal Symmetric Nonnegative Matrix Trifactorization using block coordinate descent.
     Given a symmetric matrix X >= 0, finds matrices W >= 0 and S >= 0 such that X ≈ WSW' with W'W=I.
     W is represented by:
     - v: indices of the nonzero columns of W for each row.
@@ -35,11 +35,11 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
         maxiter : int, default=1000
             Maximum iterations for each trial.
         delta : float, default=1e-7
-            Convergence tolerance.
+            Convergence tolerance (Stop if error<delta or error_prec-error<delta).
         time_limit : int, default=300
             Time limit in seconds.
-        init_method : str, default=None
-            Initialization method ("random", "SSPA", "SVCA", "SPA").
+        init_method : str, default=SVCA
+            Initialization method ("random", "SVCA", "SSPA", "SPA").
         verbosity : int, default=1
             Verbosity level (1 for messages, 0 for silent mode).
         init_seed : float, optional (default=None)
@@ -65,9 +65,12 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
     n = X.shape[0]
     error_best = float('inf')
     time_per_iteration = []
+    # Verification that there is no zero row in X (isolated node with no information)
+    if any(X.indptr[i] == X.indptr[i + 1] for i in range(X.shape[0])):
+        raise ValueError(
+            "The matrix X contains at least one zero row. Please remove empty rows (nodes without connections) during preprocessing.")
 
     # Precomputations
-
     normX = np.sqrt(np.sum(X.data ** 2))
     I, J, V = find(X)
     perm = np.argsort(I)
@@ -87,11 +90,11 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
     for trial in range(numTrials):
         time_per_iteration.append([])
         if init_method is None:
-            init_algo = "SSPA" if trial == 0 else "SVCA"
+            init_algo = "SVCA"
         else:
             init_algo = init_method
 
-        # Initialization
+        # INITIALIZATION
         if init_algo == "random":
             if init_seed is not None:
                 init_seed += 10 * trial
@@ -101,8 +104,7 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
             v = np.concatenate([base, rest])
             np.random.shuffle(v)
             w = np.random.rand(n)
-
-
+        # SVCA SSPA SPA
         else:
             if init_seed is not None:
                 init_seed += 10 * trial
@@ -124,43 +126,36 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
         prev_error = compute_error(normX, S)
         error = prev_error
 
-
-
         for iteration in range(maxiter):
             start_it = time.time()
             if time.time() - start_time > time_limit:
                 print('Time limit passed')
                 break
 
-            # Update W
-
+            # UPDATE W
             # Pre-calculations to avoid a double loop on ‘n’
             wp2 = np.zeros(r)
             S2 = S ** 2
             w2 = w ** 2
             for k in range(r):
                 wp2[k] = np.sum(w2 * S2[v, k])
-            # for each node
+            # Update of each row (node)
             for i in range(n):
                 if time.time() - start_time > time_limit:
                     print('Time limit passed')
                     break
                 # b coefficients for the r problems ax^4+bx^2+cx
                 b = 2 * (wp2 - (w[i] * S[v[i], :]) ** 2) - 2 * diagX[i] * dgS
-
                 # c coefficients
                 ind = np.arange(rowStart[i], rowStart[i + 1])
                 mask = J[ind] != i
                 cols_i = J[ind[mask]]
                 xip = V[ind[mask]]
                 c = -4 * np.dot(xip * w[cols_i], S[v[cols_i], :])
-
                 vi_new, wi_new, f_new = -1, -1, np.inf
-                for k in range(r): # Test each community
-
+                for k in range(r):  # Test each community
                     # Cardan resolution for min ax^4+bx^2+cx
                     roots = cardan_depressed(4 * S2[k, k], 2 * b[k], c[k])
-
                     # best positive solution
                     x = np.sqrt(r / n)  # default value
                     min_value = S2[k, k] * (x ** 4) + b[k] * (x ** 2) + c[k] * x
@@ -168,14 +163,10 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
                         value = S2[k, k] * (sol ** 4) + b[k] * (sol ** 2) + c[k] * sol
                         if sol > 0 and value < min_value:
                             x, min_value = sol, value
-
                     if S2[k, k] * x ** 4 + b[k] * x ** 2 + c[k] * x < f_new:
                         f_new, wi_new, vi_new = S2[k, k] * x ** 4 + b[k] * x ** 2 + c[k] * x, x, k
-
                 # update wp2
-
                 wp2 = wp2 - (w[i] * S[v[i], :]) ** 2 + (wi_new * S[vi_new, :]) ** 2
-
                 # update of w et v for node i
                 w[i], v[i] = wi_new, vi_new
 
@@ -192,7 +183,6 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
 
             prev_error = error
             error = compute_error(normX, S)
-
             time_per_iteration[-1].append(round(time.time() - start_it, 4))
 
             if error < delta or abs(prev_error - error) < delta:
@@ -214,11 +204,11 @@ def OtrisymNMF_CD(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, i
 
 
 def initialize_W(X, r, method="SVCA", init_seed=None):
-    """ Initializes W based on the chosen method."""
+    """ Initializes W based on the chosen method (SVCA, SSPA or SPA)."""
 
     if method == "SSPA":
         n = X.shape[0]
-        p = max(2, math.floor(0.1 * n / r))
+        p = max(2, math.floor(0.1 * n / r))  # default value
 
         options = {'average': 1}
         if init_seed is not None:
@@ -301,7 +291,7 @@ def extract_w_v(W, r):
     """ Extracts w and v from W."""
     w = np.max(W, axis=1)
     v = np.argmax(W, axis=1)
-    # assign random communities if no assignement
+    # assign random communities if no assignment
     zero_indices = np.where(w == 0)[0]
     random_values = np.random.randint(0, r, size=zero_indices.shape[0])
     v[zero_indices] = random_values
@@ -344,13 +334,19 @@ def compute_error(normX, S):
 
 def Community_detection_SVCA(X, r, numTrials=1, verbosity=1, init_seed=None):
     """
-        Perform community detection using the SVCA (Smooth VCA).
+        Perform community detection using SVCA (Smooth VCA).
+        Find a first approximation of  W >= 0 and S >= 0 such that X ≈ WSW' with W'W=I.
+        W is represented by:
+        - v: indices of the nonzero columns of W for each row.
+        - w: values of the nonzero elements in each row of W.
 
         Parameters:
         - X: ndarray or sparse matrix csr_matrix (Adjacency matrix of the graph)
         - r: int (Number of communities)
         - numTrials: int (Number of trials to find the best decomposition, default=1)
         - verbosity: int (Level of verbosity for printing progress, default=1)
+        - init_seed : float, optional (default=None)
+                      Random seed for the initialization for the experiments
 
         Returns:
         - w_best: ndarray (Importance of each node in its community)
@@ -358,6 +354,10 @@ def Community_detection_SVCA(X, r, numTrials=1, verbosity=1, init_seed=None):
         - S_best: ndarray (Interaction matrix between communities)
         - error_best: float (Reconstruction error of the best trial)
         """
+    # Verification that there is no zero row in X (isolated node with no information)
+    if any(X.indptr[i] == X.indptr[i + 1] for i in range(X.shape[0])):
+        raise ValueError(
+            "The matrix X contains at least one zero row. Please remove empty rows (nodes without connections) during preprocessing.")
 
     I, J, V = find(X)
     perm = np.argsort(I)
@@ -385,7 +385,6 @@ def Community_detection_SVCA(X, r, numTrials=1, verbosity=1, init_seed=None):
         S = np.zeros((r, r))
         np.add.at(S, (v[I], v[J]), prodVal)
 
-
         error = compute_error(normX, S)
 
         if error <= error_best:
@@ -395,4 +394,3 @@ def Community_detection_SVCA(X, r, numTrials=1, verbosity=1, init_seed=None):
             print(f'Trial {trial + 1}/{numTrials} with SVCA: Error {error:.4e} | Best: {error_best:.4e}')
 
     return w_best, v_best, S_best, error_best
-
