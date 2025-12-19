@@ -3,10 +3,10 @@
 
 ## Overview
 
-The **Orthogonal Symmetric Nonnegative Matrix Trifactorization** (OtrisymNMF) is a method designed to decompose a symmetric nonnegative matrix $X \geq 0$ into two matrices $W \geq 0$ and $S \geq 0$, such that:
+The **Orthogonal Symmetric Nonnegative Matrix Trifactorization** (OtrisymNMF) decomposes a symmetric nonnegative matrix $X \geq 0$ of size $n\times n$ into two matrices $Z \geq 0$ of size $n \times r$ and $S \geq 0$ of size $r\times r$, such that:
 
 $$
-X \approx W S W^T \quad \text{with} \quad W^T W = I
+X \approx Z S Z^T \quad \text{with} \quad Z^T Z = I
 $$
 
 ## Folder Structure
@@ -14,19 +14,29 @@ $$
 ```
 - algo/
   - OtrisymNMF/
-    - OtrisymNMF_CD.m
+    - frost.m
+    - init_SVCA.m
 ```
 
-## Function: `OtrisymNMF_CD`
+## Function: `frost`
 
-The `OtrisymNMF_CD` function performs Orthogonal Symmetric Nonnegative Matrix Trifactorization using a **Coordinate Descent** approach. It solves the following optimization problem:
-
+The `frost` function solves the Orthogonal Symmetric Nonnegative Matrix Trifactorization with respect to the squared Frobenius norm using a block coordinate descent approach. It solves the following optimization problem:
 $$
-\min_{W \geq 0, S \geq 0} \|\| X - W S W^T \|\|_F^2 \quad \text{subject to} \quad W^T W = I
+\min_{Z \geq 0, S \geq 0} \|\| X - Z S Z^T \|\|_F^2 \quad \text{subject to} \quad Z^T Z = I,
+$$
+given X and the rank r.
+
+An example script demonstrating how to use the `FROST` function is included in the script`Exemple.m`.
+
+## Function: `init_SVCA`
+
+The `init_SVCA` function gives a first approximation of Z >= 0 and S >= 0 such that X ≈ ZSZ' with Z'Z=I.
+$$
+\min_{Z \geq 0, S \geq 0} \|\| X - Z S Z^T \|\|_F^2 \quad \text{subject to} \quad Z^T Z = I
 $$
 
 
-An example script demonstrating how to use the `OtrisymNMF_CD` function is included in the script`Exemple.m`.
+An example script demonstrating how to use the `FROST` function is included in the script`Exemple.m`.
 
 
 

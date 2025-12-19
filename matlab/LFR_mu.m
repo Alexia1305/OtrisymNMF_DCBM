@@ -27,7 +27,7 @@ for mu=mu_liste
         A = sparse(edges(:,1), edges(:,2), 1, n, n);
 
         %Test
-        [w_best,v_best,S_best,erreur_best,time_global,time_iteration] = OtrisymNMF_CD(A,r,'time_limit',1000,'init',"SVCA","numTrials",10);
+        [w_best,v_best,S_best,erreur_best,time_global,time_iteration] = frost(A,r,'time_limit',1000,'init',"SVCA","numTrials",10);
         NMI_list(g) = nmi(labels,v_best);
         iter_list(g)=length(time_iteration{1});
         time_list(g)=time_global;

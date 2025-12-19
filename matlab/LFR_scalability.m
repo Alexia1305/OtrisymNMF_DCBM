@@ -14,7 +14,7 @@ if ~isfile(output_file)
 end
 
 % List of algorithms to test
-algos={'OtrisymNMF_rdm','OtrisymNMF_SVCA','SVCA'};
+algos={'FROST','FROST_SVCA','SVCA'};
 
 for n=n_liste
 
@@ -38,21 +38,21 @@ for n=n_liste
             A = sparse(edges(:,1), edges(:,2), 1, n, n);
     
             % Community detection 
-            if strcmp(algos{a},'OtrisymNMF_rdm')
-                [w_best,v_best,S_best,erreur_best,time_global,time_iteration] = OtrisymNMF_CD(A,r,'time_limit',1000,'init',"random",'verbosity',0);
+            if strcmp(algos{a},'FROST')
+                [w_best,v_best,S_best,erreur_best,time_global,time_iteration] = frost(A,r,'time_limit',1000,'init',"random",'verbosity',0);
                 NMI_list(g) = nmi(labels,v_best);
                 iter_list(g)=length(time_iteration{1});
                 time_list(g)=time_global;
                 time_it_list = [time_it_list,time_iteration{1}];
 
-            elseif strcmp(algos{a},'OtrisymNMF_SVCA')
-                [w_best,v_best,S_best,erreur_best,time_global,time_iteration] = OtrisymNMF_CD(A,r,'time_limit',1000,'init',"SVCA",'verbosity',0);
+            elseif strcmp(algos{a},'FROST_SVCA')
+                [w_best,v_best,S_best,erreur_best,time_global,time_iteration] = frost(A,r,'time_limit',1000,'init',"SVCA",'verbosity',0);
                 NMI_list(g) = nmi(labels,v_best);
                 iter_list(g)=length(time_iteration{1});
                 time_list(g)=time_global;
                 time_it_list = [time_it_list,time_iteration{1}];
             else
-                [w_best,v_best,S_best,erreur_best,time_global,time_trial] = Init_SVCA(A,r,'verbosity',0);      
+                [w_best,v_best,S_best,erreur_best,time_global,time_trial] = init_SVCA(A,r,'verbosity',0);      
                 NMI_list(g) = nmi(labels,v_best);
                 iter_list(g)=1;
                 time_list(g)=time_global;

@@ -1,24 +1,24 @@
 % Perform community detection using SVCA (Smooth VCA).
 %
-% function [w,v,S,error] = Init_SVCA(X,r,varargin)
+% function [w,v,S,error] = init_SVCA(X,r,varargin)
 %
-% Find a first approximation of  W >= 0 and S >= 0 such that X ≈ WSW' with W'W=I.
+% Gives a first approximation of  Z >= 0 and S >= 0 such that X ≈ ZSZ' with Z'Z=I.
 %
 % INPUTS
 %  X: symmetric nonnegative matrix nxn sparse 
-%  r: number of columns of W
+%  r: number of columns of Z
 %
 % Options (varargin)
 %  numTrials 1*(default*) :number of trials with different initializations
 %  verbosity :1* to display messages, 0 no display
 %
 % OUTPUTS
-%  v: vector of lenght n, v(i) gives the index of the columns of W not nul
+%  v: vector of lenght n, v(i) gives the index of the columns of Z not nul
 %     for the i-th row
 %  w : vector of lenght n, w(i) gives the value of the non zero element of
 %      the i-th row
 %  S: central matrix rxr 
-%  error: relative error ||X-WSW||_F/||X||_F
+%  error: relative error ||X-ZSZ||_F/||X||_F
 %  time_global: Total Runtime
 %  time_iteration: time_iteration{t}{i} time of iteration i in trial t
 %
@@ -26,7 +26,7 @@
 % This code is a supplementary material to the paper
 %  TOCOMPLETE 
 
-function [w_best,v_best,S_best,erreur_best,time_global,time_trial] = Init_SVCA(X,r,varargin)
+function [w_best,v_best,S_best,erreur_best,time_global,time_trial] = init_SVCA(X,r,varargin)
 
 if nargin <= 2
     options = [];
@@ -57,7 +57,7 @@ n         = size(X,1);
 normX     = norm(X,'fro');
 normX2    = normX^2;
 [I,J,V]   = find(X);    
-[~, perm] = sort(I,'ascend'); % permutation to sort given W rows
+[~, perm] = sort(I,'ascend'); % permutation to sort given Z rows
 I         = I(perm);
 J         = J(perm);
 V         = V(perm);
@@ -65,21 +65,21 @@ V         = V(perm);
 for trials =1:options.numTrials
     start_trial=tic;
 
-    % Estimation of WO=WS by SVCA
+    % Estimation of ZO=ZS by SVCA
     p=max(2,floor(0.1*n/r));
     options1.average=1;
-    [WO,~] = SVCA(X,r,p,options1);
+    [ZO,~] = SVCA(X,r,p,options1);
     norm2x = sqrt(sum(X.^2, 1));
     Xn = X .* (1 ./ (norm2x + 1e-16));
-    % Compute W>=0 s.t. min||X-WOW'||_F W'W=I
-    HO = orthNNLS(X, WO, Xn);
-    W = HO';
+    % Compute Z>=0 s.t. min||X-ZOZ'||_F Z'Z=I
+    HO = orthNNLS(X, ZO, Xn);
+    Z = HO';
     
-    % Construction of v and w given W
-    v=max((W~=0).*(1:r),[],2);
+    % Construction of v and w given Z
+    v=max((Z~=0).*(1:r),[],2);
     zero_idx = find(v == 0);
     v(zero_idx) = randi(r, size(zero_idx)); 
-    w = W(sub2ind(size(W), (1:n)', v));
+    w = Z(sub2ind(size(Z), (1:n)', v));
         
    
     % Normalization of w 

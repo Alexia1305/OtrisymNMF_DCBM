@@ -7,7 +7,7 @@ load("data/karate.mat")
 
 %OtrisymNMF
 r=2;
-[w,v,S,erreur,~,~] = OtrisymNMF_CD(A,r,'numTrials',1);
+[w,v,S,erreur,~,~] = frost(A,r,'numTrials',5);
 disp("NMI of OtrisymNMF partition on karate club : ")
 
 disp(nmi(Label_karate,v))
@@ -56,7 +56,7 @@ r=2;
 
 % OtrisymNMF
 
-[w2,v2,S2,erreur2] = OtrisymNMF_CD(X,r);
+[w2,v2,S2,erreur2] = frost(X,r,'numTrials',5);
 disp("NMI of OtrisymNMF partition on Dolphins : ")
 disp(nmi(clusters,v2))
 
