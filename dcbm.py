@@ -1,0 +1,118 @@
+from scipy.sparse import issparse
+
+import pysbm
+import otrisymNMF
+import networkx as nx
+import time
+from scipy.sparse import find, csr_matrix
+
+
+def dcbm(G, r, objective_function, inference_algo, numTrials=1, init_partition=None, init_method="random", verbosity=1,
+         init_seed=None, time_limit=None, need_time=False):
+    """
+       Performs Degree-Corrected Block Model (DCBM) inference using multiple trials with different initializations
+       and returns the partition with the highest objective function value.
+
+       Parameters:
+       -----------
+       G : networkx.Graph
+           The input graph to be partitioned.
+       r : int
+           The number of communities to detect.
+       objective_function : callable
+           A function that defines the objective to maximize during inference.
+       inference_algo : callable
+           The inference algorithm used to optimize the objective function.
+       numTrials : int, optional (default=1)
+           The number of trials for stochastic inference, each with a different initialization.
+       init_partition : list, optional (default=None)
+           An initial partitioning of nodes (if available). If None, a random partition is used in each trial.
+       init_method : str, optional (default="random")
+            Initialization method to have a first node partition ("random", "SVCA", "SSPA", "SPA").
+       verbosity : int, optional (default=1)
+            (1 for messages, 0 for silent mode).
+        init_seed : float, optional (default=None)
+            Random seed for the initialization for the experiments
+        time_limit : float, optional (default=None)
+            Time limit for inference
+
+
+       Returns:
+       --------
+       list
+           A list where each entry corresponds to the community of the respective node in the order of the nodes
+           of the graph.
+           The partition with the best (highest) objective function value is returned.
+       """
+    start = time.time()
+    obj_max_d = -float('inf')
+    best_degree_partition = pysbm.NxPartition(
+        graph=G,
+        number_of_blocks=r,
+    )
+    degree_corrected_objective_function = objective_function(is_directed=False)
+    time_per_iteration = []
+    for i in range(numTrials):
+        if init_partition is not None:
+
+            degree_corrected_partition = pysbm.NxPartition(
+                graph=G,
+                number_of_blocks=r,
+                representation={node: init_partition[i] for i, node in enumerate(G.nodes)})
+            obj_value_d = degree_corrected_objective_function.calculate(degree_corrected_partition)
+            if obj_value_d > obj_max_d:
+                best_degree_partition = degree_corrected_partition
+                obj_max_d = obj_value_d
+        else:
+            if init_method == "SVCA":
+                X = nx.adjacency_matrix(G)
+                if not issparse(X):
+                    X = csr_matrix(X)
+                if init_seed is not None:
+                    init_seed += 10 * i
+                w, v = otrisymNMF.initialize_Z(X, r, method="SVCA", init_seed=init_seed)
+
+                degree_corrected_partition = pysbm.NxPartition(
+                    graph=G,
+                    number_of_blocks=r,
+                    representation={node: v[i] for i, node in enumerate(G.nodes)})
+
+                obj_value_d = degree_corrected_objective_function.calculate(degree_corrected_partition)
+                if obj_value_d > obj_max_d:
+                    best_degree_partition = degree_corrected_partition
+                    obj_max_d = obj_value_d
+
+            else:
+                degree_corrected_partition = pysbm.NxPartition(
+                    graph=G,
+                    number_of_blocks=r,
+                )
+        time_limit2 = None
+        if time_limit is not None:
+            time_limit2 = time_limit - (time.time() - start)
+            if time_limit2 < 0:
+                break
+        degree_corrected_inference = inference_algo(G, degree_corrected_objective_function,
+                                                    degree_corrected_partition, time_limit=time_limit2)
+        degree_corrected_inference.infer_stochastic_block_model()
+        obj_value_d = degree_corrected_objective_function.calculate(degree_corrected_partition)
+        if need_time:
+            time_per_iteration.append(degree_corrected_inference.time_per_iteration)
+        if obj_value_d > obj_max_d:
+            best_degree_partition = degree_corrected_partition
+            obj_max_d = obj_value_d
+        if verbosity > 0:
+            print(f'Trial {i + 1}/{numTrials} with {init_method} : logP {obj_value_d:.4e} | Best LogP: {obj_max_d:.4e}')
+
+        if time_limit is not None:
+            if time.time() - start > time_limit:
+                print("Time limit reached")
+                break
+
+    if verbosity:
+        print(f"Best logP : {obj_max_d}")
+    if need_time:
+        return [best_degree_partition.get_block_of_node(node) for node in G.nodes], time_per_iteration
+    else:
+        return [best_degree_partition.get_block_of_node(node) for node in G.nodes]
+

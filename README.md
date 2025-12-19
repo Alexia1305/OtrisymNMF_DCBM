@@ -1,16 +1,11 @@
-# A Matrix Factorization Framework for Community Detection under the Degree-Corrected Block Model
+# A matrix factorization framework for community detection under the degree-corrected block model
 
-We use **OtrisymNMF** as a **degree corrected block model (DCBM)** to detect communities in several benchmark networks, including the LFR benchmark. 
+We use **OtrisymNMF** as a **degree corrected block model (DCBM)** to detect communities in several benchmark networks.  
 We also demonstrate that our initialization, based on smoothed separable NMF, significantly improves the results of classical inference methods for the **DCBM of Karrer and Newman**.
 
-All the tools for OtrisymNMF are available in the Python package **OtrisymNMF**. For Karrer and Newman's DCBM and inference methods, we used the **pysbm** package.
-The provided notebooks compare the performance of **OtrisymNMF** and **Karrer and Newman's DCBM** on three real-world networks:
-- the **Karate Club network**,
-- the **Political Blog network**, and
-- the **Southern Women network**.
+The method for OtrisymNMF (called FROST) and the SVCA initialization are available in the Python package **OtrisymNMF**. For the DCBM inference methods, we used the **pysbm** package.
 
-Additional experiment files demonstrate that the **SVCA initialization** significantly improves the performance of inference methods on various benchmark graphs, including the **LFR benchmark**, and the **Scotland Interlock network**.
-  
+ 
 # Reproduce the results
 
 ## 🔧 Requirements
@@ -48,7 +43,7 @@ pip install -r requirements.txt
 
 ### Karate Club 
 
-To run the `Karate.ipynb` notebook:
+To run the `karate.ipynb` notebook:
 
 1. Activate your virtual environment.
 2. Launch Jupyter:
@@ -57,49 +52,61 @@ To run the `Karate.ipynb` notebook:
 jupyter notebook
 ```
 
-3. Open the `Karate.ipynb` file from the interface and execute the cells.
+3. Open the `karate.ipynb` file from the interface and execute the cells.
 
 ### Political blog
 
-run the `Polblogs.ipynb` notebook
+run the `polblogs.ipynb` notebook
 
 To test SVCA initialization, run:
 ```bash
-python Polblogs_test_init.py
+python polblogs_test_init.py
 ```
 
 ### Southern women
 
-run the `Southern_women.ipynb` notebook
+run the `southern_women.ipynb` notebook
 
-### LFR Graphs Tests
+### LFR graphs varying $mu
 
 Run the script and select the desired value for $mu.
 
 ```bash
-python LFR_benchmark.py
+python lfr_mu.py
 ```
-### Scotland Corporate Interlock Network Tests
+
+### LFR graphs scalability
+Run the script and select the desired value for the network size $n
+
 ```bash
-python Scotland_test.py
+python lfr_scalability.py
+```
+### Scotland Corporate Interlock Network test
+```bash
+python scotland_test_init.py
+```
+
+### Malaria network test
+```bash
+python malaria.py
 ```
 
 # OtrisymNMF
 
-This package implements the **Orthogonal Symmetric Nonnegative Matrix Tri-Factorization** (OtrisymNMF) algorithm.
+This package implements the method FROST to solve the **Orthogonal Symmetric Nonnegative Matrix Tri-Factorization** (OtrisymNMF) problem.
 
 The algorithm aims to solve the following optimization problem:
 
 $$
-\min_{W \geq 0, S \geq 0} ||X - WSW^T||_F^2 \quad \text{s.t.} \quad W^TW = I
+\min_{Z \geq 0, S \geq 0} ||X - ZSZ^T||_F^2 \quad \text{s.t.} \quad Z^TZ = I
 $$
 
 Where:
-- **X** is a given symmetric nonnegative matrix (e.g., adjacency matrix of an undirected graph).
-- **W** is a matrix representing the assignment of elements to **r** communities.
-- **S** is a central matrix describing interactions between communities.
+- **X** is a given symmetric nonnegative matrix of size $n \times n$  (e.g., adjacency matrix of an undirected graph).
+- **Z** is a $n \times r$ matrix encoding the assignment of each node into **r** communities, where $Z(i,k) \neq 0$ if node $i$ belongs to community $k$.
+- **S** is a $r\times r$ central matrix describing interactions between communities.
 
-The **OtrisymNMF** package also includes the **SVCA** algorithm to initialize the inference. The implementation of the algorithm, along with the initialization, is also available in **MATLAB** and **Julia** at https://github.com/Alexia1305/OtrisymNMF.
+The **OtrisymNMF** package also includes the **SVCA** algorithm to initialize the inference. The implementation of the algorithm, along with the initialization, is also available in **MATLAB** in the folder matlab
 
 
 

@@ -77,7 +77,10 @@ class ObjectiveFunction(object):
 
 def _help_function_h(x):
     if x != 0:
-        return x * math.log(x)
+        if x < 0:
+            return 0
+        else:
+            return x * math.log(x)
     # else:..
     return 0
 
