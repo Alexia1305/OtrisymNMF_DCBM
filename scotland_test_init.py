@@ -57,39 +57,39 @@ def main(graph, clusters):
 
 
 
-        # # KL_EM
-        # start_time = time.time()
-        # EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=runs,
-        #                      init_method="random", verbosity=0)
-        # end_time = time.time()
-        # NMI = normalized_mutual_info_score(clusters, EM_partition)
-        # results["KL_EM"]["NMI"].append(NMI)
-        # results["KL_EM"]["Time"].append(end_time-start_time)
-        # if NMI == 1:
-        #     results["KL_EM"]["Success_rate"].append(1)
-        #
-        #
-        # # KN
-        # start_time = time.time()
-        # EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference, numTrials=runs,
-        #                      init_method="random", verbosity=0)
-        # end_time = time.time()
-        # NMI = normalized_mutual_info_score(clusters, EM_partition)
-        # results["KN"]["NMI"].append(NMI)
-        # results["KN"]["Time"].append(end_time - start_time)
-        # if NMI == 1:
-        #     results["KN"]["Success_rate"].append(1)
-        #
-        # # MH
-        # start_time = time.time()
-        # EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.MetropolisHastingInferenceFiftyK, numTrials=runs,
-        #                      init_method="random", verbosity=0)
-        # end_time = time.time()
-        # NMI = normalized_mutual_info_score(clusters, EM_partition)
-        # results["MH"]["NMI"].append(NMI)
-        # results["MH"]["Time"].append(end_time - start_time)
-        # if NMI == 1:
-        #     results["MH"]["Success_rate"].append(1)
+        # KL_EM
+        start_time = time.time()
+        EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=runs,
+                             init_method="random", verbosity=0)
+        end_time = time.time()
+        NMI = normalized_mutual_info_score(clusters, EM_partition)
+        results["KL_EM"]["NMI"].append(NMI)
+        results["KL_EM"]["Time"].append(end_time-start_time)
+        if NMI == 1:
+            results["KL_EM"]["Success_rate"].append(1)
+
+
+        # KN
+        start_time = time.time()
+        EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference, numTrials=runs,
+                             init_method="random", verbosity=0)
+        end_time = time.time()
+        NMI = normalized_mutual_info_score(clusters, EM_partition)
+        results["KN"]["NMI"].append(NMI)
+        results["KN"]["Time"].append(end_time - start_time)
+        if NMI == 1:
+            results["KN"]["Success_rate"].append(1)
+
+        # MH
+        start_time = time.time()
+        EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.MetropolisHastingInferenceFiftyK, numTrials=runs,
+                             init_method="random", verbosity=0)
+        end_time = time.time()
+        NMI = normalized_mutual_info_score(clusters, EM_partition)
+        results["MH"]["NMI"].append(NMI)
+        results["MH"]["Time"].append(end_time - start_time)
+        if NMI == 1:
+            results["MH"]["Success_rate"].append(1)
 
 
         # FROST
@@ -105,38 +105,38 @@ def main(graph, clusters):
 
 
 
-        # # KL_EM initialized by SVCA
-        # start_time = time.time()
-        # EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference,
-        #                      numTrials=runs, init_method="SVCA", verbosity=0, init_seed=itt)
-        # end_time = time.time()
-        # NMI = normalized_mutual_info_score(clusters, EM_partition)
-        # results["KL_EM_SVCA"]["NMI"].append(NMI)
-        # results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
-        # if NMI == 1:
-        #     results["KL_EM_SVCA"]["Success_rate"].append(1)
-        #
-        # # KN initialized by SVCA
-        # start_time = time.time()
-        # EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
-        #                      numTrials=runs, init_method="SVCA", verbosity=0, init_seed=itt)
-        # end_time = time.time()
-        # NMI = normalized_mutual_info_score(clusters, EM_partition)
-        # results["KN_SVCA"]["NMI"].append(NMI)
-        # results["KN_SVCA"]["Time"].append(end_time - start_time)
-        # if NMI == 1:
-        #     results["KN_SVCA"]["Success_rate"].append(1)
-        #
-        # # MH initialized by SVCA
-        # start_time = time.time()
-        # EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.MetropolisHastingInferenceFiftyK,
-        #                      numTrials=runs, init_method="SVCA", verbosity=0, init_seed=itt)
-        # end_time = time.time()
-        # NMI = normalized_mutual_info_score(clusters, EM_partition)
-        # results["MH_SVCA"]["NMI"].append(NMI)
-        # results["MH_SVCA"]["Time"].append(end_time - start_time)
-        # if NMI == 1:
-        #     results["MH_SVCA"]["Success_rate"].append(1)
+        # KL_EM initialized by SVCA
+        start_time = time.time()
+        EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference,
+                             numTrials=runs, init_method="SVCA", verbosity=0, init_seed=itt)
+        end_time = time.time()
+        NMI = normalized_mutual_info_score(clusters, EM_partition)
+        results["KL_EM_SVCA"]["NMI"].append(NMI)
+        results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
+        if NMI == 1:
+            results["KL_EM_SVCA"]["Success_rate"].append(1)
+
+        # KN initialized by SVCA
+        start_time = time.time()
+        EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.KarrerInference,
+                             numTrials=runs, init_method="SVCA", verbosity=0, init_seed=itt)
+        end_time = time.time()
+        NMI = normalized_mutual_info_score(clusters, EM_partition)
+        results["KN_SVCA"]["NMI"].append(NMI)
+        results["KN_SVCA"]["Time"].append(end_time - start_time)
+        if NMI == 1:
+            results["KN_SVCA"]["Success_rate"].append(1)
+
+        # MH initialized by SVCA
+        start_time = time.time()
+        EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.MetropolisHastingInferenceFiftyK,
+                             numTrials=runs, init_method="SVCA", verbosity=0, init_seed=itt)
+        end_time = time.time()
+        NMI = normalized_mutual_info_score(clusters, EM_partition)
+        results["MH_SVCA"]["NMI"].append(NMI)
+        results["MH_SVCA"]["Time"].append(end_time - start_time)
+        if NMI == 1:
+            results["MH_SVCA"]["Success_rate"].append(1)
 
         # FROST initialized by SVCA
         start_time = time.time()
@@ -163,19 +163,19 @@ def main(graph, clusters):
         print(
             f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests}")
 
-    with open('Karate.txt', 'w') as file:
+    with open('scotland_results2.txt', 'w') as file:
         for algo, data in results.items():
             # Calcul des statistiques
             nmi_mean = np.mean(data['NMI'])
             nmi_std = np.std(data['NMI'], ddof=1)
 
             # Enregistrer les résultats dans le fichier texte
-            #file.write(f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests} \n")
+            file.write(f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests} \n")
 
 
 
 if __name__ == "__main__":
     random.seed(15)  # Fixer la seed
-    np.random.seed(125)
+    np.random.seed(12)
     graph, labels = read_graph()
     main(graph, labels)

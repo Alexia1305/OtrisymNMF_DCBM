@@ -9,8 +9,13 @@ from .utils import compute_error
 def frost(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_method=None,
                   verbosity=1, init_seed=None):
     """
-    Orthogonal Symmetric Nonnegative Matrix Trifactorization using block coordinate descent.
+    Heuristic for the Orthogonal Symmetric Nonnegative Matrix Trifactorization problem:
     Given a symmetric matrix X >= 0, finds matrices Z >= 0 and S >= 0 such that X ≈ ZSZ' with Z'Z=I.
+    The factorization is computed with respect to the Frobenius norm, i.e., it aims to solve:
+
+       min_{Z >= 0, S >= 0} || X - Z S Z^T ||_F^2
+       subject to Z^T Z = I
+
     Z is represented by:
     - v: indices of the nonzero columns of Z for each row.
     - w: values of the nonzero elements in each row of Z.
@@ -105,7 +110,7 @@ def frost(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_meth
         else:
             if init_seed is not None:
                 init_seed += 10 * trial
-            w,v = initialize_Z(X, r, method=init_algo, init_seed=init_seed)
+            w, v = initialize_Z(X, r, method=init_algo, init_seed=init_seed)
 
 
         # Normalization of w

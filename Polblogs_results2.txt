@@ -1,9 +1,0 @@
-Algorithm: OtrisymNMF, NMI Mean: 0.276, NMI Std: 0.3512,Time Mean: 1.2905, Time Std: 0.8085 ,Success rate 0.38
-Algorithm: KL_EM, NMI Mean: 0.6305, NMI Std: 0.2341,Time Mean: 1.2136, Time Std: 0.6984 ,Success rate 0.26
-Algorithm: KN, NMI Mean: 0.2805, NMI Std: 0.3427,Time Mean: 0.8235, Time Std: 0.4171 ,Success rate 0.17
-Algorithm: MH, NMI Mean: 0.1919, NMI Std: 0.3087,Time Mean: 14.7867, Time Std: 6.1106 ,Success rate 0.01
-Algorithm: OtrisymNMF_SVCA, NMI Mean: 0.7152, NMI Std: 0.0721,Time Mean: 0.6646, Time Std: 0.3816 ,Success rate 0.99
-Algorithm: KL_EM_SVCA, NMI Mean: 0.7118, NMI Std: 0.0719,Time Mean: 0.7583, Time Std: 0.3631 ,Success rate 0.38
-Algorithm: KN_SVCA, NMI Mean: 0.7119, NMI Std: 0.072,Time Mean: 0.6261, Time Std: 0.2741 ,Success rate 0.38
-Algorithm: MH_SVCA, NMI Mean: 0.7068, NMI Std: 0.0721,Time Mean: 14.9606, Time Std: 6.2796 ,Success rate 0.12
-Algorithm: SVCA, NMI Mean: 0.691, NMI Std: 0.0646,Time Mean: 0.2227, Time Std: 0.0987 ,Success rate 0.0

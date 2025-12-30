@@ -1,0 +1,9 @@
+Algorithm: FROST, NMI Mean: 0.4223, NMI Std: 0.4157,Time Mean: 0.1013, Time Std: 0.0368 ,Success rate 0.29 
+Algorithm: KL_EM, NMI Mean: 0.0582, NMI Std: 0.1256,Time Mean: 0.0456, Time Std: 0.0114 ,Success rate 0.0 
+Algorithm: KN, NMI Mean: 0.0227, NMI Std: 0.0477,Time Mean: 0.021, Time Std: 0.0042 ,Success rate 0.0 
+Algorithm: MH, NMI Mean: 0.116, NMI Std: 0.2132,Time Mean: 1.5911, Time Std: 0.2167 ,Success rate 0.03 
+Algorithm: FROST_SVCA, NMI Mean: 0.7884, NMI Std: 0.2958,Time Mean: 0.0829, Time Std: 0.0165 ,Success rate 0.65 
+Algorithm: KL_EM_SVCA, NMI Mean: 0.0879, NMI Std: 0.141,Time Mean: 0.0683, Time Std: 0.0203 ,Success rate 0.01 
+Algorithm: KN_SVCA, NMI Mean: 0.0591, NMI Std: 0.0948,Time Mean: 0.044, Time Std: 0.0167 ,Success rate 0.0 
+Algorithm: MH_SVCA, NMI Mean: 0.2655, NMI Std: 0.2955,Time Mean: 2.132, Time Std: 0.2501 ,Success rate 0.08 
+Algorithm: SVCA, NMI Mean: 0.0129, NMI Std: 0.0164,Time Mean: 0.0178, Time Std: 0.002 ,Success rate 0.0 

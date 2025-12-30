@@ -71,7 +71,7 @@ def dcbm(G, r, objective_function, inference_algo, numTrials=1, init_partition=N
                 if init_seed is not None:
                     init_seed += 10 * i
                 w, v = otrisymNMF.initialize_Z(X, r, method="SVCA", init_seed=init_seed)
-
+                # v is the found node assignments, is the initial node partition for inference
                 degree_corrected_partition = pysbm.NxPartition(
                     graph=G,
                     number_of_blocks=r,

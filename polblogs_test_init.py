@@ -144,7 +144,7 @@ def main(graph, clusters):
         print(
             f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests}")
 
-    with open('Polblogs_results2.txt', 'w') as file:
+    with open('polblogs_results.txt', 'w') as file:
         for algo, data in results.items():
             # Calcul des statistiques
             nmi_mean = np.mean(data['NMI'])

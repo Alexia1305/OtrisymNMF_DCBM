@@ -1,11 +1,16 @@
-% Orthogonal Symmetric Nonnegative Matrix Trifactorization (OtrisymNMF)
-% with a block coordinate descent approach
+% Heuristic for the Orthogonal Symmetric Nonnegative Matrix Trifactorization (OtrisymNMF)
+% using a block coordinate descent approach
 %
 % function [w,v,S,error,time_global,time_iteration] = frost(X,r,varargin)
 %
 % Heuristic to solve the following problem:
 %   Given a symmetric nonnegative matrix X>=0, find matrices Z>=0 and S>=0 
 %   such that X≈ZSZ' with Z'Z=I,
+%   The factorization is computed with respect to the Frobenius norm, i.e.,
+%   the problem is 
+% 
+%       min_{Z >= 0, S >= 0} || X - Z S Z^T ||_F^2
+%       subject to Z^T Z = I
 %
 % INPUTS
 %   X: Symmetric nonnegative matrix (adjacency matrix of an undirected graph)

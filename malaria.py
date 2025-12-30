@@ -164,19 +164,19 @@ def main(graph, clusters):
         print(
             f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests}")
 
-    with open('malaria_results.txt', 'w') as file:
-        for algo, data in results.items():
-            # Calcul des statistiques
-            nmi_mean = np.mean(data['NMI'])
-            nmi_std = np.std(data['NMI'], ddof=1)
-
-            # Saving results in a text file
-            file.write(f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests} \n")
-
+    # with open('malaria_results.txt', 'w') as file:
+    #     for algo, data in results.items():
+    #         # Calcul des statistiques
+    #         nmi_mean = np.mean(data['NMI'])
+    #         nmi_std = np.std(data['NMI'], ddof=1)
+    #
+    #         # Saving results in a text file
+    #         file.write(f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests} \n")
+    #
 
 
 if __name__ == "__main__":
     random.seed(15)  # Fixer la seed
     np.random.seed(125)
     graph, labels = read_graph()
-    #main(graph, labels)
+    main(graph, labels)

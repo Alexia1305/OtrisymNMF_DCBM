@@ -1,9 +1,0 @@
-,Mean NMI,SD NMI,Mean Time (s),SD Time (s),Mean Nbr of iterations,SD Nbr of iterations,Mean Time of one iteration,SD Time of one iteration
-OtrisymNMF,0.7518,0.0504,4.33,0.79,17.8,3.36,0.24,0.01
-OtrisymNMF_SVCA,0.9637,0.018,2.3,0.83,8.9,3.28,0.25,0.01
-KN,0.9072,0.0177,12.91,2.73,9.8,2.39,1.2,0.16
-KL_EM,0.9251,0.0144,19.04,2.11,22.0,3.33,0.83,0.15
-KN_SVCA,0.9839,0.0087,6.68,2.41,4.5,2.17,1.18,0.06
-KL_EM_SVCA,0.9832,0.0087,8.1,2.52,8.8,3.36,0.81,0.04
-
-Time_limit=1000s

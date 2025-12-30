@@ -6,7 +6,7 @@ clear all; clc; close all;
 n_liste = [1000,2000,5000,10000,20000,50000,100000];
 
 % Output CSV file
-output_file = 'resultats_LFRfinal.csv';
+output_file = 'resultats_LFRfinal2.csv';
 if ~isfile(output_file)
     fid = fopen(output_file,'w'); 
     fprintf(fid, 'algo,n,NMI_mean,NMI_std,Time_mean,Time_std,Iterations_mean,Iterations_std,Time_it_mean,Time_it_std\n');

@@ -30,6 +30,8 @@ def community_detection_svca(X, r, numTrials=1, verbosity=1, init_seed=None):
         - S_best: ndarray (Interaction matrix between communities)
         - error_best: float (Reconstruction error of the best trial)
         """
+    if not issparse(X):
+        X = csr_matrix(X)
     # Verification that there is no zero row in X (isolated node with no information)
     if any(X.indptr[i] == X.indptr[i + 1] for i in range(X.shape[0])):
         raise ValueError(
@@ -49,8 +51,7 @@ def community_detection_svca(X, r, numTrials=1, verbosity=1, init_seed=None):
 
         if init_seed is not None:
             init_seed += 10 * trial
-        Z = initialize_Z(X, r, method="SVCA", init_seed=init_seed)
-        w, v = extract_w_v(Z, r)
+        w, v = initialize_Z(X, r, method="SVCA", init_seed=init_seed)
         # Normalization of w
         nw = np.bincount(v, weights=w ** 2, minlength=r)
         nw = np.sqrt(nw)
@@ -183,7 +184,7 @@ def extract_w_v(Z, r):
     """
     w = np.max(Z, axis=1)
     v = np.argmax(Z, axis=1)
-    # assign random communities if no assignment
+    # assign random communities if no assignment (w[v[i]]=0)
     zero_indices = np.where(w == 0)[0]
     random_values = np.random.randint(0, r, size=zero_indices.shape[0])
     v[zero_indices] = random_values

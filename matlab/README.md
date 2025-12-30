@@ -20,13 +20,12 @@ $$
 
 ## Function: `frost`
 
-The `frost` function solves the Orthogonal Symmetric Nonnegative Matrix Trifactorization with respect to the squared Frobenius norm using a block coordinate descent approach. It solves the following optimization problem:
+The `frost` function is a heuristic to solve the Orthogonal Symmetric Nonnegative Matrix Trifactorization with respect to the squared Frobenius norm using a block coordinate descent approach. It solves the following optimization problem:
 $$
 \min_{Z \geq 0, S \geq 0} \|\| X - Z S Z^T \|\|_F^2 \quad \text{subject to} \quad Z^T Z = I,
 $$
 given X and the rank r.
 
-An example script demonstrating how to use the `FROST` function is included in the script`Exemple.m`.
 
 ## Function: `init_SVCA`
 
