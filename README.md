@@ -6,6 +6,7 @@ We also demonstrate that our initialization, based on smoothed separable NMF, si
 The method for OtrisymNMF (called FROST) and the SVCA initialization are available in the Python package **OtrisymNMF**. For the DCBM inference methods, we used the **pysbm** package.
 
 Preprint available https://arxiv.org/abs/2601.06262
+
 Dache, A., Vandaele, A., & Gillis, N. (2026). Matrix Factorization Framework for Community Detection under the Degree-Corrected Block Model. arXiv preprint arXiv:2601.06262.
  
 # Reproduce the results
