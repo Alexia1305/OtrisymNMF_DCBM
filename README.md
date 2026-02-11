@@ -4,6 +4,7 @@ We use **OtrisymNMF** as a **degree corrected block model (DCBM)** to detect com
 We also demonstrate that our initialization, based on smoothed separable NMF, significantly improves the results of classical inference methods for the **DCBM of Karrer and Newman**.
 
 The method for OtrisymNMF (called FROST) and the SVCA initialization are available in the Python package **OtrisymNMF**. For the DCBM inference methods, we used the **pysbm** package.
+
 Preprint available https://arxiv.org/abs/2601.06262
 Dache, A., Vandaele, A., & Gillis, N. (2026). Matrix Factorization Framework for Community Detection under the Degree-Corrected Block Model. arXiv preprint arXiv:2601.06262.
  
