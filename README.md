@@ -33,6 +33,7 @@ cd OtrisymNMF_DCBM
 ```bash
 py -3.9 -m venv env
 env\Scripts\activate        # on Windows
+source env/bin/activate     # Linux and MacOS
 ```
 
 3. **Install dependencies**:
