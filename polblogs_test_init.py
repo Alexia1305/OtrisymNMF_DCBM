@@ -8,7 +8,7 @@ from sklearn.metrics import normalized_mutual_info_score
 import random, time
 
 def read_graph():
-    G = nx.read_gml('Data\polblogs_cleaned.gml', label='id')
+    G = nx.read_gml('Data/polblogs_cleaned.gml', label='id')
     True_partition = [int(G.nodes[node]['value']) for node in G.nodes]
 
     return G, True_partition

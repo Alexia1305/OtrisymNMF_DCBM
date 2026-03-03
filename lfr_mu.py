@@ -203,7 +203,7 @@ def displayLFR(mu):
     # Formes disponibles (on les réutilisera si r > len(shapes))
     shapes = ['o', 's', '^', 'v', 'D', 'p', 'h', '8', '*']
 
-    pos = nx.spring_layout(G, weight="weight", seed=42, k=0.15)  # layout du graphe
+    pos = nx.spring_layout(G, weight="weight", seed=42, k=0.17)  # layout du graphe
 
     plt.figure(figsize=(14, 14))
 
@@ -223,7 +223,7 @@ def displayLFR(mu):
         G, pos,
         edgelist=intra_edges,
         width=0.3,
-        alpha=0.3,
+        alpha=0.4,
         style="solid"
     )
 
@@ -232,8 +232,8 @@ def displayLFR(mu):
     nx.draw_networkx_edges(
         G, pos,
         edgelist=inter_edges,
-        width=0,
-        alpha=0,
+        width=0.3,
+        alpha=0.3,
         style="solid"
     )
 
@@ -242,12 +242,33 @@ def displayLFR(mu):
     plt.savefig(f"LFR_mu_{mu:.1f}.png", dpi=300, bbox_inches="tight")
     plt.show()
 
+    ## Deuxième graphe
+    plt.figure(figsize=(14, 14))
+    pos = nx.spring_layout(G,k=0.45)
+
+    nx.draw_networkx_nodes(
+        G, pos,
+        node_size=40,
+        node_color='black'  # couleur opaque
+    )
+    nx.draw_networkx_edges(
+        G, pos,
+        width=0.3,
+        alpha=1,  # Transparence des arêtes
+        edge_color='gray',
+        style="solid"
+    )
+    plt.axis('off')
+    # Sauvegarde en PNG haute résolution
+    plt.savefig(f"LFR_mu_{mu:.1f}_brut.png", dpi=300, bbox_inches="tight")
+    plt.show()
+
 
 if __name__ == "__main__":
-    #displayLFR(0.1)
+    displayLFR(0.1)
     #Options TEST
-    list_mu = np.arange(0.5, 0.7, 0.1)  # mu between 0 and 0.6
-
-    random.seed(42)  # Fixer la seed
-    main(list_mu)
+    # list_mu = np.arange(0.5, 0.7, 0.1)  # mu between 0 and 0.6
+    #
+    # random.seed(42)  # Fixer la seed
+    # main(list_mu)
 

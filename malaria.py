@@ -6,6 +6,8 @@ from dcbm import dcbm
 import otrisymNMF
 from sklearn.metrics import normalized_mutual_info_score
 import random, time
+from scipy.sparse.linalg import eigsh
+from sklearn.cluster import KMeans
 
 def read_graph():
     G = nx.Graph()
@@ -33,6 +35,21 @@ def read_graph():
     plt.show()
 
     return G, types
+
+def spectral_test(graph,clusters):
+    r=2
+    X = nx.adjacency_matrix(graph)
+    n = X.shape[0]
+    X = X.astype(np.float64)
+    L, U = eigsh(X, k=r, which='LM')
+    X2 = U @ np.diag(np.sqrt(np.abs(L)))
+    Y = np.zeros((n, r))
+    for i in range(n):
+        Y[i, :] = X2[i, :] / np.linalg.norm(X2[i, :])
+    labels_spec = KMeans(n_clusters=r, random_state=42).fit_predict(Y)
+    print(
+        f" Normalized mutual information between the partition found by spectral and the one found by OtrisymNMF :{normalized_mutual_info_score(clusters, labels_spec)}")
+
 
 
 def main(graph, clusters):
@@ -179,4 +196,4 @@ if __name__ == "__main__":
     random.seed(15)  # Fixer la seed
     np.random.seed(125)
     graph, labels = read_graph()
-    main(graph, labels)
+    spectral_test(graph, labels)
