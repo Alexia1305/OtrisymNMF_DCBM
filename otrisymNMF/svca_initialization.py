@@ -246,7 +246,7 @@ def orthNNLS(M, U, Mn=None):
     # Assign the optimal weights to V(b(i), i)
     for i in range(n):
         if issparse(M):
-            V[b[i], i] = (M[:, i].T @ U[:, b[i]] )[0] / norm2u[b[i]] ** 2
+            V[b[i], i] = (M[:, i].T @ U[:, b[i]])/ norm2u[b[i]] ** 2
         else:
             V[b[i], i] = np.dot(M[:, i].T, U[:, b[i]]) / norm2u[b[i]] ** 2
 

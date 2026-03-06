@@ -119,7 +119,7 @@ def svca(X, r, p, options=None):
             if options['average'] == 1:
                 if issparse(X):
                     subX = X[:, K[k, :]]
-                    row_sums = subX.sum(axis=1).A1
+                    row_sums = subX.sum(axis=1)
                     num_cols = subX.shape[1]
                     row_means = row_sums / num_cols
 

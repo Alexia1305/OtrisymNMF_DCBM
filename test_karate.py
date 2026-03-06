@@ -9,6 +9,8 @@ import random
 # Reading and displaying the graph
 
 graph = nx.karate_club_graph()
+for u, v in graph.edges():
+    graph[u][v].pop('weight', None)  # supprime weight s’il existe
 club_labels = {node: 1 if graph.nodes[node]['club'] == 'Mr. Hi' else 0 for node in graph.nodes}
 club_vector = np.array([club_labels[node] for node in graph.nodes])
 position = nx.spring_layout(graph,seed=23)
