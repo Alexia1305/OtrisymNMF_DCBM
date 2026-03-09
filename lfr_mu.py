@@ -1,6 +1,7 @@
-from matplotlib import pyplot as plt
-from scipy.sparse import diags
+import matplotlib
+matplotlib.use("TkAgg")   # force a valid GUI backend
 
+import matplotlib.pyplot as plt
 import otrisymNMF
 import networkx as nx
 from sklearn.metrics import normalized_mutual_info_score
@@ -99,16 +100,16 @@ def main(list_mu):
             results["KL_EM"]["Time"].append(end_time - start_time)
 
 
-            # # MHA250
-            # start_time = time.time()
-            # MHA_partition = dcbm(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
-            #                       pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,init_method="random",
-            #                       verbosity=0)
-            # end_time = time.time()
-            #
-            # results["MHA250k"]["NMI"].append(normalized_mutual_info_score(labels, MHA_partition))
-            # results["MHA250k"]["AMI"].append(adjusted_mutual_info_score(labels, MHA_partition,average_method='max'))
-            # results["MHA250k"]["Time"].append(end_time - start_time)
+            # MHA250
+            start_time = time.time()
+            MHA_partition = dcbm(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
+                                  pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,init_method="random",
+                                  verbosity=0)
+            end_time = time.time()
+
+            results["MHA250k"]["NMI"].append(normalized_mutual_info_score(labels, MHA_partition))
+            results["MHA250k"]["AMI"].append(adjusted_mutual_info_score(labels, MHA_partition,average_method='max'))
+            results["MHA250k"]["Time"].append(end_time - start_time)
 
 
             #FROST_SVCA
@@ -150,15 +151,15 @@ def main(list_mu):
             results["KN_SVCA"]["Time"].append(end_time - start_time)
 
 
-            # # MHA250 initialized by SVCA
-            # start_time = time.time()
-            # MHA_partition = dcbm(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
-            #                       pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,
-            #                       init_method="SVCA", verbosity=0, init_seed=idx)
-            # end_time = time.time()
-            # results["MHA250k_SVCA"]["NMI"].append(normalized_mutual_info_score(labels, MHA_partition))
-            # results["MHA250k_SVCA"]["AMI"].append(adjusted_mutual_info_score(labels, MHA_partition,average_method='max'))
-            # results["MHA250k_SVCA"]["Time"].append(end_time - start_time)
+            # MHA250 initialized by SVCA
+            start_time = time.time()
+            MHA_partition = dcbm(G, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood,
+                                  pysbm.MetropolisHastingInferenceTwoHundredFiftyK, numTrials=10,
+                                  init_method="SVCA", verbosity=0, init_seed=idx)
+            end_time = time.time()
+            results["MHA250k_SVCA"]["NMI"].append(normalized_mutual_info_score(labels, MHA_partition))
+            results["MHA250k_SVCA"]["AMI"].append(adjusted_mutual_info_score(labels, MHA_partition,average_method='max'))
+            results["MHA250k_SVCA"]["Time"].append(end_time - start_time)
 
         summary = {}
         for algo, data in results.items():
@@ -190,8 +191,8 @@ def displayLFR(mu):
     labels = [G.nodes[v]['community'] for v in G.nodes]
     r = max(labels)
     # Palette de 20 couleurs distinctes
-    cmap = plt.cm.get_cmap("tab20", r)
-    colors = [cmap(i) for i in range(r)]
+    cmap = matplotlib.colormaps.get_cmap("tab20")
+    colors = [cmap(i / max(r-1, 1)) for i in range(r)]
     for u, v in G.edges():
         if G.nodes[u]['community'] == G.nodes[v]['community']:
             G[u][v]['weight'] = 1.2  # poids fort (attire +)
@@ -242,33 +243,12 @@ def displayLFR(mu):
     plt.savefig(f"LFR_mu_{mu:.1f}.png", dpi=300, bbox_inches="tight")
     plt.show()
 
-    ## Deuxième graphe
-    plt.figure(figsize=(14, 14))
-    pos = nx.spring_layout(G,k=0.45)
-
-    nx.draw_networkx_nodes(
-        G, pos,
-        node_size=40,
-        node_color='black'  # couleur opaque
-    )
-    nx.draw_networkx_edges(
-        G, pos,
-        width=0.3,
-        alpha=1,  # Transparence des arêtes
-        edge_color='gray',
-        style="solid"
-    )
-    plt.axis('off')
-    # Sauvegarde en PNG haute résolution
-    plt.savefig(f"LFR_mu_{mu:.1f}_brut.png", dpi=300, bbox_inches="tight")
-    plt.show()
-
 
 if __name__ == "__main__":
     displayLFR(0.1)
     #Options TEST
-    # list_mu = np.arange(0.5, 0.7, 0.1)  # mu between 0 and 0.6
-    #
-    # random.seed(42)  # Fixer la seed
-    # main(list_mu)
+    list_mu = np.arange(0, 0.7, 0.1)  # mu between 0 and 0.6
+
+    random.seed(42)  # Fixer la seed
+    main(list_mu)
 
