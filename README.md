@@ -13,35 +13,52 @@ Dache, A., Vandaele, A., & Gillis, N. (2026). Matrix Factorization Framework for
 
 ## 🔧 Requirements
 
-⚠️To be compatible with the **pysbm** package: 
--  networkx==2.6.3 to be compatible with the pysbm package
--  matplotlib== 3.4.3 to be compatible with networkx to display graph 
-- compatible with **Python 3.9**. 
-You can reproduce the same environment with the installation instructions. 
+This project was developed and tested with **Python 3.12**.
+
+Dependencies are provided for both:
+
+- **Conda users** (`environment.yml`)
+- **pip users** (`requirements.txt`)
 
 ## 📦 Installation
 
-1. **Clone the repository**:
+**Clone the repository**:
 
 ```bash
 git clone https://github.com/Alexia1305/OtrisymNMF_DCBM.git
 cd OtrisymNMF_DCBM
 ```
 
-2. **Create and activate a virtual environment**:
+**Option 1 — Using Conda**:
 
+Create the environment:
 ```bash
-py -3.9 -m venv env
-env\Scripts\activate        # on Windows
-source env/bin/activate     # Linux and MacOS
+conda env create -f environment.yml
 ```
+Activate it:
+```bash
+conda activate otrisymnmf
+```
+**Option 2 — Using pip**
 
-3. **Install dependencies**:
+1. Create a virtual environment with Python 3.12.
+```bash
+python -m venv env
+```
+2. Activate the environment:
 
+Windows:
+```bash
+env\Scripts\activate
+```
+Linux / macOS:
+```bash
+source env/bin/activate
+```
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-
 
 ## 🚀 Run Tests
 
