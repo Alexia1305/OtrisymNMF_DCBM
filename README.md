@@ -1,48 +1,51 @@
-# A matrix factorization framework for community detection under the degree-corrected block model
-
-We use **OtrisymNMF** as a **degree corrected block model (DCBM)** to detect communities in several benchmark networks.  
-We also demonstrate that our initialization, based on smoothed separable NMF, significantly improves the results of classical inference methods for the **DCBM of Karrer and Newman**.
-
-The method for OtrisymNMF (called FROST) and the SVCA initialization are available in the Python package **OtrisymNMF**. For the DCBM inference methods, we used the **pysbm** package.
-
-Preprint available https://arxiv.org/abs/2601.06262
-
-Dache, A., Vandaele, A., & Gillis, N. (2026). Matrix Factorization Framework for Community Detection under the Degree-Corrected Block Model. arXiv preprint arXiv:2601.06262.
- 
-# Reproduce the results
-
 ## 🔧 Requirements
 
-⚠️To be compatible with the **pysbm** package: 
--  networkx==2.6.3 to be compatible with the pysbm package
--  matplotlib== 3.4.3 to be compatible with networkx to display graph 
-- compatible with **Python 3.9**. 
-You can reproduce the same environment with the installation instructions. 
+This project was developed and tested with **Python 3.12**.
+
+Dependencies are provided for both:
+
+- **Conda users** (`environment.yml`)
+- **pip users** (`requirements.txt`)
 
 ## 📦 Installation
 
-1. **Clone the repository**:
+**Clone the repository**:
 
 ```bash
 git clone https://github.com/Alexia1305/OtrisymNMF_DCBM.git
 cd OtrisymNMF_DCBM
 ```
 
-2. **Create and activate a virtual environment**:
+**Option 1 — Using Conda**:
 
+Create the environment:
 ```bash
-py -3.9 -m venv env
-env\Scripts\activate        # on Windows
-source env/bin/activate     # Linux and MacOS
+conda env create -f environment.yml
 ```
+Activate it:
+```bash
+conda activate otrisymnmf
+```
+**Option 2 — Using pip**
 
-3. **Install dependencies**:
+1. Create a virtual environment with Python 3.12.
+```bash
+python -m venv env
+```
+2. Activate the environment:
 
+Windows:
+```bash
+env\Scripts\activate
+```
+Linux / macOS:
+```bash
+source env/bin/activate
+```
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-
-
 ## 🚀 Run Tests
 
 ### Karate Club 
