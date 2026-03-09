@@ -1,5 +1,4 @@
 import json
-
 import otrisymNMF
 import networkx as nx
 from sklearn.metrics import normalized_mutual_info_score
@@ -214,7 +213,7 @@ def main(list_n):
 if __name__ == "__main__":
 
     #Options TEST
-    list_n = [100000]
+    list_n = [1000]
 
     random.seed(42)  # Fixer la seed
     main(list_n)

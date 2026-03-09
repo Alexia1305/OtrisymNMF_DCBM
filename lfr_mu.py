@@ -1,6 +1,4 @@
 import matplotlib
-matplotlib.use("TkAgg")   # force a valid GUI backend
-
 import matplotlib.pyplot as plt
 import otrisymNMF
 import networkx as nx

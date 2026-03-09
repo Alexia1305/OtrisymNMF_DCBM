@@ -55,7 +55,6 @@ def main(graph, clusters):
                             init_method="random", verbosity=0)
         end_time = time.time()
         NMI = normalized_mutual_info_score(clusters, EM_partition)
-        print(NMI)
         results["KN"]["NMI"].append(NMI)
         results["KN"]["Time"].append(end_time - start_time)
         if NMI >= 0.72867696256281:
