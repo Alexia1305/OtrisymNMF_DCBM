@@ -1,9 +1,9 @@
-Algorithm: FROST, NMI Mean: 0.6102, NMI Std: 0.3459,Time Mean: 0.4069, Time Std: 0.0738
+Algorithm: FROST, NMI Mean: 0.3474, NMI Std: 0.1175,Time Mean: 0.8277, Time Std: 0.367
 Algorithm: KL_EM, NMI Mean: nan, NMI Std: nan,Time Mean: nan, Time Std: nan
-Algorithm: KN, NMI Mean: 0.855, NMI Std: 0.3263,Time Mean: 0.6308, Time Std: 0.0742
+Algorithm: KN, NMI Mean: 0.3998, NMI Std: 0.241,Time Mean: 1.3762, Time Std: 0.335
 Algorithm: MH, NMI Mean: nan, NMI Std: nan,Time Mean: nan, Time Std: nan
-Algorithm: FROST_SVCA, NMI Mean: 0.9596, NMI Std: 0.1041,Time Mean: 0.4026, Time Std: 0.0509
+Algorithm: FROST_SVCA, NMI Mean: 0.6378, NMI Std: 0.1493,Time Mean: 0.5694, Time Std: 0.1082
 Algorithm: KL_EM_SVCA, NMI Mean: nan, NMI Std: nan,Time Mean: nan, Time Std: nan
-Algorithm: KN_SVCA, NMI Mean: 0.9966, NMI Std: 0.0108,Time Mean: 0.5021, Time Std: 0.1066
+Algorithm: KN_SVCA, NMI Mean: 0.7843, NMI Std: 0.1475,Time Mean: 1.1266, Time Std: 0.4059
 Algorithm: MH_SVCA, NMI Mean: nan, NMI Std: nan,Time Mean: nan, Time Std: nan
-Algorithm: SVCA, NMI Mean: 0.9423, NMI Std: 0.1425,Time Mean: 0.2136, Time Std: 0.018
+Algorithm: SVCA, NMI Mean: 0.5317, NMI Std: 0.1511,Time Mean: 0.2505, Time Std: 0.0248

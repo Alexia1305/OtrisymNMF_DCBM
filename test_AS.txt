@@ -1,0 +1,35 @@
+
+===== lambda = 0.0 =====
+Algorithm: FROST, NMI Mean: 0.0006, NMI Std: 0.001, Time Mean: 0.7163, Time Std: 0.2477
+Algorithm: KL_EM, NMI Mean: 0.0007, NMI Std: 0.0009, Time Mean: 1.8152, Time Std: 0.72
+Algorithm: KN, NMI Mean: 0.0003, NMI Std: 0.0004, Time Mean: 0.7436, Time Std: 0.2255
+Algorithm: MH, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: FROST_SVCA, NMI Mean: 0.0013, NMI Std: 0.0017, Time Mean: 0.9512, Time Std: 0.1602
+Algorithm: KL_EM_SVCA, NMI Mean: 0.0007, NMI Std: 0.001, Time Mean: 1.6833, Time Std: 0.4092
+Algorithm: KN_SVCA, NMI Mean: 0.001, NMI Std: 0.0012, Time Mean: 1.0585, Time Std: 0.2512
+Algorithm: MH_SVCA, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: SVCA, NMI Mean: 0.001, NMI Std: 0.0011, Time Mean: 0.47, Time Std: 0.0835
+
+===== lambda = 0.1 =====
+Algorithm: FROST, NMI Mean: 0.0005, NMI Std: 0.0006, Time Mean: 0.4334, Time Std: 0.1865
+Algorithm: KL_EM, NMI Mean: 0.001, NMI Std: 0.0013, Time Mean: 4.2131, Time Std: 16.8766
+Algorithm: KN, NMI Mean: 0.0009, NMI Std: 0.0009, Time Mean: 0.4606, Time Std: 0.1793
+Algorithm: MH, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: FROST_SVCA, NMI Mean: 0.0011, NMI Std: 0.0016, Time Mean: 0.5905, Time Std: 0.1764
+Algorithm: KL_EM_SVCA, NMI Mean: 0.001, NMI Std: 0.002, Time Mean: 2.948, Time Std: 10.2613
+Algorithm: KN_SVCA, NMI Mean: 0.0013, NMI Std: 0.0022, Time Mean: 0.7127, Time Std: 0.2612
+Algorithm: MH_SVCA, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: SVCA, NMI Mean: 0.001, NMI Std: 0.0011, Time Mean: 0.2842, Time Std: 0.0902
+
+===== lambda = 0.2 =====
+Algorithm: FROST, NMI Mean: 0.0035, NMI Std: 0.0054, Time Mean: 0.4497, Time Std: 0.1886
+Algorithm: KL_EM, NMI Mean: 0.0039, NMI Std: 0.0082, Time Mean: 6.1575, Time Std: 19.415
+Algorithm: KN, NMI Mean: 0.0026, NMI Std: 0.004, Time Mean: 0.3983, Time Std: 0.1468
+Algorithm: MH, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: FROST_SVCA, NMI Mean: 0.014, NMI Std: 0.0178, Time Mean: 0.6354, Time Std: 0.3724
+Algorithm: KL_EM_SVCA, NMI Mean: 0.0137, NMI Std: 0.0172, Time Mean: 0.9907, Time Std: 0.2967
+Algorithm: KN_SVCA, NMI Mean: 0.0149, NMI Std: 0.0205, Time Mean: 0.659, Time Std: 0.1818
+Algorithm: MH_SVCA, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: SVCA, NMI Mean: 0.0094, NMI Std: 0.0129, Time Mean: 0.2843, Time Std: 0.1026
+
+===== lambda = 0.30000000000000004 =====

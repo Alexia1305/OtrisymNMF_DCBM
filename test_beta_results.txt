@@ -1,0 +1,55 @@
+
+===== beta = 2.5 =====
+Algorithm: FROST, NMI Mean: 0.252, NMI Std: 0.1721, Time Mean: 0.3938, Time Std: 0.1935
+Algorithm: KL_EM, NMI Mean: 0.5012, NMI Std: 0.259, Time Mean: 1.2352, Time Std: 0.4693
+Algorithm: KN, NMI Mean: 0.1954, NMI Std: 0.1887, Time Mean: 0.6638, Time Std: 0.2936
+Algorithm: MH, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: FROST_SVCA, NMI Mean: 0.5347, NMI Std: 0.0967, Time Mean: 0.3666, Time Std: 0.1466
+Algorithm: KL_EM_SVCA, NMI Mean: 0.6746, NMI Std: 0.0967, Time Mean: 0.6489, Time Std: 0.2489
+Algorithm: KN_SVCA, NMI Mean: 0.6735, NMI Std: 0.0862, Time Mean: 0.5078, Time Std: 0.1708
+Algorithm: MH_SVCA, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: SVCA, NMI Mean: 0.4537, NMI Std: 0.0998, Time Mean: 0.1785, Time Std: 0.0459
+
+===== beta = 2.75 =====
+Algorithm: FROST, NMI Mean: 0.2417, NMI Std: 0.1871, Time Mean: 0.3523, Time Std: 0.1471
+Algorithm: KL_EM, NMI Mean: 0.4775, NMI Std: 0.2719, Time Mean: 1.2934, Time Std: 0.5507
+Algorithm: KN, NMI Mean: 0.2195, NMI Std: 0.2257, Time Mean: 0.6302, Time Std: 0.2134
+Algorithm: MH, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: FROST_SVCA, NMI Mean: 0.5382, NMI Std: 0.1009, Time Mean: 0.3539, Time Std: 0.1334
+Algorithm: KL_EM_SVCA, NMI Mean: 0.7005, NMI Std: 0.0802, Time Mean: 0.6368, Time Std: 0.3527
+Algorithm: KN_SVCA, NMI Mean: 0.688, NMI Std: 0.0948, Time Mean: 0.518, Time Std: 0.2042
+Algorithm: MH_SVCA, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: SVCA, NMI Mean: 0.4519, NMI Std: 0.0807, Time Mean: 0.1729, Time Std: 0.0549
+
+===== beta = 3 =====
+Algorithm: FROST, NMI Mean: 0.2379, NMI Std: 0.1892, Time Mean: 0.4089, Time Std: 0.2264
+Algorithm: KL_EM, NMI Mean: 0.4273, NMI Std: 0.2869, Time Mean: 1.2991, Time Std: 0.5545
+Algorithm: KN, NMI Mean: 0.1815, NMI Std: 0.1963, Time Mean: 0.6572, Time Std: 0.3341
+Algorithm: MH, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: FROST_SVCA, NMI Mean: 0.5715, NMI Std: 0.0693, Time Mean: 0.3607, Time Std: 0.1256
+Algorithm: KL_EM_SVCA, NMI Mean: 0.7086, NMI Std: 0.0826, Time Mean: 0.6919, Time Std: 0.295
+Algorithm: KN_SVCA, NMI Mean: 0.6972, NMI Std: 0.0945, Time Mean: 0.552, Time Std: 0.2162
+Algorithm: MH_SVCA, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: SVCA, NMI Mean: 0.4349, NMI Std: 0.0845, Time Mean: 0.1895, Time Std: 0.0725
+
+===== beta = 3.25 =====
+Algorithm: FROST, NMI Mean: 0.2238, NMI Std: 0.1887, Time Mean: 0.517, Time Std: 0.2662
+Algorithm: KL_EM, NMI Mean: 0.3937, NMI Std: 0.2833, Time Mean: 1.4957, Time Std: 0.6372
+Algorithm: KN, NMI Mean: 0.2592, NMI Std: 0.2454, Time Mean: 0.9106, Time Std: 0.4683
+Algorithm: MH, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: FROST_SVCA, NMI Mean: 0.5513, NMI Std: 0.1137, Time Mean: 0.4288, Time Std: 0.1601
+Algorithm: KL_EM_SVCA, NMI Mean: 0.7294, NMI Std: 0.0821, Time Mean: 0.8682, Time Std: 0.4528
+Algorithm: KN_SVCA, NMI Mean: 0.7098, NMI Std: 0.111, Time Mean: 0.673, Time Std: 0.3039
+Algorithm: MH_SVCA, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: SVCA, NMI Mean: 0.4354, NMI Std: 0.0966, Time Mean: 0.1994, Time Std: 0.0615
+
+===== beta = 3.5 =====
+Algorithm: FROST, NMI Mean: 0.2026, NMI Std: 0.187, Time Mean: 0.4559, Time Std: 0.2072
+Algorithm: KL_EM, NMI Mean: 0.438, NMI Std: 0.2833, Time Mean: 1.5498, Time Std: 0.6507
+Algorithm: KN, NMI Mean: 0.2765, NMI Std: 0.2312, Time Mean: 0.8461, Time Std: 0.4726
+Algorithm: MH, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: FROST_SVCA, NMI Mean: 0.5221, NMI Std: 0.1549, Time Mean: 0.4125, Time Std: 0.1639
+Algorithm: KL_EM_SVCA, NMI Mean: 0.7471, NMI Std: 0.0903, Time Mean: 0.7798, Time Std: 0.3994
+Algorithm: KN_SVCA, NMI Mean: 0.7048, NMI Std: 0.1494, Time Mean: 0.568, Time Std: 0.2061
+Algorithm: MH_SVCA, NMI Mean: nan, NMI Std: nan, Time Mean: nan, Time Std: nan
+Algorithm: SVCA, NMI Mean: 0.3904, NMI Std: 0.1055, Time Mean: 0.1956, Time Std: 0.0739
