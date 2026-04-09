@@ -5,6 +5,8 @@ import otrisymNMF
 import networkx as nx
 import time
 from scipy.sparse import find, csr_matrix
+import numpy as np
+import random as rd
 
 
 def dcbm(G, r, objective_function, inference_algo, numTrials=1, init_partition=None, init_method="random", verbosity=1,
@@ -70,6 +72,8 @@ def dcbm(G, r, objective_function, inference_algo, numTrials=1, init_partition=N
                     X = csr_matrix(X)
                 if init_seed is not None:
                     init_seed += 10 * i
+                    rd.seed(init_seed)
+                    np.random.seed(init_seed)
                 w, v = otrisymNMF.initialize_Z(X, r, method="SVCA", init_seed=init_seed)
                 # v is the found node assignments, is the initial node partition for inference
                 degree_corrected_partition = pysbm.NxPartition(
@@ -83,10 +87,15 @@ def dcbm(G, r, objective_function, inference_algo, numTrials=1, init_partition=N
                     obj_max_d = obj_value_d
 
             else:
+                if init_seed is not None:
+                    init_seed += 10 * i
+                    rd.seed(init_seed)
+                    np.random.seed(init_seed)
                 degree_corrected_partition = pysbm.NxPartition(
                     graph=G,
                     number_of_blocks=r,
                 )
+
         time_limit2 = None
         if time_limit is not None:
             time_limit2 = time_limit - (time.time() - start)
@@ -115,4 +124,73 @@ def dcbm(G, r, objective_function, inference_algo, numTrials=1, init_partition=N
         return [best_degree_partition.get_block_of_node(node) for node in G.nodes], time_per_iteration
     else:
         return [best_degree_partition.get_block_of_node(node) for node in G.nodes]
+
+
+def dcbm_PAH(G, r, objective_function, numTrials=1, verbosity=1,
+         init_seed=None):
+    """
+       Performs Agglomerative Peixoto inference using multiple trials
+       and returns the partition with the highest objective function value.
+
+       Parameters:
+       -----------
+       G : networkx.Graph
+           The input graph to be partitioned.
+       r : int
+           The number of communities to detect.
+       objective_function : callable
+            A function that defines the objective to maximize during inference.
+       numTrials : int, optional (default=1)
+           The number of trials for stochastic inference, each with a different initialization.
+       verbosity : int, optional (default=1)
+            (1 for messages, 0 for silent mode).
+        init_seed : float, optional (default=None)
+            Random seed  for the experiments
+        time_limit : float, optional (default=None)
+            Time limit for inference
+
+
+       Returns:
+       --------
+       list
+           A list where each entry corresponds to the community of the respective node in the order of the nodes
+           of the graph.
+           The partition with the best (highest) objective function value is returned.
+       """
+    start = time.time()
+    obj_max_d = -float('inf')
+    best_degree_partition = pysbm.NxPartition(
+        graph=G,
+        number_of_blocks=r,
+    )
+    degree_corrected_objective_function = objective_function(is_directed=False)
+
+    for i in range(numTrials):
+        if init_seed is not None:
+            init_seed += 10 * i
+            rd.seed(init_seed)
+            np.random.seed(init_seed)
+
+        degree_corrected_partition = pysbm.NxPartition(
+            graph=G,
+            number_of_blocks=r,
+        )
+        degree_corrected_inference = pysbm.PeixotoInference(G, degree_corrected_objective_function, degree_corrected_partition)
+        degree_corrected_inference.infer_stochastic_block_model()
+        obj_value_d = degree_corrected_objective_function.calculate(degree_corrected_partition)
+
+        if obj_value_d > obj_max_d:
+            best_degree_partition = degree_corrected_partition
+            obj_max_d = obj_value_d
+        if verbosity > 0:
+            print(f'Trial {i + 1}/{numTrials}  : logP {obj_value_d:.4e} | Best LogP: {obj_max_d:.4e}')
+
+
+
+    if verbosity:
+        print(f"Best logP : {obj_max_d}")
+
+    return [best_degree_partition.get_block_of_node(node) for node in G.nodes]
+
+
 

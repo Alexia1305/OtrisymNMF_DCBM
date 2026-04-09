@@ -1,9 +1,0 @@
-Algorithm: FROST, NMI Mean: nan, NMI Std: nan,Time Mean: nan, Time Std: nan ,Success rate 0.0 
-Algorithm: KL_EM, NMI Mean: nan, NMI Std: nan,Time Mean: nan, Time Std: nan ,Success rate 0.0 
-Algorithm: KN, NMI Mean: 0.0199, NMI Std: 0.0366,Time Mean: 0.0237, Time Std: 0.0068 ,Success rate 0.0 
-Algorithm: MH, NMI Mean: nan, NMI Std: nan,Time Mean: nan, Time Std: nan ,Success rate 0.0 
-Algorithm: FROST_SVCA, NMI Mean: nan, NMI Std: nan,Time Mean: nan, Time Std: nan ,Success rate 0.0 
-Algorithm: KL_EM_SVCA, NMI Mean: nan, NMI Std: nan,Time Mean: nan, Time Std: nan ,Success rate 0.0 
-Algorithm: KN_SVCA, NMI Mean: 0.0618, NMI Std: 0.0797,Time Mean: 0.0803, Time Std: 0.0122 ,Success rate 0.0 
-Algorithm: MH_SVCA, NMI Mean: nan, NMI Std: nan,Time Mean: nan, Time Std: nan ,Success rate 0.0 
-Algorithm: SVCA, NMI Mean: nan, NMI Std: nan,Time Mean: nan, Time Std: nan ,Success rate 0.0 

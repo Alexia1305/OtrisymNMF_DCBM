@@ -1,0 +1,9 @@
+,Mean NMI,SD NMI,Mean AMI,SD AMI,ARMI moyen,Erreur type ARMI,Mean Time (s),SD Time (s),Mean Nbr of iterations,SD Nbr of iterations,Mean Time of one iteration,SD Time of one iteration,Temps moyen CPU (s),Erreur type Temps CPU
+KN,,,,,,,,,,,,,,
+KL_EM,,,,,,,,,,,,,,
+FROST,0.575,0.013,0.538,0.014,0.4676,0.0141,2688.33,334.75,19.2,2.39,139.97,3.2,2681.65,333.98
+KN_SVCA,,,,,,,,,,,,,,
+KL_EM_SVCA,,,,,,,,,,,,,,
+FROST_SVCA,0.964,0.008,0.961,0.009,0.9435,0.0125,1162.92,237.62,7.0,1.7,139.5,2.7,1276.55,236.18
+SVCA,0.916,0.009,0.909,0.01,0.8837,0.0112,184.31,3.61,0.0,0.0,0.0,0.0,298.21,5.76
+PAH,,,,,,,,,,,,,,

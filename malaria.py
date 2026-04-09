@@ -24,6 +24,47 @@ def read_graph():
                 u, v, w = int(parts[0]), int(parts[1]), float(parts[2])
                 G.add_edge(u, v, weight=w)
 
+    top_nodes = sorted([n for n, d in G.nodes(data=True) if d['type'] == 1])
+    bottom_nodes = sorted([n for n, d in G.nodes(data=True) if d['type'] == 2])
+
+    # Construire les positions manuellement pour mieux espacer
+    pos = {}
+    for i, n in enumerate(top_nodes):
+        pos[n] = (i / len(top_nodes), 1)
+    for i, n in enumerate(bottom_nodes):
+        pos[n] = (i / len(bottom_nodes), 0)
+
+    plt.figure(figsize=(30, 6))
+    nx.draw(
+        G, pos,
+        node_size=10,
+        node_color=['steelblue' if G.nodes[n]['type'] == 1 else 'salmon' for n in G.nodes()],
+        edge_color='gray',
+        alpha=0.3,
+        with_labels=False,
+        width=0.3
+    )
+    plt.title("Layout bipartite — 1000 nœuds")
+    plt.show()
+
+    top_nodes = sorted([n for n, d in G.nodes(data=True) if d['type'] == 1])
+    bottom_nodes = sorted([n for n, d in G.nodes(data=True) if d['type'] == 2])
+    ordered_nodes = top_nodes + bottom_nodes
+
+    A = nx.to_numpy_array(G, nodelist=ordered_nodes)
+
+    # Agrandir les pixels avec zoom (ex: bloc 3x3 par cellule)
+    zoom = 5
+    A_big = np.kron(A, np.ones((zoom, zoom)))
+
+    plt.figure(figsize=(12, 12))
+    plt.imshow(A_big, cmap='Blues', aspect='auto', interpolation='none')
+    plt.axhline(len(top_nodes) * zoom - 0.5, color='red', linewidth=1)
+    plt.axvline(len(top_nodes) * zoom - 0.5, color='red', linewidth=1)
+    plt.tight_layout()
+    # Sauvegarder la figure
+    plt.savefig("bipartite_matrix.png", dpi=300)
+    plt.show()
 
     # Network display
     node_colors = ['red' if label == 1 else 'blue' for label in types]

@@ -6,6 +6,8 @@ from dcbm import dcbm
 import otrisymNMF
 from sklearn.metrics import normalized_mutual_info_score
 import random, time
+import clustering_mi as cmi # for the assymetrically normalized of the reduced mutual information
+
 
 def read_graph():
     G = nx.read_gml('Data/polblogs_cleaned.gml', label='id')

@@ -1141,12 +1141,11 @@ class KarrerInference(Inference):
                 if time.time() - start > self.time_limit:
                     print("Time limit reached")
             else:
-                raise Exception("Could not find minimum in 100 steps" + str(self.partition.get_representation()) + str(
-                    self.partition.graph.edges()))
+                raise Exception("Could not find minimum in 100 steps")
         except StopIteration:
             pass
 
-    def infer_stepwise(self,start):
+    def infer_stepwise(self, start):
         saved_representation = self.partition.get_representation()
         improve = 0
         overall_improve = 0
@@ -1235,7 +1234,7 @@ class EMInference(Inference):
         if self.partition.is_graph_directed():
             start = time.time()
             try:
-                for _ in range(2 * len(self.graph)):
+                for _ in range(100):
                     it_start = time.time()
                     if self.time_limit is not None:
                         if time.time()-start > self.time_limit:
@@ -1246,14 +1245,13 @@ class EMInference(Inference):
                     if time.time() - start > self.time_limit:
                         print("Time limit reached")
                 else:
-                    print("EMInference: could not find an optimal partition in", 2 * len(self.graph), "steps",
-                          self.partition.get_representation(), self.graph.edges())
+                    print("EMInference: could not find an optimal partition in 100 steps")
             except StopIteration:
                 pass
         else:
             start = time.time()
             try:
-                for iteration in range(2 * len(self.graph)):
+                for _ in range(100):
                     it_start = time.time()
                     if self.time_limit is not None:
                         if time.time() - start > self.time_limit:
@@ -1265,8 +1263,7 @@ class EMInference(Inference):
                     if time.time() - start > self.time_limit:
                         print("Time limit reached")
                 else:
-                    print("EMInference: could not find an optimal partition in", 2 * len(self.graph), "steps",
-                          self.partition.get_representation(), self.graph.edges())
+                    print("EMInference: could not find an optimal partition in 100 steps")
             except StopIteration:
                 pass
 
