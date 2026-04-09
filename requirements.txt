@@ -5,3 +5,4 @@ matplotlib
 networkx
 scikit-learn
 jupyterlab
+clustering_mi

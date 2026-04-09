@@ -1,7 +1,7 @@
 import numpy as np
 import networkx as nx
 import pysbm
-from dcbm import dcbm
+from dcbm_inference import dcbm
 import otrisymNMF
 from sklearn.metrics import normalized_mutual_info_score, adjusted_mutual_info_score
 import random, time
@@ -54,8 +54,6 @@ def generate_graph(n=300, r=3, beta=2.5, ave_deg=20, p=1, q=0.2):
 
 
 def generate_graph_noise(n=300, r=3, beta=2.5, ave_deg=20, p=1, q=0.2, epsi=0):
-    # power_law
-    xmin = 1
 
     # Creation of Z matrice
     labels = np.repeat(np.arange(r), int(n / r))
@@ -372,7 +370,7 @@ def testave_deg(n=600, r=3, p=0.9, q=0.3, list_ave_deg=[10, 20, 40, 60], beta=3)
                 file.write(line + "\n")
 
 
-def testSNR(n=600, r=3, p=1, q_list=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], ave_deg=20, beta=3):
+def testpq(n=600, r=3, p=1, q_list=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], ave_deg=20, beta=3):
     np.random.seed(13)
     random.seed(42)
     nbr_tests = 50
@@ -513,12 +511,12 @@ def testSNR(n=600, r=3, p=1, q_list=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], ave_deg
                 file.write(line + "\n")
 
 
-def testNoise(n=600, r=3, p=0.9, q=0.3, ave_deg=20, beta=2.5):
+def testNoise(n=600, r=3, p=1, q=0.1, ave_deg=20, beta=2.5):
     np.random.seed(13)
     random.seed(42)
     nbr_tests = 100
     trials = 10
-    epsilons = np.arange(0.05, 0.06, 0.01)
+    epsilons = np.arange(0, 0.06, 0.01)
     with open("results/test_Noise_results.txt", "a") as file:
         file.write(f"\n Parameters n: {n}, r: {r}, p:{p}, q:{q}, ave_deg:{ave_deg}, beta:{beta}, nbr test:{nbr_tests}, trials:{trials} =====\n")
         for epsi in epsilons:

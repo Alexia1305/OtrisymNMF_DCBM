@@ -8,7 +8,7 @@ import pysbm
 import time
 import numpy as np
 import pandas as pd
-from dcbm import dcbm,dcbm_PAH
+from dcbm_inference import dcbm,dcbm_PAH
 import random
 import clustering_mi as cmi # for the assymetrically normalized of the reduced mutual information
 import json

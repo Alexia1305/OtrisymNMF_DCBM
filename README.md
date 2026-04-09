@@ -95,7 +95,7 @@ python scotland_test_init.py
 
 ### Malaria network test
 ```bash
-python malaria.py
+python malaria_test_init.py
 ```
 
 # OtrisymNMF

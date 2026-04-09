@@ -2,7 +2,7 @@ import numpy as np
 import pysbm
 import networkx as nx
 import matplotlib.pyplot as plt
-from dcbm import dcbm
+from dcbm_inference import dcbm
 import otrisymNMF
 from sklearn.metrics import normalized_mutual_info_score
 import random, time

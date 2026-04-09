@@ -13,3 +13,5 @@ dependencies:
   - scikit-learn
   - jupyterlab
   - pip
+  - pip:
+      - clustering_mi
