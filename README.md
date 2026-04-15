@@ -24,7 +24,7 @@ conda env create -f environment.yml
 ```
 Activate it:
 ```bash
-conda activate otrisymnmf
+conda activate otrisymnmf-dcbm
 ```
 **Option 2 — Using pip**
 
