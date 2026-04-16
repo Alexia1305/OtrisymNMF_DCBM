@@ -24,56 +24,14 @@ def read_graph():
                 u, v, w = int(parts[0]), int(parts[1]), float(parts[2])
                 G.add_edge(u, v, weight=w)
 
-    top_nodes = sorted([n for n, d in G.nodes(data=True) if d['type'] == 1])
-    bottom_nodes = sorted([n for n, d in G.nodes(data=True) if d['type'] == 2])
-
-    # Construire les positions manuellement pour mieux espacer
-    pos = {}
-    for i, n in enumerate(top_nodes):
-        pos[n] = (i / len(top_nodes), 1)
-    for i, n in enumerate(bottom_nodes):
-        pos[n] = (i / len(bottom_nodes), 0)
-
-    plt.figure(figsize=(30, 6))
-    nx.draw(
-        G, pos,
-        node_size=10,
-        node_color=['steelblue' if G.nodes[n]['type'] == 1 else 'salmon' for n in G.nodes()],
-        edge_color='gray',
-        alpha=0.3,
-        with_labels=False,
-        width=0.3
-    )
-    plt.title("Layout bipartite — 1000 nœuds")
-    plt.show()
-
-    top_nodes = sorted([n for n, d in G.nodes(data=True) if d['type'] == 1])
-    bottom_nodes = sorted([n for n, d in G.nodes(data=True) if d['type'] == 2])
-    ordered_nodes = top_nodes + bottom_nodes
-
-    A = nx.to_numpy_array(G, nodelist=ordered_nodes)
-
-    # Agrandir les pixels avec zoom (ex: bloc 3x3 par cellule)
-    zoom = 5
-    A_big = np.kron(A, np.ones((zoom, zoom)))
-
-    plt.figure(figsize=(12, 12))
-    plt.imshow(A_big, cmap='Blues', aspect='auto', interpolation='none')
-    plt.axhline(len(top_nodes) * zoom - 0.5, color='red', linewidth=1)
-    plt.axvline(len(top_nodes) * zoom - 0.5, color='red', linewidth=1)
-    plt.tight_layout()
-    # Sauvegarder la figure
-    plt.savefig("bipartite_matrix.png", dpi=300)
-    plt.show()
-
-    # Network display
-    node_colors = ['red' if label == 1 else 'blue' for label in types]
-    pos = nx.spring_layout(G, seed=36,k=0.01)
-    plt.figure(figsize=(20, 12))
-    nx.draw(G,pos, with_labels=False,edge_color='gray', node_color=node_colors, node_size=40, font_size=12,
-            width=1)
-    plt.savefig("malaria.png")
-    plt.show()
+    # # Network display
+    # node_colors = ['red' if label == 1 else 'blue' for label in types]
+    # pos = nx.spring_layout(G, seed=36,k=0.01)
+    # plt.figure(figsize=(20, 12))
+    # nx.draw(G,pos, with_labels=False,edge_color='gray', node_color=node_colors, node_size=40, font_size=12,
+    #         width=1)
+    # plt.savefig("malaria.png")
+    # plt.show()
 
     return G, types
 
@@ -116,16 +74,16 @@ def main(graph, clusters):
 
 
 
-        # # KL_EM
-        # start_time = time.time()
-        # EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=runs,
-        #                     init_method="random", verbosity=0)
-        # end_time = time.time()
-        # NMI = normalized_mutual_info_score(clusters, EM_partition)
-        # results["KL_EM"]["NMI"].append(NMI)
-        # results["KL_EM"]["Time"].append(end_time-start_time)
-        # if NMI == 1:
-        #     results["KL_EM"]["Success_rate"].append(1)
+        # KL_EM
+        start_time = time.time()
+        EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference, numTrials=runs,
+                            init_method="random", verbosity=0)
+        end_time = time.time()
+        NMI = normalized_mutual_info_score(clusters, EM_partition)
+        results["KL_EM"]["NMI"].append(NMI)
+        results["KL_EM"]["Time"].append(end_time-start_time)
+        if NMI == 1:
+            results["KL_EM"]["Success_rate"].append(1)
 
 
         # KN
@@ -139,41 +97,41 @@ def main(graph, clusters):
         if NMI == 1:
             results["KN"]["Success_rate"].append(1)
 
-        # # MH
-        # start_time = time.time()
-        # EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.MetropolisHastingInferenceFiftyK, numTrials=runs,
-        #                     init_method="random", verbosity=0)
-        # end_time = time.time()
-        # NMI = normalized_mutual_info_score(clusters, EM_partition)
-        # results["MH"]["NMI"].append(NMI)
-        # results["MH"]["Time"].append(end_time - start_time)
-        # if NMI == 1:
-        #     results["MH"]["Success_rate"].append(1)
+        # MH
+        start_time = time.time()
+        EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.MetropolisHastingInferenceFiftyK, numTrials=runs,
+                            init_method="random", verbosity=0)
+        end_time = time.time()
+        NMI = normalized_mutual_info_score(clusters, EM_partition)
+        results["MH"]["NMI"].append(NMI)
+        results["MH"]["Time"].append(end_time - start_time)
+        if NMI == 1:
+            results["MH"]["Success_rate"].append(1)
 
 
-        # # FROST
-        # start_time = time.time()
-        # X = nx.adjacency_matrix(graph)
-        # w_best, v_best, S_best, error_best,time_it = otrisymNMF.frost(X, r, init_method="random", numTrials=runs, verbosity=0, init_seed=itt, delta=1e-5)
-        # end_time = time.time()
-        # NMI = normalized_mutual_info_score(clusters, v_best)
-        # results["FROST"]["NMI"].append(NMI)
-        # results["FROST"]["Time"].append(end_time - start_time)
-        # if NMI == 1:
-        #     results["FROST"]["Success_rate"].append(1)
-        #
-        #
-        #
-        # # KL_EM initialized by SVCA
-        # start_time = time.time()
-        # EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference,
-        #                     numTrials=runs, init_method="SVCA", verbosity=0, init_seed=itt)
-        # end_time = time.time()
-        # NMI = normalized_mutual_info_score(clusters, EM_partition)
-        # results["KL_EM_SVCA"]["NMI"].append(NMI)
-        # results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
-        # if NMI == 1:
-        #     results["KL_EM_SVCA"]["Success_rate"].append(1)
+        # FROST
+        start_time = time.time()
+        X = nx.adjacency_matrix(graph)
+        w_best, v_best, S_best, error_best,time_it = otrisymNMF.frost(X, r, init_method="random", numTrials=runs, verbosity=0, init_seed=itt, delta=1e-5)
+        end_time = time.time()
+        NMI = normalized_mutual_info_score(clusters, v_best)
+        results["FROST"]["NMI"].append(NMI)
+        results["FROST"]["Time"].append(end_time - start_time)
+        if NMI == 1:
+            results["FROST"]["Success_rate"].append(1)
+
+
+
+        # KL_EM initialized by SVCA
+        start_time = time.time()
+        EM_partition = dcbm(graph, r, pysbm.DegreeCorrectedUnnormalizedLogLikelyhood, pysbm.EMInference,
+                            numTrials=runs, init_method="SVCA", verbosity=0, init_seed=itt)
+        end_time = time.time()
+        NMI = normalized_mutual_info_score(clusters, EM_partition)
+        results["KL_EM_SVCA"]["NMI"].append(NMI)
+        results["KL_EM_SVCA"]["Time"].append(end_time - start_time)
+        if NMI == 1:
+            results["KL_EM_SVCA"]["Success_rate"].append(1)
 
         #KN initialized by SVCA
         start_time = time.time()
@@ -197,40 +155,40 @@ def main(graph, clusters):
         if NMI == 1:
             results["MH_SVCA"]["Success_rate"].append(1)
 
-        # # FROST initialized by SVCA
-        # start_time = time.time()
-        # X = nx.adjacency_matrix(graph)
-        # w_best, v_best, S_best, error_best,time_it = otrisymNMF.frost(X, r, init_method="SVCA", numTrials=runs, verbosity=0, init_seed=itt, delta=1e-5)
-        # end_time = time.time()
-        # NMI = normalized_mutual_info_score(clusters, v_best)
-        # results["FROST_SVCA"]["NMI"].append(NMI)
-        # results["FROST_SVCA"]["Time"].append(end_time - start_time)
-        # if NMI == 1:
-        #     results["FROST_SVCA"]["Success_rate"].append(1)
-        # #
-        # # SVCA
-        # start_time = time.time()
-        # X = nx.adjacency_matrix(graph)
-        # w_best, v_best, S_best, error_best = otrisymNMF.community_detection_svca(X, r, numTrials=runs, verbosity=0)
-        # end_time = time.time()
-        # NMI = normalized_mutual_info_score(clusters, v_best)
-        # results["SVCA"]["NMI"].append(NMI)
-        # results["SVCA"]["Time"].append(end_time - start_time)
-        # if NMI == 1:
-        #     results["SVCA"]["Success_rate"].append(1)
+        # FROST initialized by SVCA
+        start_time = time.time()
+        X = nx.adjacency_matrix(graph)
+        w_best, v_best, S_best, error_best,time_it = otrisymNMF.frost(X, r, init_method="SVCA", numTrials=runs, verbosity=0, init_seed=itt, delta=1e-5)
+        end_time = time.time()
+        NMI = normalized_mutual_info_score(clusters, v_best)
+        results["FROST_SVCA"]["NMI"].append(NMI)
+        results["FROST_SVCA"]["Time"].append(end_time - start_time)
+        if NMI == 1:
+            results["FROST_SVCA"]["Success_rate"].append(1)
+        #
+        # SVCA
+        start_time = time.time()
+        X = nx.adjacency_matrix(graph)
+        w_best, v_best, S_best, error_best = otrisymNMF.community_detection_svca(X, r, numTrials=runs, verbosity=0)
+        end_time = time.time()
+        NMI = normalized_mutual_info_score(clusters, v_best)
+        results["SVCA"]["NMI"].append(NMI)
+        results["SVCA"]["Time"].append(end_time - start_time)
+        if NMI == 1:
+            results["SVCA"]["Success_rate"].append(1)
     for algo, data in results.items():
         print(
             f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests}")
 
-    # with open('malaria_results.txt', 'w') as file:
-    #     for algo, data in results.items():
-    #         # Calcul des statistiques
-    #         nmi_mean = np.mean(data['NMI'])
-    #         nmi_std = np.std(data['NMI'], ddof=1)
-    #
-    #         # Saving results in a text file
-    #         file.write(f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests} \n")
-    #
+    with open('results/malaria_results.txt', 'w') as file:
+        for algo, data in results.items():
+            # Calcul des statistiques
+            nmi_mean = np.mean(data['NMI'])
+            nmi_std = np.std(data['NMI'], ddof=1)
+
+            # Saving results in a text file
+            file.write(f"Algorithm: {algo}, NMI Mean: {np.round(np.mean(data['NMI']),4)}, NMI Std: {np.round(np.std(data['NMI'], ddof=1),4)},Time Mean: {np.round(np.mean(data['Time']),4)}, Time Std: {np.round(np.std(data['Time'], ddof=1),4)} ,Success rate {np.sum(data['Success_rate'])/nbr_tests} \n")
+
 
 
 if __name__ == "__main__":
