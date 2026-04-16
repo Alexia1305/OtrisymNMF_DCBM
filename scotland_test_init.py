@@ -25,11 +25,11 @@ def read_graph():
     clusters = np.delete(clusters, node_indices)
 
     # Network display
-    # node_colors = ['red' if label == 1 else 'blue' for label in clusters]
-    # plt.figure(figsize=(10, 7))
-    # nx.draw(G, nx.circular_layout(G), with_labels=False, node_color=node_colors, node_size=30, font_size=12,
-    #         width=0.5)
-    # plt.show()
+    node_colors = ['red' if label == 1 else 'blue' for label in clusters]
+    plt.figure(figsize=(10, 7))
+    nx.draw(G, nx.circular_layout(G), with_labels=False, node_color=node_colors, node_size=30, font_size=12,
+            width=0.5)
+    plt.show()
 
     return G, clusters
 
