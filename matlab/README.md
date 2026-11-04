@@ -22,7 +22,7 @@ $$
 
 The `frost` function is a heuristic to solve the Orthogonal Symmetric Nonnegative Matrix Trifactorization with respect to the squared Frobenius norm using a block coordinate descent approach. It solves the following optimization problem:
 $$
-\min_{Z \geq 0, S \geq 0} \|\| X - Z S Z^T \|\|_F^2 \quad \text{subject to} \quad Z^T Z = I,
+\min_{Z \geq 0, S \geq 0} ||X - ZSZ^T||_F^2 \quad \text{s.t.} \quad Z^TZ = I
 $$
 given X and the rank r.
 
