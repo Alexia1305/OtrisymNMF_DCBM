@@ -32,6 +32,7 @@ given X and the rank r.
 ## Function: `init_SVCA`
 
 The `init_SVCA` function gives a first approximation of Z >= 0 and S >= 0 such that X ≈ ZSZ' with Z'Z=I.
+
 $$
 \min_{Z \geq 0, S \geq 0} \|\| X - Z S Z^T \|\|_F^2 \quad \text{subject to} \quad Z^T Z = I
 $$
