@@ -1,4 +1,30 @@
-## 🔧 Requirements
+
+# Nonnegative Matrix Trifactorization for Community Detection under the Degree-Corrected Block Model
+
+Code for the paper **" Nonnegative Matrix Trifactorization for Community Detection under the Degree-Corrected Block Model"** by Alexandra Dache, Arnaud Vandaele and Nicolas Gillis.
+
+This repository contains:
+- Python and MATLAB implementations of **FROST**, our method for community detection and our initialization method based on SVCA.
+    - `otrisymNMF/`: the Python package with frost and the initialization.
+    - `matlab/`: the MATLAB implementation of FROST and an example script.
+- Code to reproduce the numerical experiments presented in the paper.
+
+## FROST for community detection
+
+The algorithm FROST aims to solve the following optimization problem:
+
+$$
+\min_{Z \geq 0, S \geq 0} ||X - ZSZ^T||_F^2 \quad \text{s.t.} \quad Z^TZ = I
+$$
+
+Where:
+- **X** is a given symmetric nonnegative matrix of size $n \times n$  (e.g., adjacency matrix of an undirected graph).
+- **Z** is a $n \times r$ matrix encoding the assignment of each node into **r** communities, where $Z(i,k) \neq 0$ if node $i$ belongs to community $k$.
+- **S** is a $r\times r$ central matrix describing interactions between communities.
+
+## Python 
+
+### 🔧 Requirements
 
 This project was developed and tested with **Python 3.12**.
 
@@ -7,7 +33,7 @@ Dependencies are provided for both:
 - **Conda users** (`environment.yml`)
 - **pip users** (`requirements.txt`)
 
-## 📦 Installation
+### 📦 Installation
 
 **Clone the repository**:
 
@@ -46,9 +72,9 @@ source env/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
-## 🚀 Run Tests
+### 🚀 Run Tests
 
-### Karate Club 
+#### Karate Club 
 
 To run the `karate.ipynb` notebook:
 
@@ -61,7 +87,7 @@ jupyter notebook
 
 3. Open the `karate.ipynb` file from the interface and execute the cells.
 
-### Political blog
+#### Political blog
 
 run the `polblogs.ipynb` notebook
 
@@ -70,54 +96,33 @@ To test SVCA initialization, run:
 python polblogs_test_init.py
 ```
 
-### Southern women
+#### Southern women
 
 run the `southern_women.ipynb` notebook
 
-### LFR graphs varying $mu
+#### Synthetic Experiments 
 
-Run the script and select the desired value for $mu.
-
-```bash
-python lfr_mu.py
-```
-
-### LFR graphs scalability
-Run the script and select the desired value for the network size $n
+Run the scripts `dcbm_synthetic.py` and  `dcbm_scalability.py`for the scalability experiment.
 
 ```bash
-python lfr_scalability.py
+python ldcbm_synthetic.py
 ```
-### Scotland Corporate Interlock Network test
+
 ```bash
-python scotland_test_init.py
+dcbm_scalability.py
 ```
 
-### Malaria network test
+#### Real graphs Experiments 
+Run the script `real_datasets.py` and select the desired real graph.
+
 ```bash
-python malaria_test_init.py
+python real_datasets.py
 ```
 
-# OtrisymNMF
-
-This package implements the method FROST to solve the **Orthogonal Symmetric Nonnegative Matrix Tri-Factorization** (OtrisymNMF) problem.
-
-The algorithm aims to solve the following optimization problem:
-
-$$
-\min_{Z \geq 0, S \geq 0} ||X - ZSZ^T||_F^2 \quad \text{s.t.} \quad Z^TZ = I
-$$
-
-Where:
-- **X** is a given symmetric nonnegative matrix of size $n \times n$  (e.g., adjacency matrix of an undirected graph).
-- **Z** is a $n \times r$ matrix encoding the assignment of each node into **r** communities, where $Z(i,k) \neq 0$ if node $i$ belongs to community $k$.
-- **S** is a $r\times r$ central matrix describing interactions between communities.
-
-The **OtrisymNMF** package also includes the **SVCA** algorithm to initialize the inference. The implementation of the algorithm, along with the initialization, is also available in **MATLAB** in the folder matlab
-
-
-
-# pysbm
+### Other methods 
+#### graph-tool
+To run graph-tool, install graph-tool see documentation https://graph-tool.skewed.de/installation.html
+#### pysbm
 A Python Package for Stochastic Block Model Inference by 
 
 Funke T, Becker T (2019) Stochastic block models: A comparison of variants and inference methods. 
