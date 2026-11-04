@@ -6,9 +6,10 @@ from .svca import sspa
 from .svca import svca
 from scipy.sparse import issparse
 from scipy.sparse import diags
-from .utils import compute_error
+from .utils import compute_error,regularized_normalized_A
 
-def community_detection_svca(X, r, numTrials=1, verbosity=1, init_seed=None):
+
+def community_detection_svca(X, r, numTrials=1, verbosity=1, init_seed=None, regularized_normalized=True):
     """
         Perform community detection using SVCA (Smooth VCA).
         Find a first approximation of  Z >= 0 and S >= 0 such that X ≈ ZSZ' with Z'Z=I.
@@ -23,6 +24,8 @@ def community_detection_svca(X, r, numTrials=1, verbosity=1, init_seed=None):
         - verbosity: int (1 for messages, 0 for silent mode).
         - init_seed : float, optional (default=None)
                       Random seed for the initialization for the experiments
+        - regularized_normalized: boolean, default=True 
+                    Use the regularized normalized adjacency matrix 
 
         Returns:
         - w_best: ndarray (Importance of each node in its community)
@@ -37,6 +40,8 @@ def community_detection_svca(X, r, numTrials=1, verbosity=1, init_seed=None):
         raise ValueError(
             "The matrix X contains at least one zero row. Please remove empty rows (nodes without connections) during preprocessing.")
 
+    if regularized_normalized: 
+        X=regularized_normalized_A(X)
     I, J, V = find(X)
     perm = np.argsort(I)
     I = I[perm]
@@ -82,7 +87,7 @@ def initialize_Z(X, r, method="SVCA", init_seed=None):
         - w: values of the nonzero elements in each row of Z.
 
     Parameters:
-    - X: ndarray or sparse matrix csr_matrix (Adjacency matrix of the graph)
+    - X: ndarray or sparse matrix csr_matrix (Adjacency matrix of the graph or regularized normalized adjacency matrix)
     - r: int (Number of communities)
     - method : str, default=SVCA
         method ("random", "SVCA", "SSPA", "SPA").
@@ -158,6 +163,8 @@ def initialize_Z(X, r, method="SVCA", init_seed=None):
             HO = orthNNLS(X, ZS, Xn)
             # Transposition
             Z = HO.T
+
+        
 
 
         else:

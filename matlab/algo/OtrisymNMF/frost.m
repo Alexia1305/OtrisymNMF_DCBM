@@ -21,6 +21,8 @@
 %              Default: 1
 %   init: Initialization method for Z
 %         Options: 'random', 'SSPA', 'SVCA' (default), 'SPA'
+%   regularized_normalized: Use the regularized normalized adjacency matrix
+%                           Boolean (True by default)
 %   maxiter: Maximum number of iterations per trial
 %            Default: 1000
 %   delta: Convergence tolerance
@@ -59,6 +61,9 @@ end
 if ~isfield(options, 'numTrials')
     options.numTrials = 1;
 end
+if ~isfield(options, 'regularized_normalized')
+    options.regularized_normalized = true;
+end
 if ~isfield(options, 'time_limit')
     options.time_limit = 5*60;
 end 
@@ -83,9 +88,30 @@ end
  if options.verbosity > 0
         fprintf('Running %u Trials in Series \n', options.numTrials);
  end
+
+n = size(X,1);
+% Normalized Regularized Compute X= (D + d_mean*I)^(-1/2) X (D + d_mean*I)^(-1/2).
+if options.regularized_normalized
+    % Degrees and regularization
+    d = full(sum(X, 2));
+    d_reg = d + mean(d);
+
+    % Inverse square roots; zero for nonpositive entries
+    s = zeros(n, 1);
+    positive = d_reg > 0;
+    s(positive) = 1 ./ sqrt(d_reg(positive));
+
+    % Scale rows and columns
+    if issparse(X)
+        Sd = spdiags(s, 0, n, n);
+        X = Sd * X * Sd;
+    else
+        X = (s .* X) .* s.';
+    end
+
+end 
  
 % PRECOMPUTATION 
-n = size(X,1);
 normX = norm(X, 'fro');
 normX2 = normX^2;
 [I,J,V] = find(X);    

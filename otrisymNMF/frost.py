@@ -1,13 +1,14 @@
 import numpy as np
+import math
 import time
-from scipy.sparse import find, csr_matrix
+from scipy.sparse import find, csr_array
 from scipy.sparse import issparse
 from .svca_initialization import initialize_Z
-from .utils import compute_error
+from .utils import compute_error,regularized_normalized_A
 
 
-def frost(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_method=None,
-                  verbosity=1, init_seed=None):
+def frost(X, r, numTrials=1, maxiter=1000, delta=1e-5, time_limit=1000000, init_method=None,
+                  verbosity=1, init_seed=None, regularized_normalized=True,init_partition=None ):
     """
     Heuristic for the Orthogonal Symmetric Nonnegative Matrix Trifactorization problem:
     Given a symmetric matrix X >= 0, finds matrices Z >= 0 and S >= 0 such that X ≈ ZSZ' with Z'Z=I.
@@ -28,7 +29,7 @@ def frost(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_meth
         - S describes interactions between the r communities.
 
     Parameters:
-        X : crs_matrix , shape (n, n)
+        X : crs_array , shape (n, n)
             Symmetric nonnegative matrix (Adjacency matrix of an undirected graph).
         r : int
             Number of columns of Z (Number of communities).
@@ -46,6 +47,8 @@ def frost(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_meth
             (1 for messages, 0 for silent mode).
         init_seed : float, optional (default=None)
             Random seed for the initialization for the experiments
+        regularized_normalized: boolean, default=True 
+            Use the regularized normalized adjacency matrix 
 
     Returns:
         w_best : np.array, shape (n,)
@@ -63,15 +66,18 @@ def frost(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_meth
     """
     start_time = time.time()
     if not issparse(X):
-        X = csr_matrix(X)
+        X = csr_array(X)
     n = X.shape[0]
     error_best = float('inf')
     time_per_iteration = []
     # Verification that there is no zero row in X (isolated node with no information)
-    if any(X.indptr[i] == X.indptr[i + 1] for i in range(X.shape[0])):
+    if np.any(X.indptr[:-1] == X.indptr[1:]):
         raise ValueError(
             "The matrix X contains at least one zero row. Please remove empty rows (nodes without connections) during preprocessing.")
+    if regularized_normalized:
+        X=regularized_normalized_A(X)
 
+        
     # Precomputations
     normX = np.sqrt(np.sum(X.data ** 2))
     I, J, V = find(X)
@@ -85,32 +91,44 @@ def frost(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_meth
         [len(I)]
     ))
     diagX = X.diagonal()
-
+    has_diagonal = np.any(diagX != 0)
+    rows = []
+    for i in range(n):
+        ind = np.arange(rowStart[i], rowStart[i + 1])
+        mask = J[ind] != i
+        rows.append((J[ind[mask]], V[ind[mask]]))
+    
     if verbosity > 0:
         print(f'Running {numTrials} Trials in Series')
 
     for trial in range(numTrials):
         time_per_iteration.append([])
-        if init_method is None:
-            init_algo = "SVCA"
-        else:
-            init_algo = init_method
+        if init_partition is not None :
+            init_algo ="init_partition"
+            v = init_partition
+            w = np.asarray(X.sum(axis=1)).ravel().astype(float)
+            
+        else: 
+            if init_method is None:
+                init_algo = "SVCA"
+            else:
+                init_algo = init_method
 
-        # INITIALIZATION
-        if init_algo == "random":
-            if init_seed is not None:
-                init_seed += 10 * trial
-                np.random.seed(init_seed)
-            base = np.arange(r)
-            rest = np.random.randint(0, r, size=n - r)
-            v = np.concatenate([base, rest])
-            np.random.shuffle(v)
-            w = np.random.rand(n)
-        # SVCA SSPA SPA
-        else:
-            if init_seed is not None:
-                init_seed += 10 * trial
-            w, v = initialize_Z(X, r, method=init_algo, init_seed=init_seed)
+            # INITIALIZATION
+            if init_algo == "random":
+                if init_seed is not None:
+                    init_seed += 10 * trial
+                    np.random.seed(init_seed)
+                base = np.arange(r)
+                rest = np.random.randint(0, r, size=n - r)
+                v = np.concatenate([base, rest])
+                np.random.shuffle(v)
+                w = np.random.rand(n)
+            # SVCA SSPA SPA
+            else:
+                if init_seed is not None:
+                    init_seed += 10 * trial
+                w, v = initialize_Z(X, r, method=init_algo, init_seed=init_seed)
 
 
         # Normalization of w
@@ -138,37 +156,44 @@ def frost(X, r, numTrials=1, maxiter=1000, delta=1e-7, time_limit=300, init_meth
             # Pre-calculations to avoid a double loop on ‘n’
             wp2 = np.zeros(r)
             S2 = S ** 2
+            dgS2 = np.diag(S2)
+            cardan_a = list(4 * dgS2)
+            dgS2 = list(dgS2)
+            S_rows = list(S)
             w2 = w ** 2
             for k in range(r):
                 wp2[k] = np.sum(w2 * S2[v, k])
             # Update of each row (node)
-            for i in range(n):
+            perm = np.random.permutation(n)
+            for i in perm:
                 if time.time() - start_time > time_limit:
                     print('Time limit passed')
                     break
                 # b coefficients for the r problems ax^4+bx^2+cx
-                b = 2 * (wp2 - (w[i] * S[v[i], :]) ** 2) - 2 * diagX[i] * dgS
+                contribution = (w[i] * S_rows[v[i]]) ** 2
+                b = 2 * (wp2 - contribution)
+                if has_diagonal:
+                    b -= 2 * diagX[i] * dgS
                 # c coefficients
-                ind = np.arange(rowStart[i], rowStart[i + 1])
-                mask = J[ind] != i
-                cols_i = J[ind[mask]]
-                xip = V[ind[mask]]
+                cols_i, xip = rows[i]
                 c = -4 * np.dot(xip * w[cols_i], S[v[cols_i], :])
                 vi_new, wi_new, f_new = -1, -1, np.inf
-                for k in range(r):  # Test each community
+                for k, (a_k, b_k, c_k, cardan_ak) in enumerate(zip(dgS2, b, c, cardan_a)):  # Test each community
                     # Cardan resolution for min ax^4+bx^2+cx
-                    roots = cardan_depressed(4 * S2[k, k], 2 * b[k], c[k])
+                    roots = cardan_depressed(cardan_ak, 2 * b_k, c_k)
                     # best positive solution
-                    x = np.sqrt(r / n)  # default value
-                    min_value = S2[k, k] * (x ** 4) + b[k] * (x ** 2) + c[k] * x
+                    x = 0
+                    min_value = 0
                     for sol in roots:
-                        value = S2[k, k] * (sol ** 4) + b[k] * (sol ** 2) + c[k] * sol
-                        if sol > 0 and value < min_value:
-                            x, min_value = sol, value
-                    if S2[k, k] * x ** 4 + b[k] * x ** 2 + c[k] * x < f_new:
-                        f_new, wi_new, vi_new = S2[k, k] * x ** 4 + b[k] * x ** 2 + c[k] * x, x, k
+                        if sol > 0:
+                            value = a_k * (sol ** 4) + b_k * (sol ** 2) + c_k * sol
+                            if value < min_value:
+                                x, min_value = sol, value
+                    if min_value < f_new:
+                        f_new, wi_new, vi_new = min_value, x, k
                 # update wp2
-                wp2 = wp2 - (w[i] * S[v[i], :]) ** 2 + (wi_new * S[vi_new, :]) ** 2
+                wp2 -= contribution
+                wp2 += (wi_new * S_rows[vi_new]) ** 2
                 # update of w et v for node i
                 w[i], v[i] = wi_new, vi_new
 
@@ -220,18 +245,13 @@ def cardan_depressed(a, c, d, tol=1e-12):
     if abs(Delta) < tol:
         return [0]
     elif Delta > 0:  # one real solution
-        sqrtD = np.sqrt(Delta / 27)
-        return [np.cbrt((-q + sqrtD) / 2) + np.cbrt((-q - sqrtD) / 2)]
+        sqrtD = math.sqrt(Delta / 27)
+        return [math.cbrt((-q + sqrtD) / 2) + math.cbrt((-q - sqrtD) / 2)]
 
     else:  # 3 real different solutions or multiple solution
 
-        r = 2 * np.sqrt(-p / 3)
-        cos_arg = -q / 2 * np.sqrt(-27 / (p ** 3))
-        cos_arg = np.clip(cos_arg, -1, 1)
-        theta = np.arccos(cos_arg) / 3
-        return r * np.cos(np.array([theta, theta + 2 * np.pi / 3, theta + 4 * np.pi / 3]))
-
-
-
-
-
+        r = 2 * math.sqrt(-p / 3)
+        cos_arg = -q / 2 * math.sqrt(-27 / (p ** 3))
+        cos_arg = max(-1.0, min(1.0, cos_arg))
+        theta = math.arccos(cos_arg) / 3
+        return [ r * math.cos(theta), r * math.cos(theta + 2 * math.pi / 3), r * math.cos(theta + 4 * math.pi / 3)]

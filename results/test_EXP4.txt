@@ -1,0 +1,72 @@
+
+ Parameters n: 600, r: 3, beta: 6, ave_deg:10, gamma:2.5, rhos:[0, 0.1, 0.2, 0.4, 0.6, 0.8, 1] nbr test:100, trials:10 =====
+
+===== = 0 =====
+Algorithm: KN, NMI Mean: 0.5321, NMI Std: 0.171, AMI Mean: 0.5307, AMI Std: 0.1715, RMI Mean: 0.5101, RMI Std: 0.1721, Time Mean: 2.8234, Time Std: 0.5121
+Algorithm: KL_EM, NMI Mean: 0.722, NMI Std: 0.0446, AMI Mean: 0.7211, AMI Std: 0.0448, RMI Mean: 0.7013, RMI Std: 0.0451, Time Mean: 5.5737, Time Std: 0.9456
+Algorithm: FROST_SVCA, NMI Mean: 0.7076, NMI Std: 0.0484, AMI Mean: 0.7067, AMI Std: 0.0485, RMI Mean: 0.6867, RMI Std: 0.0495, Time Mean: 2.0922, Time Std: 0.3027
+Algorithm: KN_SVCA, NMI Mean: 0.7225, NMI Std: 0.0432, AMI Mean: 0.7217, AMI Std: 0.0433, RMI Mean: 0.7018, RMI Std: 0.0437, Time Mean: 2.9195, Time Std: 0.4051
+Algorithm: KL_EM_SVCA, NMI Mean: 0.7204, NMI Std: 0.0628, AMI Mean: 0.7195, AMI Std: 0.063, RMI Mean: 0.6996, RMI Std: 0.0637, Time Mean: 3.6682, Time Std: 0.5754
+Algorithm: SCORE, NMI Mean: 0.4771, NMI Std: 0.1111, AMI Mean: 0.4755, AMI Std: 0.1114, RMI Mean: 0.4511, RMI Std: 0.1149, Time Mean: 0.15, Time Std: 0.0603
+Algorithm: SCORE+, NMI Mean: 0.6685, NMI Std: 0.0468, AMI Mean: 0.6675, AMI Std: 0.047, RMI Mean: 0.6464, RMI Std: 0.0513, Time Mean: 0.1378, Time Std: 0.0314
+Algorithm: graph_tool, NMI Mean: 0.7173, NMI Std: 0.0545, AMI Mean: 0.7164, AMI Std: 0.0547, RMI Mean: 0.6945, RMI Std: 0.0635, Time Mean: 5.7539, Time Std: 1.19
+
+===== = 0.1 =====
+Algorithm: KN, NMI Mean: 0.4645, NMI Std: 0.1565, AMI Mean: 0.4628, AMI Std: 0.157, RMI Mean: 0.4423, RMI Std: 0.1571, Time Mean: 3.4699, Time Std: 0.7756
+Algorithm: KL_EM, NMI Mean: 0.6416, NMI Std: 0.0556, AMI Mean: 0.6405, AMI Std: 0.0558, RMI Mean: 0.6201, RMI Std: 0.0561, Time Mean: 6.9812, Time Std: 1.1783
+Algorithm: FROST_SVCA, NMI Mean: 0.6666, NMI Std: 0.0442, AMI Mean: 0.6656, AMI Std: 0.0444, RMI Mean: 0.6454, RMI Std: 0.0448, Time Mean: 2.2814, Time Std: 0.4512
+Algorithm: KN_SVCA, NMI Mean: 0.6484, NMI Std: 0.053, AMI Mean: 0.6474, AMI Std: 0.0531, RMI Mean: 0.6271, RMI Std: 0.0537, Time Mean: 3.5126, Time Std: 0.8953
+Algorithm: KL_EM_SVCA, NMI Mean: 0.6516, NMI Std: 0.0485, AMI Mean: 0.6505, AMI Std: 0.0486, RMI Mean: 0.6303, RMI Std: 0.049, Time Mean: 4.6768, Time Std: 1.0639
+Algorithm: SCORE, NMI Mean: 0.4676, NMI Std: 0.1051, AMI Mean: 0.4659, AMI Std: 0.1054, RMI Mean: 0.4424, RMI Std: 0.1079, Time Mean: 0.1612, Time Std: 0.0691
+Algorithm: SCORE+, NMI Mean: 0.6351, NMI Std: 0.0455, AMI Mean: 0.6339, AMI Std: 0.0456, RMI Mean: 0.6136, RMI Std: 0.0458, Time Mean: 0.1546, Time Std: 0.0684
+Algorithm: graph_tool, NMI Mean: 0.6411, NMI Std: 0.0536, AMI Mean: 0.64, AMI Std: 0.0538, RMI Mean: 0.6165, RMI Std: 0.0638, Time Mean: 7.5861, Time Std: 1.4644
+
+===== = 0.2 =====
+Algorithm: KN, NMI Mean: 0.4129, NMI Std: 0.1407, AMI Mean: 0.4111, AMI Std: 0.1412, RMI Mean: 0.3907, RMI Std: 0.1411, Time Mean: 3.4088, Time Std: 0.8658
+Algorithm: KL_EM, NMI Mean: 0.5842, NMI Std: 0.0522, AMI Mean: 0.583, AMI Std: 0.0524, RMI Mean: 0.5626, RMI Std: 0.0526, Time Mean: 6.79, Time Std: 1.5141
+Algorithm: FROST_SVCA, NMI Mean: 0.6319, NMI Std: 0.0467, AMI Mean: 0.6308, AMI Std: 0.0469, RMI Mean: 0.6105, RMI Std: 0.0472, Time Mean: 2.0845, Time Std: 0.432
+Algorithm: KN_SVCA, NMI Mean: 0.592, NMI Std: 0.0529, AMI Mean: 0.5908, AMI Std: 0.0531, RMI Mean: 0.5704, RMI Std: 0.0532, Time Mean: 3.2854, Time Std: 0.6446
+Algorithm: KL_EM_SVCA, NMI Mean: 0.5934, NMI Std: 0.0531, AMI Mean: 0.5922, AMI Std: 0.0533, RMI Mean: 0.5719, RMI Std: 0.0534, Time Mean: 4.4476, Time Std: 0.9164
+Algorithm: SCORE, NMI Mean: 0.4551, NMI Std: 0.1023, AMI Mean: 0.4534, AMI Std: 0.1026, RMI Mean: 0.4304, RMI Std: 0.1044, Time Mean: 0.1459, Time Std: 0.0594
+Algorithm: SCORE+, NMI Mean: 0.6047, NMI Std: 0.046, AMI Mean: 0.6035, AMI Std: 0.0461, RMI Mean: 0.5831, RMI Std: 0.0464, Time Mean: 0.1414, Time Std: 0.0324
+Algorithm: graph_tool, NMI Mean: 0.5748, NMI Std: 0.0651, AMI Mean: 0.5734, AMI Std: 0.0654, RMI Mean: 0.5472, RMI Std: 0.0791, Time Mean: 7.6998, Time Std: 1.7131
+
+===== = 0.4 =====
+Algorithm: KN, NMI Mean: 0.3365, NMI Std: 0.1175, AMI Mean: 0.3344, AMI Std: 0.1178, RMI Mean: 0.3146, RMI Std: 0.1173, Time Mean: 3.469, Time Std: 0.5724
+Algorithm: KL_EM, NMI Mean: 0.4854, NMI Std: 0.0674, AMI Mean: 0.4839, AMI Std: 0.0676, RMI Mean: 0.4636, RMI Std: 0.0676, Time Mean: 7.3091, Time Std: 1.1732
+Algorithm: FROST_SVCA, NMI Mean: 0.5687, NMI Std: 0.0543, AMI Mean: 0.5674, AMI Std: 0.0545, RMI Mean: 0.5469, RMI Std: 0.0548, Time Mean: 1.9185, Time Std: 0.1896
+Algorithm: KN_SVCA, NMI Mean: 0.506, NMI Std: 0.0511, AMI Mean: 0.5045, AMI Std: 0.0513, RMI Mean: 0.4842, RMI Std: 0.0513, Time Mean: 3.3806, Time Std: 0.3972
+Algorithm: KL_EM_SVCA, NMI Mean: 0.5077, NMI Std: 0.05, AMI Mean: 0.5062, AMI Std: 0.0502, RMI Mean: 0.4859, RMI Std: 0.0502, Time Mean: 4.8049, Time Std: 0.7705
+Algorithm: SCORE, NMI Mean: 0.4452, NMI Std: 0.087, AMI Mean: 0.4435, AMI Std: 0.0873, RMI Mean: 0.4204, RMI Std: 0.0891, Time Mean: 0.128, Time Std: 0.0201
+Algorithm: SCORE+, NMI Mean: 0.5528, NMI Std: 0.0434, AMI Mean: 0.5514, AMI Std: 0.0435, RMI Mean: 0.5311, RMI Std: 0.0435, Time Mean: 0.1358, Time Std: 0.0208
+Algorithm: graph_tool, NMI Mean: 0.4781, NMI Std: 0.0726, AMI Mean: 0.4764, AMI Std: 0.0731, RMI Mean: 0.4451, RMI Std: 0.0911, Time Mean: 10.1697, Time Std: 7.2187
+
+===== = 0.6 =====
+Algorithm: KN, NMI Mean: 0.268, NMI Std: 0.1073, AMI Mean: 0.2657, AMI Std: 0.1077, RMI Mean: 0.2469, RMI Std: 0.1067, Time Mean: 3.9516, Time Std: 1.1183
+Algorithm: KL_EM, NMI Mean: 0.4168, NMI Std: 0.0589, AMI Mean: 0.415, AMI Std: 0.0591, RMI Mean: 0.3949, RMI Std: 0.0589, Time Mean: 8.6131, Time Std: 2.4102
+Algorithm: FROST_SVCA, NMI Mean: 0.5205, NMI Std: 0.0444, AMI Mean: 0.519, AMI Std: 0.0445, RMI Mean: 0.4983, RMI Std: 0.0448, Time Mean: 2.1109, Time Std: 0.5551
+Algorithm: KN_SVCA, NMI Mean: 0.4426, NMI Std: 0.0508, AMI Mean: 0.4409, AMI Std: 0.051, RMI Mean: 0.4207, RMI Std: 0.0508, Time Mean: 3.9076, Time Std: 1.1005
+Algorithm: KL_EM_SVCA, NMI Mean: 0.444, NMI Std: 0.0495, AMI Mean: 0.4423, AMI Std: 0.0497, RMI Mean: 0.4221, RMI Std: 0.0495, Time Mean: 5.8554, Time Std: 1.6776
+Algorithm: SCORE, NMI Mean: 0.4247, NMI Std: 0.0864, AMI Mean: 0.4229, AMI Std: 0.0867, RMI Mean: 0.4, RMI Std: 0.0884, Time Mean: 0.1442, Time Std: 0.0532
+Algorithm: SCORE+, NMI Mean: 0.5012, NMI Std: 0.0501, AMI Mean: 0.4996, AMI Std: 0.0503, RMI Mean: 0.4792, RMI Std: 0.0502, Time Mean: 0.1539, Time Std: 0.0454
+Algorithm: graph_tool, NMI Mean: 0.3828, NMI Std: 0.0738, AMI Mean: 0.3806, AMI Std: 0.0744, RMI Mean: 0.3381, RMI Std: 0.0969, Time Mean: 12.0399, Time Std: 3.8157
+
+===== = 0.8 =====
+Algorithm: KN, NMI Mean: 0.2301, NMI Std: 0.1033, AMI Mean: 0.2277, AMI Std: 0.1036, RMI Mean: 0.2095, RMI Std: 0.1023, Time Mean: 4.7529, Time Std: 1.6235
+Algorithm: KL_EM, NMI Mean: 0.3526, NMI Std: 0.0765, AMI Mean: 0.3506, AMI Std: 0.0767, RMI Mean: 0.3309, RMI Std: 0.0762, Time Mean: 10.677, Time Std: 4.059
+Algorithm: FROST_SVCA, NMI Mean: 0.4856, NMI Std: 0.0395, AMI Mean: 0.484, AMI Std: 0.0396, RMI Mean: 0.4632, RMI Std: 0.0398, Time Mean: 2.6653, Time Std: 3.0824
+Algorithm: KN_SVCA, NMI Mean: 0.3951, NMI Std: 0.0457, AMI Mean: 0.3933, AMI Std: 0.0459, RMI Mean: 0.3732, RMI Std: 0.0457, Time Mean: 4.7487, Time Std: 1.5726
+Algorithm: KL_EM_SVCA, NMI Mean: 0.3925, NMI Std: 0.0482, AMI Mean: 0.3906, AMI Std: 0.0483, RMI Mean: 0.3707, RMI Std: 0.0481, Time Mean: 8.1594, Time Std: 11.1369
+Algorithm: SCORE, NMI Mean: 0.4192, NMI Std: 0.0842, AMI Mean: 0.4173, AMI Std: 0.0845, RMI Mean: 0.3944, RMI Std: 0.0862, Time Mean: 0.1869, Time Std: 0.2242
+Algorithm: SCORE+, NMI Mean: 0.4667, NMI Std: 0.0379, AMI Mean: 0.465, AMI Std: 0.038, RMI Mean: 0.4446, RMI Std: 0.0379, Time Mean: 0.1753, Time Std: 0.0593
+Algorithm: graph_tool, NMI Mean: 0.306, NMI Std: 0.1, AMI Mean: 0.3032, AMI Std: 0.101, RMI Mean: 0.252, RMI Std: 0.1185, Time Mean: 16.881, Time Std: 6.1853
+
+===== = 1 =====
+Algorithm: KN, NMI Mean: 0.1953, NMI Std: 0.0807, AMI Mean: 0.1928, AMI Std: 0.0809, RMI Mean: 0.175, RMI Std: 0.0796, Time Mean: 4.6353, Time Std: 1.1765
+Algorithm: KL_EM, NMI Mean: 0.3011, NMI Std: 0.0754, AMI Mean: 0.2989, AMI Std: 0.0756, RMI Mean: 0.2796, RMI Std: 0.0748, Time Mean: 10.5375, Time Std: 6.8372
+Algorithm: FROST_SVCA, NMI Mean: 0.4472, NMI Std: 0.0425, AMI Mean: 0.4455, AMI Std: 0.0427, RMI Mean: 0.4245, RMI Std: 0.043, Time Mean: 2.6081, Time Std: 4.5108
+Algorithm: KN_SVCA, NMI Mean: 0.3554, NMI Std: 0.0458, AMI Mean: 0.3534, AMI Std: 0.0459, RMI Mean: 0.3335, RMI Std: 0.0457, Time Mean: 12.3767, Time Std: 78.9104
+Algorithm: KL_EM_SVCA, NMI Mean: 0.3537, NMI Std: 0.0474, AMI Mean: 0.3518, AMI Std: 0.0475, RMI Mean: 0.3319, RMI Std: 0.0472, Time Mean: 8.5697, Time Std: 18.8334
+Algorithm: SCORE, NMI Mean: 0.4062, NMI Std: 0.0785, AMI Mean: 0.4043, AMI Std: 0.0787, RMI Mean: 0.3813, RMI Std: 0.0811, Time Mean: 0.4533, Time Std: 3.0496
+Algorithm: SCORE+, NMI Mean: 0.4347, NMI Std: 0.0357, AMI Mean: 0.4329, AMI Std: 0.0359, RMI Mean: 0.4126, RMI Std: 0.0358, Time Mean: 0.1721, Time Std: 0.0626
+Algorithm: graph_tool, NMI Mean: 0.2227, NMI Std: 0.0829, AMI Mean: 0.2191, AMI Std: 0.084, RMI Mean: 0.1581, RMI Std: 0.0876, Time Mean: 27.9881, Time Std: 112.7505
