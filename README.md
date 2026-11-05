@@ -1,7 +1,7 @@
 
-# Nonnegative Matrix Trifactorization for Community Detection under the Degree-Corrected Block Model
+# Matrix Factorization Framework for Community Detection under the Degree-Corrected Block Model
 
-Code for the paper **" Nonnegative Matrix Trifactorization for Community Detection under the Degree-Corrected Block Model"** by Alexandra Dache, Arnaud Vandaele and Nicolas Gillis.
+Code for the paper **" Matrix Factorization Framework for Community Detection under the Degree-Corrected Block Model"** by Alexandra Dache, Arnaud Vandaele and Nicolas Gillis.
 
 This repository contains:
 - Python and MATLAB implementations of **FROST**, our method for community detection and our initialization method based on SVCA.
